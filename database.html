@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Core System - Advanced Tracking</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f4f7fa;
+            color: #2d3748;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .form-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #718096;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .sort-icon {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .sort-icon:hover {
+            color: #4f46e5;
+        }
+
+        .status-pill {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            z-index: 1050;
+            width: 100%;
+            background: white;
+            border: 1px solid #edf2f7;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .autocomplete-item {
+            padding: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .autocomplete-item:hover {
+            background: #f8fafc;
+        }
+
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body x-data="hrSystem()" x-init="init()">
+
+    <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="../hris.php">
+                <span class="bg-primary text-white rounded-3 px-2 py-1 me-2" style="background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;">HR</span>
+                CORE <span class="ms-2 badge bg-light text-muted fw-normal" style="font-size: 0.6rem;">Internasional</span>
+            </a></p>
+            <div class="d-flex align-items-center gap-2">
+                <select x-model="lang" class="form-select form-select-sm border-0 bg-light fw-600">
+                    <option value="id">🇮🇩 ID</option>
+                    <option value="en">🇺🇸 EN</option>
+                    <option value="zh">🇨🇳 中文</option>
+                </select>
+                <button @click="clearData()" class="btn btn-sm btn-outline-danger border-0">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="row g-4">
+            <div class="col-xl-4 col-lg-5">
+                <div class="card p-4">
+                    <h5 class="fw-bold mb-4" x-text="isEdit ? t('editEmp') : t('regEmp')"></h5>
+                    <form @submit.prevent="saveEmployee" class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label" x-text="t('nip')"></label>
+                            <input type="text" x-model="formData.nip" class="form-control" required :readonly="isEdit">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" x-text="t('ktp')"></label>
+                            <input type="text" x-model="formData.ktp" class="form-control" maxlength="16" required @input="onlyNumber('ktp')">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" x-text="t('fullName')"></label>
+                            <input type="text" x-model="formData.name" class="form-control" required>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" x-text="t('religion')"></label>
+                            <select x-model="formData.religion" class="form-select">
+                                <option value="">-</option>
+                                <option>Islam</option>
+                                <option>Kristen</option>
+                                <option>Katolik</option>
+                                <option>Hindu</option>
+                                <option>Budha</option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" x-text="t('edu')"></label>
+                            <select x-model="formData.edu" class="form-select">
+                                <option>SMA/K</option>
+                                <option>D3</option>
+                                <option>S1</option>
+                                <option>S2</option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" x-text="t('marital')"></label>
+                            <select x-model="formData.marital" class="form-select">
+                                <template x-for="opt in t('maritalOpts')">
+                                    <option :value="opt" x-text="opt"></option>
+                                </template>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" x-text="t('phone')"></label>
+                            <input type="text" x-model="formData.phone" class="form-control" placeholder="08..." @input="onlyNumber('phone')">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" x-text="t('no_rek')"></label>
+                            <input type="text" x-model="formData.no_rek" class="form-control" placeholder="1790..." @input="onlyNumber('no_rek')">
+                        </div>
+
+                        <div class="col-12 position-relative">
+                            <label class="form-label text-primary" x-text="t('searchLoc')"></label>
+                            <input type="text" x-model="addressSearch" @input.debounce.500ms="findLoc()" class="form-control bg-light border-0" :placeholder="t('typeLoc')">
+                            <div class="autocomplete-list" x-show="suggestions.length > 0" x-cloak>
+                                <template x-for="item in suggestions">
+                                    <div class="autocomplete-item" @click="pickLoc(item)" x-text="item.display_name"></div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label" x-text="t('village')"></label>
+                            <input type="text" x-model="formData.kel" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" x-text="t('district')"></label>
+                            <input type="text" x-model="formData.kec" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" x-text="t('city')"></label>
+                            <input type="text" x-model="formData.kota" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" x-text="t('zip')"></label>
+                            <input type="text" x-model="formData.zip" class="form-control">
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label" x-text="t('dept')"></label>
+                            <select x-model="formData.dept" class="form-select">
+                                <option>IT</option>
+                                <option>HR</option>
+                                <option>Finance</option>
+                                <option>Sales</option>
+                                <option>Produksi</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" x-text="t('jobStatus')"></label>
+                            <select x-model="formData.status" class="form-select">
+                                <option value="Aktif" x-text="t('active')"></option>
+                                <option value="Resign" x-text="t('resign')"></option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mt-3 py-2 fw-bold" x-text="isEdit ? t('updateBtn') : t('saveBtn')"></button>
+                        <button type="button" x-show="isEdit" @click="resetForm()" class="btn btn-link w-100 text-muted text-decoration-none small" x-text="t('cancel')"></button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-xl-8 col-lg-7">
+                <div class="card mb-4 p-3">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-6">
+                            <div class="input-group bg-light rounded-3 px-2">
+                                <span class="input-group-text border-0 bg-transparent text-muted"><i class="bi bi-search"></i></span>
+                                <input type="text" x-model="search" class="form-control border-0 bg-transparent py-2" :placeholder="t('searchPlaceholder')">
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-md-end gap-2">
+                            <button @click="exportExcel()" class="btn btn-sm btn-success px-3" title="Export Excel"><i class="bi bi-file-earmark-excel"></i></button>
+                            <button @click="exportPDF()" class="btn btn-sm btn-danger px-3" title="Export PDF"><i class="bi bi-file-earmark-pdf"></i></button>
+                            <label class="btn btn-sm btn-dark px-3 mb-0" title="Import Data">
+                                <i class="bi bi-upload"></i> <input type="file" @change="handleImport($event)" class="d-none">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr style="font-size: 0.85rem;">
+                                    <th class="ps-4 py-3" style="cursor: pointer" @click="sortBy('nip')">
+                                        NIP <i class="bi" :class="getSortIcon('nip')"></i>
+                                    </th>
+                                    <th style="cursor: pointer" @click="sortBy('name')">
+                                        <span x-text="t('fullName')"></span> <i class="bi" :class="getSortIcon('name')"></i>
+                                    </th>
+                                    <th x-text="t('dept')"></th>
+                                    <th x-text="t('status')"></th>
+                                    <th class="text-center" x-text="t('action')"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="emp in paginatedData" :key="emp.nip">
+                                    <tr>
+                                        <td class="ps-4 fw-bold text-primary" x-text="emp.nip"></td>
+                                        <td>
+                                            <div class="fw-semibold" x-text="emp.name"></div>
+                                            <div class="small text-muted" x-text="emp.phone"></div>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark fw-medium" x-text="emp.dept"></span></td>
+                                        <td>
+                                            <span :class="emp.status === 'Aktif' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'" class="status-pill" x-text="emp.status === 'Aktif' ? t('active') : t('resign')"></span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button @click="viewEmp(emp)" class="btn btn-sm btn-light rounded-circle me-1"><i class="bi bi-eye"></i></button>
+                                            <button @click="editEmp(emp)" class="btn btn-sm btn-light rounded-circle text-primary"><i class="bi bi-pencil"></i></button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card-footer bg-white py-3 border-top">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="small text-muted" x-text="`Total Data: ${filteredData.length}`"></div>
+                            <div class="d-flex gap-2">
+                                <button @click="page--" :disabled="page===1" class="btn btn-sm btn-outline-secondary border-0">
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+                                <button @click="page++" :disabled="page>=maxPage" class="btn btn-sm btn-outline-secondary border-0">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="infoModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" x-show="viewData" style="border-radius: 15px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="fw-bold" x-text="t('profile')"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Terdaftar Pada</small>
+                            <span class="small fw-bold" x-text="viewData.created_at"></span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Update Terakhir</small>
+                            <span class="small fw-bold" x-text="viewData.updated_at || '-'"></span>
+                        </div>
+                        <div class="col-12">
+                            <hr class="my-1">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Nama Lengkap</label>
+                            <div class="fw-semibold" x-text="viewData.name"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">KTP</label>
+                            <div x-text="viewData.ktp"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">No Telepon</label>
+                            <div x-text="viewData.phone"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Agama</label>
+                            <div x-text="viewData.religion"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Status Marital</label>
+                            <div x-text="viewData.marital"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Pendidikan</label>
+                            <div x-text="viewData.edu"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Alamat Lengkap</label>
+                            <div class="small bg-light p-2 rounded" x-text="`${viewData.kel || ''}, ${viewData.kec || ''}, ${viewData.kota || ''}, ${viewData.zip || ''}`"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function hrSystem() {
+            return {
+                lang: 'id',
+                search: '',
+                page: 1,
+                size: 7,
+                isEdit: false,
+                addressSearch: '',
+                suggestions: [],
+                employees: [],
+                viewData: {},
+                userIP: '',
+                sortCol: 'nip',
+                sortDir: 'asc',
+
+                translations: {
+                    id: {
+                        editEmp: 'Ubah Data Karyawan',
+                        regEmp: 'Registrasi Karyawan Baru',
+                        nip: 'NIP',
+                        ktp: 'No. KTP',
+                        fullName: 'Nama Lengkap',
+                        religion: 'Agama',
+                        edu: 'Pendidikan',
+                        marital: 'Status Marital',
+                        maritalOpts: ['Lajang', 'Menikah', 'Cerai'],
+                        phone: 'WhatsApp / Telepon',
+                        searchLoc: 'Cari Alamat (Auto-complete)',
+                        typeLoc: 'Ketik Kelurahan...',
+                        village: 'Kelurahan',
+                        district: 'Kecamatan',
+                        city: 'Kota/Kabupaten',
+                        zip: 'Kode Pos',
+                        dept: 'Departemen',
+                        jobStatus: 'Status Kerja',
+                        active: 'Aktif',
+                        resign: 'Resign',
+                        saveBtn: 'Simpan Data',
+                        updateBtn: 'Update Perubahan',
+                        cancel: 'Batalkan',
+                        searchPlaceholder: 'Cari Nama, NIP, atau Departemen...',
+                        action: 'Aksi',
+                        profile: 'Log Audit & Profil Karyawan',
+                        no_rek: 'No. Rekening Bank'
+                    },
+                    en: {
+                        editEmp: 'Edit Employee Data',
+                        regEmp: 'New Employee Registration',
+                        nip: 'Employee ID',
+                        ktp: 'National ID',
+                        fullName: 'Full Name',
+                        religion: 'Religion',
+                        edu: 'Education',
+                        marital: 'Marital Status',
+                        maritalOpts: ['Single', 'Married', 'Divorced'],
+                        phone: 'WhatsApp Number',
+                        searchLoc: 'Search Address (Auto)',
+                        typeLoc: 'Type village name...',
+                        village: 'Village',
+                        district: 'District',
+                        city: 'City',
+                        zip: 'Zip Code',
+                        dept: 'Department',
+                        jobStatus: 'Status',
+                        active: 'Active',
+                        resign: 'Resigned',
+                        saveBtn: 'Save Employee',
+                        updateBtn: 'Update Data',
+                        cancel: 'Cancel',
+                        searchPlaceholder: 'Search name, ID, or dept...',
+                        action: 'Action',
+                        profile: 'Audit Log & Profile',
+                        no_rek: 'Bank Account'
+                    },
+                    zh: {
+                        editEmp: '编辑员工数据',
+                        regEmp: '新员工注册',
+                        nip: '工号',
+                        ktp: '身份证号',
+                        fullName: '姓名',
+                        religion: '宗教',
+                        edu: '教育程度',
+                        marital: '婚姻状况',
+                        maritalOpts: ['未婚', '已婚', '离异'],
+                        phone: '联系电话',
+                        searchLoc: '自动搜索地址',
+                        typeLoc: '搜索街道/村...',
+                        village: '村/里',
+                        district: '区',
+                        city: '城市',
+                        zip: '邮编',
+                        dept: '部门',
+                        jobStatus: '员工状态',
+                        active: '在职',
+                        resign: '离职',
+                        saveBtn: '保存',
+                        updateBtn: '更新',
+                        cancel: '取消',
+                        searchPlaceholder: '搜索...',
+                        action: '操作',
+                        profile: '审计日志与详情',
+                        no_rek: '银行账号'
+                    }
+                },
+
+                t(key) {
+                    return this.translations[this.lang][key];
+                },
+
+                async init() {
+                    const saved = localStorage.getItem('hr_v6_db');
+                    if (saved) this.employees = JSON.parse(saved);
+                    try {
+                        const res = await fetch('https://api.ipify.org?format=json');
+                        const data = await res.json();
+                        this.userIP = data.ip;
+                    } catch (e) {
+                        this.userIP = 'Unknown';
+                    }
+                },
+
+                formData: {
+                    nip: '',
+                    ktp: '',
+                    name: '',
+                    phone: '',
+                    kel: '',
+                    kec: '',
+                    kota: '',
+                    zip: '',
+                    religion: '',
+                    edu: 'S1',
+                    marital: 'Lajang',
+                    dept: 'IT',
+                    status: 'Aktif',
+                    no_rek: ''
+                },
+
+                get filteredData() {
+                    let data = this.employees.filter(e =>
+                        e.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                        e.nip.toString().includes(this.search) ||
+                        e.dept.toLowerCase().includes(this.search.toLowerCase())
+                    );
+
+                    return data.sort((a, b) => {
+                        let valA = a[this.sortCol].toString().toLowerCase();
+                        let valB = b[this.sortCol].toString().toLowerCase();
+                        if (this.sortDir === 'asc') return valA > valB ? 1 : -1;
+                        return valA < valB ? 1 : -1;
+                    });
+                },
+
+                get paginatedData() {
+                    const start = (this.page - 1) * this.size;
+                    return this.filteredData.slice(start, start + this.size);
+                },
+
+                get maxPage() {
+                    return Math.ceil(this.filteredData.length / this.size);
+                },
+
+                sortBy(col) {
+                    if (this.sortCol === col) {
+                        this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        this.sortCol = col;
+                        this.sortDir = 'asc';
+                    }
+                },
+
+                getSortIcon(col) {
+                    if (this.sortCol !== col) return 'bi-arrow-down-up text-muted small';
+                    return this.sortDir === 'asc' ? 'bi-sort-alpha-down' : 'bi-sort-alpha-up-alt';
+                },
+
+                async findLoc() {
+                    if (this.addressSearch.length < 3) return;
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${this.addressSearch}&addressdetails=1&limit=5&countrycodes=id`);
+                    this.suggestions = await res.json();
+                },
+
+                pickLoc(item) {
+                    const a = item.address;
+                    this.formData.kel = a.village || a.suburb || a.neighborhood || '';
+                    this.formData.kec = a.district || a.city_district || '';
+                    this.formData.kota = a.city || a.town || a.regency || '';
+                    this.formData.zip = a.postcode || '';
+                    this.addressSearch = item.display_name;
+                    this.suggestions = [];
+                },
+
+                saveEmployee() {
+                    const now = new Date();
+                    const timestamp = `${now.toLocaleDateString()} ${now.toLocaleTimeString()} (${Intl.DateTimeFormat().resolvedOptions().timeZone})`;
+
+                    if (this.isEdit) {
+                        const idx = this.employees.findIndex(e => e.nip === this.formData.nip);
+                        this.employees[idx] = {
+                            ...this.formData,
+                            updated_at: timestamp,
+                            last_ip: this.userIP
+                        };
+                    } else {
+                        if (this.employees.some(e => e.nip === this.formData.nip)) return alert("Duplicate NIP!");
+                        this.employees.push({
+                            ...this.formData,
+                            created_at: timestamp,
+                            ip_origin: this.userIP
+                        });
+                    }
+                    this.persist();
+                    this.resetForm();
+                },
+
+                handleImport(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const data = new Uint8Array(e.target.result);
+                        const wb = XLSX.read(data, {
+                            type: 'array'
+                        });
+                        const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+
+                        let errors = [];
+                        let success = 0;
+                        const now = new Date();
+                        const ts = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+
+                        json.forEach((row, i) => {
+                            if (this.employees.some(emp => emp.nip == row.nip)) {
+                                errors.push(`Baris ${i+2}: NIP ${row.nip} duplikat.`);
+                            } else if (!row.nip || !row.name) {
+                                errors.push(`Baris ${i+2}: Data wajib (NIP/Nama) kosong.`);
+                            } else {
+                                this.employees.push({
+                                    ...row,
+                                    created_at: ts,
+                                    ip_origin: 'Import'
+                                });
+                                success++;
+                            }
+                        });
+
+                        this.persist();
+                        alert(`Import Selesai!\nBerhasil: ${success}\nGagal: ${errors.length}`);
+                        if (errors.length) this.downloadLog(errors);
+                    };
+                    reader.readAsArrayBuffer(file);
+                },
+
+                downloadLog(errs) {
+                    const blob = new Blob([errs.join('\n')], {
+                        type: 'text/plain'
+                    });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `import_log_${Date.now()}.txt`;
+                    a.click();
+                },
+
+                editEmp(emp) {
+                    this.isEdit = true;
+                    this.formData = {
+                        ...emp
+                    };
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                },
+
+                viewEmp(emp) {
+                    this.viewData = emp;
+                    new bootstrap.Modal(document.getElementById('infoModal')).show();
+                },
+
+                resetForm() {
+                    this.isEdit = false;
+                    this.formData = {
+                        nip: '',
+                        ktp: '',
+                        name: '',
+                        phone: '',
+                        kel: '',
+                        kec: '',
+                        kota: '',
+                        zip: '',
+                        religion: '',
+                        edu: 'S1',
+                        marital: this.t('maritalOpts')[0],
+                        dept: 'IT',
+                        status: 'Aktif',
+                        no_rek: ''
+                    };
+                    this.addressSearch = '';
+                },
+
+                onlyNumber(f) {
+                    this.formData[f] = this.formData[f].replace(/\D/g, '');
+                },
+                persist() {
+                    localStorage.setItem('hr_v6_db', JSON.stringify(this.employees));
+                },
+                clearData() {
+                    if (confirm('Hapus semua database karyawan? Tindakan ini tidak bisa dibatalkan.')) {
+                        localStorage.clear();
+                        location.reload();
+                    }
+                },
+
+                exportExcel() {
+                    const ws = XLSX.utils.json_to_sheet(this.employees);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "HR_Data");
+                    XLSX.writeFile(wb, "HR_Database_V6.xlsx");
+                },
+
+                exportPDF() {
+                    const {
+                        jsPDF
+                    } = window.jspdf;
+                    const doc = new jsPDF('l');
+                    doc.text("HR Core - Employee List Report", 14, 15);
+                    doc.autoTable({
+                        startY: 20,
+                        head: [
+                            ['NIP', 'Name', 'Dept', 'Phone', 'Created At']
+                        ],
+                        body: this.employees.map(e => [e.nip, e.name, e.dept, e.phone, e.created_at])
+                    });
+                    doc.save("Report_HR_System.pdf");
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
