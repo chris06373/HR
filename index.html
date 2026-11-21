@@ -647,6 +647,12 @@ function showModule(moduleName) {
         window.location.href = "absensi.html";
         return;
     }
+
+    // Redirect ke halaman payroll.html
+    if (moduleName === "payroll") {
+        window.location.href = "payroll.html";
+        return;
+    }
     
     const module = modules[moduleName];
 
