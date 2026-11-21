@@ -1,0 +1,961 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Attendance System</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+
+        .navbar {
+            background: #fff;
+        }
+
+        .card-custom {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .clock-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        #video {
+            width: 100%;
+            border-radius: 10px;
+            background: #000;
+            transform: scaleX(-1);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 15px 8px 35px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #0d6efd;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 10px;
+            color: #aaa;
+        }
+
+        .attendance-photo {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .btn-attendance {
+            border-radius: 8px;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        @media (max-width: 576px) {
+            .clock-display {
+                font-size: 2rem;
+            }
+
+            .navbar .container {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .table {
+                min-width: 450px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-light mb-4 shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+
+        <a href="../hris.php" class="text-decoration-none">
+            <h5 class="fw-bold text-primary mb-0">
+                <i class="bi bi-fingerprint"></i>
+                <span id="terminalTitle">Digital Attendance</span>
+            </h5>
+        </a>
+
+        <div class="d-flex align-items-center gap-2">
+
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-primary lang-btn" data-lang="id">ID</button>
+                <button class="btn btn-sm btn-outline-primary lang-btn" data-lang="en">EN</button>
+                <button class="btn btn-sm btn-outline-primary lang-btn" data-lang="zh">ZH</button>
+            </div>
+
+            <button onclick="clearAllData()" id="btnClear"
+                class="btn btn-outline-danger btn-sm rounded-pill">
+                Clear Data
+            </button>
+
+        </div>
+    </div>
+</nav>
+
+
+<!-- MAIN CONTENT -->
+<div class="container pb-5">
+
+    <div class="row g-4">
+
+        <!-- ABSENSI -->
+        <div class="col-lg-5">
+
+            <div class="card card-custom p-4 text-center bg-white">
+
+                <!-- CLOCK -->
+                <div id="clock" class="clock-display">
+                    00:00:00
+                </div>
+
+                <p class="text-muted small mb-4 fw-medium" id="currentDate">
+                    Loading date...
+                </p>
+
+                <!-- NOTIFICATION -->
+                <div id="notifContainer"></div>
+
+                <form id="formAbsensi">
+
+                    <!-- NAMA KARYAWAN -->
+                    <div class="text-start mb-3">
+
+                        <label class="form-label small fw-bold text-secondary" id="labelName">
+                            Employee Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="namaKaryawan"
+                            class="form-control form-control-lg border-0 bg-light"
+                            placeholder="Type name..."
+                            required
+                        >
+
+                    </div>
+
+                    <!-- CAMERA -->
+                    <div class="mb-4">
+
+                        <video id="video" autoplay playsinline></video>
+
+                        <canvas id="canvas" width="400" height="300" class="d-none"></canvas>
+
+                        <button
+                            type="button"
+                            id="btnSnap"
+                            class="btn btn-dark w-100 rounded-pill mt-3 py-2 fw-bold"
+                            onclick="takeSnapshot()"
+                        >
+                            <i class="bi bi-camera-fill me-2"></i>
+                            <span id="labelSelfie">Take Selfie</span>
+                        </button>
+
+                    </div>
+
+                    <!-- BUTTON ABSENSI -->
+                    <div class="row g-2">
+
+                        <div class="col-6">
+                            <button
+                                type="button"
+                                onclick="submitAbsen('in')"
+                                id="btnMasuk"
+                                class="btn btn-success btn-attendance w-100 py-2 fw-bold"
+                                disabled
+                            >
+                                Clock In
+                            </button>
+                        </div>
+
+                        <div class="col-6">
+                            <button
+                                type="button"
+                                onclick="submitAbsen('out')"
+                                id="btnPulang"
+                                class="btn btn-danger btn-attendance w-100 py-2 fw-bold"
+                                disabled
+                            >
+                                Clock Out
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <!-- GPS STATUS -->
+                    <div id="statusInfo" class="mt-3 small fw-bold text-secondary">
+                        Waiting for GPS...
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+
+        <!-- RIWAYAT ABSENSI -->
+        <div class="col-lg-7">
+
+            <div class="card card-custom p-4 h-100 bg-white">
+
+                <h6 class="fw-bold mb-3">
+                    <i class="bi bi-journal-text me-2 text-primary"></i>
+                    <span id="labelLog">Today's Attendance Log</span>
+                </h6>
+
+                <!-- SEARCH -->
+                <div class="search-container">
+
+                    <i class="bi bi-search search-icon"></i>
+
+                    <input
+                        type="text"
+                        id="fuzzySearch"
+                        class="search-input"
+                        placeholder="Search name or status..."
+                    >
+
+                </div>
+
+                <!-- TABLE -->
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead>
+                            <tr class="small text-muted border-bottom">
+
+                                <th id="labelStaff">Staff</th>
+
+                                <th id="labelTime">Time</th>
+
+                                <th class="text-center" id="labelMap">Map</th>
+
+                                <th class="text-end" id="labelPhoto">Photo</th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody id="attendanceTableBody"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+
+// ========================================
+// TRANSLATION CONFIGURATION
+// ========================================
+
+const translations = {
+
+    id: {
+        title: 'Sistem Absensi Local',
+        terminal: 'Absensi Digital',
+        submission_title: 'Pengajuan Cuti',
+        emp_name: 'Nama Karyawan',
+        take_selfie: 'Ambil Foto',
+        in: 'Masuk',
+        out: 'Pulang',
+        gps_wait: 'Menunggu GPS...',
+        gps_active: 'GPS Aktif',
+        gps_denied: 'Akses GPS Ditolak!',
+        log_attendance: 'Riwayat Absensi Hari Ini',
+        staff: 'Karyawan',
+        time: 'Waktu',
+        photo: 'Foto',
+        map: 'Peta',
+        search_placeholder: 'Cari nama atau status...',
+        clear_data: 'Hapus Data',
+        confirm_clear: 'Hapus semua data absensi di perangkat ini?',
+        success_msg: 'Berhasil Absen',
+        input_placeholder: 'Ketik nama...',
+        no_data: 'Belum ada data absensi'
+    },
+
+    en: {
+        title: 'Local Attendance System',
+        terminal: 'Digital Attendance',
+        submission_title: 'Leave Request',
+        emp_name: 'Employee Name',
+        take_selfie: 'Take Selfie',
+        in: 'Clock In',
+        out: 'Clock Out',
+        gps_wait: 'Waiting for GPS...',
+        gps_active: 'GPS Active',
+        gps_denied: 'GPS Access Denied!',
+        log_attendance: "Today's Attendance Log",
+        staff: 'Staff',
+        time: 'Time',
+        photo: 'Photo',
+        map: 'Map',
+        search_placeholder: 'Search name or status...',
+        clear_data: 'Clear Data',
+        confirm_clear: 'Delete all attendance data on this device?',
+        success_msg: 'Attendance Success',
+        input_placeholder: 'Type name...',
+        no_data: 'No attendance records'
+    },
+
+    zh: {
+        title: '本地考勤系统',
+        terminal: '数字考勤',
+        submission_title: '请假申请',
+        emp_name: '员工姓名',
+        take_selfie: '自拍',
+        in: '签到',
+        out: '签退',
+        gps_wait: '等待 GPS...',
+        gps_active: 'GPS 已激活',
+        gps_denied: 'GPS 访问被拒绝！',
+        log_attendance: '今日考勤记录',
+        staff: '员工',
+        time: '时间',
+        photo: '照片',
+        map: '地图',
+        search_placeholder: '搜索姓名或状态...',
+        clear_data: '清除数据',
+        confirm_clear: '删除此设备上的所有考勤数据？',
+        success_msg: '签到成功',
+        input_placeholder: '输入姓名...',
+        no_data: '暂无考勤记录'
+    }
+
+};
+
+
+// ========================================
+// LANGUAGE CONFIGURATION
+// ========================================
+
+const urlParams = new URLSearchParams(window.location.search);
+
+let currentLang = urlParams.get('lang') || 'id';
+
+if (!translations[currentLang]) {
+    currentLang = 'id';
+}
+
+let uiLabels = translations[currentLang];
+
+
+function changeLanguage(lang) {
+
+    if (!translations[lang]) return;
+
+    currentLang = lang;
+
+    uiLabels = translations[lang];
+
+    const url = new URL(window.location.href);
+
+    url.searchParams.set('lang', lang);
+
+    window.history.replaceState({}, '', url);
+
+    applyTranslations();
+
+    renderTable(document.getElementById('fuzzySearch').value);
+}
+
+
+function applyTranslations() {
+
+    document.documentElement.lang = currentLang;
+
+    document.title = uiLabels.title;
+
+    document.getElementById('terminalTitle').textContent =
+        uiLabels.terminal;
+
+    document.getElementById('labelName').textContent =
+        uiLabels.emp_name;
+
+    document.getElementById('namaKaryawan').placeholder =
+        uiLabels.input_placeholder;
+
+    document.getElementById('labelSelfie').textContent =
+        uiLabels.take_selfie;
+
+    document.getElementById('btnMasuk').textContent =
+        uiLabels.in;
+
+    document.getElementById('btnPulang').textContent =
+        uiLabels.out;
+
+    document.getElementById('labelLog').textContent =
+        uiLabels.log_attendance;
+
+    document.getElementById('labelStaff').textContent =
+        uiLabels.staff;
+
+    document.getElementById('labelTime').textContent =
+        uiLabels.time;
+
+    document.getElementById('labelMap').textContent =
+        uiLabels.map;
+
+    document.getElementById('labelPhoto').textContent =
+        uiLabels.photo;
+
+    document.getElementById('fuzzySearch').placeholder =
+        uiLabels.search_placeholder;
+
+    document.getElementById('btnClear').textContent =
+        uiLabels.clear_data;
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+
+        btn.classList.toggle(
+            'btn-primary',
+            btn.dataset.lang === currentLang
+        );
+
+        btn.classList.toggle(
+            'btn-outline-primary',
+            btn.dataset.lang !== currentLang
+        );
+
+    });
+
+}
+
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+
+    btn.addEventListener('click', () => {
+        changeLanguage(btn.dataset.lang);
+    });
+
+});
+
+
+// ========================================
+// GLOBAL VARIABLES
+// ========================================
+
+let selfieBase64 = null;
+
+let userCoords = {
+    lat: null,
+    lng: null
+};
+
+const video = document.getElementById('video');
+
+
+// ========================================
+// CLOCK
+// ========================================
+
+function updateClock() {
+
+    const now = new Date();
+
+    document.getElementById('clock').innerText =
+        now.toLocaleTimeString('id-ID', {
+            hour12: false,
+            timeZone: 'Asia/Jakarta'
+        });
+
+    document.getElementById('currentDate').innerText =
+        now.toLocaleDateString(
+            currentLang === 'zh' ? 'zh-CN' :
+            currentLang === 'en' ? 'en-US' : 'id-ID',
+            {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                timeZone: 'Asia/Jakarta'
+            }
+        ) + ' (Asia/Jakarta)';
+
+}
+
+updateClock();
+
+setInterval(updateClock, 1000);
+
+
+// ========================================
+// GEOLOCATION
+// ========================================
+
+if (navigator.geolocation) {
+
+    navigator.geolocation.getCurrentPosition(
+
+        (pos) => {
+
+            userCoords.lat = pos.coords.latitude;
+
+            userCoords.lng = pos.coords.longitude;
+
+            document.getElementById('statusInfo').innerHTML = `
+                <span class="text-success">
+                    <i class="bi bi-check-circle-fill"></i>
+                    ${uiLabels.gps_active}
+                </span>
+            `;
+
+            checkReady();
+
+        },
+
+        (err) => {
+
+            document.getElementById('statusInfo').innerHTML = `
+                <span class="text-danger">
+                    ${uiLabels.gps_denied}
+                </span>
+            `;
+
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        }
+
+    );
+
+}
+
+
+// ========================================
+// CAMERA
+// ========================================
+
+navigator.mediaDevices.getUserMedia({
+
+    video: {
+        facingMode: 'user'
+    },
+
+    audio: false
+
+})
+
+.then(stream => {
+
+    video.srcObject = stream;
+
+})
+
+.catch(err => {
+
+    console.error('Camera Error:', err);
+
+    showNotif('Camera access failed!', 'danger');
+
+});
+
+
+// ========================================
+// TAKE SNAPSHOT
+// ========================================
+
+function takeSnapshot() {
+
+    if (!video.srcObject || video.readyState < 2) {
+
+        showNotif('Camera is not ready!', 'danger');
+
+        return;
+
+    }
+
+    const canvas = document.getElementById('canvas');
+
+    const context = canvas.getContext('2d');
+
+    context.save();
+
+    context.translate(canvas.width, 0);
+
+    context.scale(-1, 1);
+
+    context.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    context.restore();
+
+    selfieBase64 = canvas.toDataURL('image/jpeg', 0.8);
+
+    showNotif('OK!', 'info');
+
+    checkReady();
+
+}
+
+
+// ========================================
+// CHECK FORM READY
+// ========================================
+
+function checkReady() {
+
+    const nama =
+        document.getElementById('namaKaryawan').value.trim();
+
+    const isReady =
+        nama.length > 2 &&
+        selfieBase64 !== null &&
+        userCoords.lat !== null &&
+        userCoords.lng !== null;
+
+    document.getElementById('btnMasuk').disabled = !isReady;
+
+    document.getElementById('btnPulang').disabled = !isReady;
+
+}
+
+document.getElementById('namaKaryawan').addEventListener(
+    'input',
+    checkReady
+);
+
+
+// ========================================
+// SUBMIT ATTENDANCE
+// ========================================
+
+function submitAbsen(tipe) {
+
+    const nama =
+        document.getElementById('namaKaryawan').value.trim();
+
+    if (
+        nama.length <= 2 ||
+        !selfieBase64 ||
+        userCoords.lat === null ||
+        userCoords.lng === null
+    ) {
+
+        showNotif('Please complete the attendance form!', 'danger');
+
+        return;
+
+    }
+
+    const waktu = new Date().toISOString();
+
+    const tipeLabel = uiLabels[tipe];
+
+    const dataBaru = {
+
+        nama_karyawan: nama,
+
+        tipe_absen: tipeLabel,
+
+        waktu: waktu,
+
+        lat: userCoords.lat,
+
+        lng: userCoords.lng,
+
+        foto: selfieBase64
+
+    };
+
+
+    let listAbsensi =
+        JSON.parse(localStorage.getItem('absensi_data')) || [];
+
+    listAbsensi.unshift(dataBaru);
+
+    localStorage.setItem(
+        'absensi_data',
+        JSON.stringify(listAbsensi)
+    );
+
+
+    // RESET FORM
+
+    selfieBase64 = null;
+
+    document.getElementById('namaKaryawan').value = '';
+
+    checkReady();
+
+    renderTable();
+
+    showNotif(
+        `${uiLabels.success_msg}: ${tipeLabel}`,
+        'success'
+    );
+
+}
+
+
+// ========================================
+// RENDER ATTENDANCE TABLE
+// ========================================
+
+function renderTable(filter = '') {
+
+    const tbody =
+        document.getElementById('attendanceTableBody');
+
+    const data =
+        JSON.parse(localStorage.getItem('absensi_data')) || [];
+
+    tbody.innerHTML = '';
+
+    const filteredData = data.filter(item => {
+
+        return (
+
+            item.nama_karyawan
+                .toLowerCase()
+                .includes(filter.toLowerCase())
+
+            ||
+
+            item.tipe_absen
+                .toLowerCase()
+                .includes(filter.toLowerCase())
+
+        );
+
+    });
+
+
+    if (filteredData.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center text-muted py-4">
+                    ${uiLabels.no_data}
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    filteredData.forEach(item => {
+
+        const jam = new Date(item.waktu).toLocaleTimeString(
+            currentLang === 'zh' ? 'zh-CN' :
+            currentLang === 'en' ? 'en-US' : 'id-ID',
+            {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Asia/Jakarta'
+            }
+        );
+
+
+        const tr = document.createElement('tr');
+
+        tr.className = 'small border-bottom align-middle';
+
+
+        const tdNama = document.createElement('td');
+
+        const namaDiv = document.createElement('div');
+
+        namaDiv.className = 'fw-bold';
+
+        namaDiv.textContent = item.nama_karyawan;
+
+
+        const badge = document.createElement('span');
+
+        badge.className = 'badge bg-primary px-2';
+
+        badge.style.fontSize = '0.6rem';
+
+        badge.textContent = item.tipe_absen.toUpperCase();
+
+
+        tdNama.appendChild(namaDiv);
+
+        tdNama.appendChild(badge);
+
+
+        const tdWaktu = document.createElement('td');
+
+        tdWaktu.className = 'fw-bold';
+
+        tdWaktu.textContent = jam;
+
+
+        const tdMap = document.createElement('td');
+
+        tdMap.className = 'text-center';
+
+        const mapLink = document.createElement('a');
+
+        mapLink.href =
+            `https://www.google.com/maps?q=${item.lat},${item.lng}`;
+
+        mapLink.target = '_blank';
+
+        mapLink.rel = 'noopener noreferrer';
+
+        mapLink.className =
+            'btn btn-sm btn-light border text-danger';
+
+        mapLink.innerHTML =
+            '<i class="bi bi-geo-alt-fill"></i>';
+
+        tdMap.appendChild(mapLink);
+
+
+        const tdFoto = document.createElement('td');
+
+        tdFoto.className = 'text-end';
+
+        const img = document.createElement('img');
+
+        img.src = item.foto;
+
+        img.alt = 'Attendance Photo';
+
+        img.className = 'attendance-photo shadow-sm';
+
+        tdFoto.appendChild(img);
+
+
+        tr.appendChild(tdNama);
+
+        tr.appendChild(tdWaktu);
+
+        tr.appendChild(tdMap);
+
+        tr.appendChild(tdFoto);
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+// ========================================
+// SEARCH
+// ========================================
+
+document.getElementById('fuzzySearch').addEventListener(
+    'input',
+    (e) => {
+
+        renderTable(e.target.value);
+
+    }
+);
+
+
+// ========================================
+// CLEAR ALL DATA
+// ========================================
+
+function clearAllData() {
+
+    if (confirm(uiLabels.confirm_clear)) {
+
+        localStorage.removeItem('absensi_data');
+
+        renderTable();
+
+    }
+
+}
+
+
+// ========================================
+// NOTIFICATION
+// ========================================
+
+function showNotif(msg, type) {
+
+    const container =
+        document.getElementById('notifContainer');
+
+    container.innerHTML = `
+        <div class="alert alert-${type} py-2 small border-0 shadow-sm">
+            ${msg}
+        </div>
+    `;
+
+    setTimeout(() => {
+
+        container.innerHTML = '';
+
+    }, 3000);
+
+}
+
+
+// ========================================
+// INITIALIZATION
+// ========================================
+
+applyTranslations();
+
+renderTable();
+
+</script>
+
+</body>
+</html>
