@@ -636,6 +636,12 @@ const modules = {
 
 function showModule(moduleName) {
 
+     // Redirect ke halaman database.html
+    if (moduleName === "database") {
+        window.location.href = "database.html";
+        return;
+    }
+    
     const module = modules[moduleName];
 
     if (!module) {
