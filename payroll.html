@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll - Enterprise Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            color: #333;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            min-width: 260px;
+            background: #1e293b;
+            color: white;
+            padding: 20px 12px;
+            transition: 0.3s;
+        }
+
+        .sidebar-header {
+            font-size: 21px;
+            font-weight: bold;
+            padding: 10px 15px 25px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            margin: 4px 0;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 7px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #334155;
+            color: white;
+        }
+
+        .nav-link.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        /* CONTENT */
+        .content-area {
+            flex: 1;
+            padding: 25px;
+            min-width: 0;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .page-title {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .btn {
+            padding: 9px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        /* SUMMARY CARDS */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+        /* FORM */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #334155;
+        }
+
+        .form-group input {
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .preview-box {
+            margin-top: 16px;
+            padding: 14px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .form-actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* TABLE */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 11px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: bold;
+        }
+
+        .menu-toggle {
+            display: none;
+            padding: 9px 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -270px;
+                top: 0;
+                z-index: 1000;
+                height: 100vh;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .menu-toggle {
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">ENTERPRISE APP</div>
+        <nav>
+            <a href="index.html" class="nav-link">
+                <i>▦</i>
+                <span>Dashboard</span>
+            </a>
+            <a href="database.html" class="nav-link">
+                <i>▤</i>
+                <span>Employee Database</span>
+            </a>
+            <a href="absensi.html" class="nav-link">
+                <i>◷</i>
+                <span>Attendance</span>
+            </a>
+            <a href="payroll.html" class="nav-link active">
+                <i>▣</i>
+                <span>Payroll</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="content-area">
+        <div class="topbar">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button class="menu-toggle" id="menuToggle">☰ Menu</button>
+                <div class="page-title">Payroll & Gaji Karyawan</div>
+            </div>
+            <a href="index.html" class="btn btn-secondary">← Kembali ke Dashboard</a>
+        </div>
+
+        <!-- RINGKASAN -->
+        <div class="summary-grid">
+            <div class="card">
+                <div class="card-label">Total Gaji Pokok</div>
+                <div class="card-value" id="sumBasic">Rp 0</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Total Uang Makan & Transport</div>
+                <div class="card-value" id="sumAllowance">Rp 0</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Total Potongan Absensi</div>
+                <div class="card-value" id="sumDeduction">Rp 0</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Total Gaji Bersih (Take Home Pay)</div>
+                <div class="card-value" id="sumNet">Rp 0</div>
+            </div>
+        </div>
+
+        <!-- FORM INPUT PAYROLL -->
+        <div class="card" style="margin-bottom: 22px;">
+            <h3>Input / Hitung Komponen Gaji</h3>
+            <form id="payrollForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="empName">Nama Karyawan</label>
+                        <input type="text" id="empName" placeholder="Contoh: Budi Santoso" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="basicSalary">Gaji Pokok (Rp)</label>
+                        <input type="number" id="basicSalary" min="0" value="5000000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mealPerDay">Uang Makan / Hari (Rp)</label>
+                        <input type="number" id="mealPerDay" min="0" value="25000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="transportPerDay">Transport / Hari (Rp)</label>
+                        <input type="number" id="transportPerDay" min="0" value="20000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workDays">Target Hari Kerja</label>
+                        <input type="number" id="workDays" min="1" max="31" value="22" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="presentDays">Hari Hadir (Absensi)</label>
+                        <input type="number" id="presentDays" min="0" max="31" value="22" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="absentDeductionPerDay">Potongan per Hari Tidak Hadir (Rp)</label>
+                        <input type="number" id="absentDeductionPerDay" min="0" value="100000" required>
+                    </div>
+                </div>
+
+                <div class="preview-box">
+                    <div>
+                        <strong>Estimasi Tunjangan (Makan + Transport):</strong>
+                        <span id="previewAllowance">Rp 0</span>
+                        &nbsp;|&nbsp;
+                        <strong>Potongan Absen:</strong>
+                        <span id="previewDeduction">Rp 0</span>
+                    </div>
+                    <div>
+                        <strong>Gaji Bersih:</strong>
+                        <span id="previewNet" style="font-size:16px; color:#2563eb; font-weight:bold;">Rp 0</span>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">+ Simpan Slip Payroll</button>
+                    <button type="button" class="btn btn-secondary" id="resetBtn">Reset Form</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TABEL DATA PAYROLL -->
+        <div class="card">
+            <h3>Daftar Rekap Payroll</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Gaji Pokok</th>
+                            <th>Absensi</th>
+                            <th>Uang Makan</th>
+                            <th>Transport</th>
+                            <th>Potongan Absen</th>
+                            <th>Gaji Bersih</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payrollTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+const STORAGE_KEY = "enterprise_payroll_records_v1";
+
+const form = document.getElementById("payrollForm");
+const tableBody = document.getElementById("payrollTableBody");
+
+const inputs = [
+    "basicSalary",
+    "mealPerDay",
+    "transportPerDay",
+    "workDays",
+    "presentDays",
+    "absentDeductionPerDay"
+];
+
+function formatRupiah(amount) {
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0
+    }).format(amount || 0);
+}
+
+function calculatePayroll(data) {
+    const basicSalary = Number(data.basicSalary) || 0;
+    const mealPerDay = Number(data.mealPerDay) || 0;
+    const transportPerDay = Number(data.transportPerDay) || 0;
+    const workDays = Math.max(1, Number(data.workDays) || 22);
+    const presentDays = Math.max(0, Number(data.presentDays) || 0);
+    const absentDeductionPerDay = Number(data.absentDeductionPerDay) || 0;
+
+    const absentDays = Math.max(0, workDays - presentDays);
+    const totalMeal = mealPerDay * presentDays;
+    const totalTransport = transportPerDay * presentDays;
+    const totalDeduction = absentDeductionPerDay * absentDays;
+    const netSalary = Math.max(0, basicSalary + totalMeal + totalTransport - totalDeduction);
+
+    return {
+        basicSalary,
+        workDays,
+        presentDays,
+        absentDays,
+        totalMeal,
+        totalTransport,
+        totalAllowance: totalMeal + totalTransport,
+        totalDeduction,
+        netSalary
+    };
+}
+
+function getFormValues() {
+    return {
+        empName: document.getElementById("empName").value.trim(),
+        basicSalary: document.getElementById("basicSalary").value,
+        mealPerDay: document.getElementById("mealPerDay").value,
+        transportPerDay: document.getElementById("transportPerDay").value,
+        workDays: document.getElementById("workDays").value,
+        presentDays: document.getElementById("presentDays").value,
+        absentDeductionPerDay: document.getElementById("absentDeductionPerDay").value
+    };
+}
+
+function updatePreview() {
+    const calc = calculatePayroll(getFormValues());
+    document.getElementById("previewAllowance").textContent = formatRupiah(calc.totalAllowance);
+    document.getElementById("previewDeduction").textContent = formatRupiah(calc.totalDeduction);
+    document.getElementById("previewNet").textContent = formatRupiah(calc.netSalary);
+}
+
+function loadRecords() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    } catch {
+        return [];
+    }
+}
+
+function saveRecords(records) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+}
+
+function renderAll() {
+    const records = loadRecords();
+    tableBody.innerHTML = "";
+
+    let sumBasic = 0;
+    let sumAllowance = 0;
+    let sumDeduction = 0;
+    let sumNet = 0;
+
+    if (records.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align:center; color:#64748b;">
+                    Belum ada data payroll tersimpan.
+                </td>
+            </tr>
+        `;
+    } else {
+        records.forEach((item, index) => {
+            sumBasic += item.basicSalary;
+            sumAllowance += item.totalAllowance;
+            sumDeduction += item.totalDeduction;
+            sumNet += item.netSalary;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${item.empName}</strong></td>
+                <td>${formatRupiah(item.basicSalary)}</td>
+                <td>${item.presentDays}/${item.workDays} hari (absen ${item.absentDays})</td>
+                <td>${formatRupiah(item.totalMeal)}</td>
+                <td>${formatRupiah(item.totalTransport)}</td>
+                <td>${formatRupiah(item.totalDeduction)}</td>
+                <td><strong>${formatRupiah(item.netSalary)}</strong></td>
+                <td>
+                    <button class="btn btn-danger" onclick="deleteRecord(${index})">Hapus</button>
+                </td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+
+    document.getElementById("sumBasic").textContent = formatRupiah(sumBasic);
+    document.getElementById("sumAllowance").textContent = formatRupiah(sumAllowance);
+    document.getElementById("sumDeduction").textContent = formatRupiah(sumDeduction);
+    document.getElementById("sumNet").textContent = formatRupiah(sumNet);
+}
+
+window.deleteRecord = function(index) {
+    const records = loadRecords();
+    records.splice(index, 1);
+    saveRecords(records);
+    renderAll();
+};
+
+form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const raw = getFormValues();
+    if (!raw.empName) return;
+
+    const calc = calculatePayroll(raw);
+    const records = loadRecords();
+    records.unshift({
+        empName: raw.empName,
+        ...calc
+    });
+
+    saveRecords(records);
+    renderAll();
+    form.reset();
+    updatePreview();
+});
+
+document.getElementById("resetBtn").addEventListener("click", function() {
+    form.reset();
+    updatePreview();
+});
+
+inputs.forEach(id => {
+    document.getElementById(id).addEventListener("input", updatePreview);
+});
+
+document.getElementById("menuToggle").addEventListener("click", function() {
+    document.getElementById("sidebar").classList.toggle("show");
+});
+
+updatePreview();
+renderAll();
+</script>
+
+</body>
+</html>
