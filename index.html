@@ -641,6 +641,12 @@ function showModule(moduleName) {
         window.location.href = "database.html";
         return;
     }
+
+       // Redirect ke halaman absensi.html
+    if (moduleName === "absensi") {
+        window.location.href = "absensi.html";
+        return;
+    }
     
     const module = modules[moduleName];
 
