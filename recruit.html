@@ -1200,7 +1200,7 @@
           <select id="editSchedCandidate" required disabled></select>
         </div>
         <div class="field">
-          <label for="editSchedDate">Tanggal (Mulai Hari Ini)</label>
+          <label for="editSchedDate">Tanggal</label>
           <input type="date" id="editSchedDate" required />
         </div>
         <div class="field">
@@ -1569,7 +1569,7 @@
               <div class="card-actions">
                 ${isHired ? `<button type="button" class="btn btn-sm btn-success btn-letter">Surat</button>` : ""}
                 <button type="button" class="btn btn-sm btn-edit-cand" ${isHired ? "disabled title='Data kandidat Hired tidak dapat diedit'" : ""}>Edit</button>
-                <button type="button" class="btn btn-sm btn-schedule">${sched ? "Update Jadwal" : "Jadwal"}</button>
+                <button type="button" class="btn btn-sm btn-schedule" ${isHired ? "disabled title='Data kandidat sudah tidak bisa di edit jadwal'" : ""}></button>
               </div>
             </div>
           `;
