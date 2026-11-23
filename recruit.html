@@ -452,7 +452,7 @@
       transition: border-color 0.15s ease;
     }
 
-    .cal-day:hover {
+    .cal-day:hover:not(.empty):not(.past) {
       border-color: var(--primary);
     }
 
@@ -460,6 +460,19 @@
       background: transparent;
       border-color: transparent;
       cursor: default;
+    }
+
+    .cal-day.past {
+      background: #f1f5f9;
+      color: #94a3b8;
+      border-color: #e2e8f0;
+      cursor: not-allowed;
+      opacity: 0.65;
+      pointer-events: none;
+    }
+
+    .cal-day.past .event-dot {
+      background: #94a3b8;
     }
 
     .cal-day.selected {
@@ -1240,7 +1253,7 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const STORAGE_KEY = "recruitment_hub_data_v5";
+    const STORAGE_KEY = "recruitment_hub_data_v6";
     const STAGES = ["Applied", "Screening", "Interview", "Offering", "Hired"];
     const MIN_SALARY = 5000000;
     const MAX_SALARY = 65000000;
@@ -1253,7 +1266,9 @@
     const DEFAULT_DATA = {
       candidates: [],
       schedules: [],
-      histories: []
+      histories: [],
+      letterCounter: 0,
+      candidateLetters: {} // { [candidateId]: "HR/mmddyyyy/001" }
     };
 
     let state = loadState();
@@ -1293,7 +1308,6 @@
         if (!raw) return structuredClone(DEFAULT_DATA);
         const parsed = JSON.parse(raw);
 
-        // Pastikan setiap kandidat maksimal memiliki 1 jadwal interview
         const rawSchedules = Array.isArray(parsed.schedules) ? parsed.schedules : [];
         const uniqueByCandidate = new Map();
         rawSchedules.forEach((s) => {
@@ -1305,7 +1319,12 @@
         return {
           candidates: Array.isArray(parsed.candidates) ? parsed.candidates : [],
           schedules: Array.from(uniqueByCandidate.values()),
-          histories: Array.isArray(parsed.histories) ? parsed.histories : []
+          histories: Array.isArray(parsed.histories) ? parsed.histories : [],
+          letterCounter: Number.isFinite(Number(parsed.letterCounter)) ? Number(parsed.letterCounter) : 0,
+          candidateLetters:
+            parsed.candidateLetters && typeof parsed.candidateLetters === "object"
+              ? parsed.candidateLetters
+              : {}
         };
       } catch {
         return structuredClone(DEFAULT_DATA);
@@ -1314,6 +1333,28 @@
 
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    /**
+     * Format nomor surat: HR/mmddyyyy/001
+     * Mengambil atau membuat nomor surat tetap per kandidat Hired.
+     */
+    function getOrCreateLetterNumber(candidateId, dateObj = new Date()) {
+      if (state.candidateLetters[candidateId]) {
+        return state.candidateLetters[candidateId];
+      }
+
+      const mm = pad(dateObj.getMonth() + 1);
+      const dd = pad(dateObj.getDate());
+      const yyyy = String(dateObj.getFullYear());
+
+      state.letterCounter = (Number(state.letterCounter) || 0) + 1;
+      const seq = String(state.letterCounter).padStart(3, "0");
+      const docNumber = `HR/${mm}${dd}${yyyy}/${seq}`;
+
+      state.candidateLetters[candidateId] = docNumber;
+      saveState();
+      return docNumber;
     }
 
     function syncCandidateMetaInLogs(cand) {
@@ -1364,14 +1405,14 @@
       const cand = state.candidates.find((c) => c.id === candId);
       if (!cand || cand.stage !== "Hired") return;
 
-      const docNumber = `HR/OFFER/${todayObj.getFullYear()}/${pad(todayObj.getMonth() + 1)}/${cand.id.slice(-4).toUpperCase()}`;
+      const docNumber = getOrCreateLetterNumber(cand.id, new Date());
       const issuedDate = formatDateIndo(minInterviewDate);
 
       document.getElementById("hiredLetterBody").innerHTML = `
         <div class="letter-header">
           <div>
             <div class="letter-title">Surat Pemberitahuan Diterima Bekerja</div>
-            <div style="font-size:0.76rem; color:var(--muted);">No. Dokumen: ${escapeHtml(docNumber)}</div>
+            <div style="font-size:0.78rem; color:var(--muted);">No. Dokumen: <strong>${escapeHtml(docNumber)}</strong></div>
           </div>
           <div style="text-align:right; font-size:0.78rem; color:var(--muted);">
             <div>Tanggal Terbit</div>
@@ -1387,6 +1428,10 @@
         </p>
 
         <table class="letter-table">
+          <tr>
+            <td>Nomor Surat</td>
+            <td>: <strong>${escapeHtml(docNumber)}</strong></td>
+          </tr>
           <tr>
             <td>Nama Lengkap</td>
             <td>: <strong>${escapeHtml(cand.name)}</strong></td>
@@ -1523,7 +1568,7 @@
               <select class="stage-select" ${isHired ? "disabled" : ""} aria-label="Pindah tahap ${escapeHtml(c.name)}">${stageOptions}</select>
               <div class="card-actions">
                 ${isHired ? `<button type="button" class="btn btn-sm btn-success btn-letter">Surat</button>` : ""}
-                <button type="button" class="btn btn-sm btn-edit-cand">Edit</button>
+                <button type="button" class="btn btn-sm btn-edit-cand" ${isHired ? "disabled title='Data kandidat Hired tidak dapat diedit'" : ""}>Edit</button>
                 <button type="button" class="btn btn-sm btn-schedule">${sched ? "Update Jadwal" : "Jadwal"}</button>
               </div>
             </div>
@@ -1539,9 +1584,12 @@
             letterBtn.addEventListener("click", () => openHiredLetterModal(c.id));
           }
 
-          card.querySelector(".btn-edit-cand").addEventListener("click", () => {
-            openEditCandidateModal(c.id);
-          });
+          const editBtn = card.querySelector(".btn-edit-cand");
+          if (editBtn && !isHired) {
+            editBtn.addEventListener("click", () => {
+              openEditCandidateModal(c.id);
+            });
+          }
 
           card.querySelector(".btn-schedule").addEventListener("click", () => {
             const selCand = document.getElementById("schedCandidate");
@@ -1571,7 +1619,20 @@
 
       const oldStage = cand.stage;
       cand.stage = newStage;
-      recordHistory(cand.id, `Tahap berubah: ${oldStage} → ${newStage}`, newStage);
+
+      let letterNo = "";
+      if (newStage === "Hired") {
+        letterNo = getOrCreateLetterNumber(cand.id, new Date());
+      }
+
+      recordHistory(
+        cand.id,
+        newStage === "Hired"
+          ? `Tahap berubah: ${oldStage} → Hired (No. Surat: ${letterNo})`
+          : `Tahap berubah: ${oldStage} → ${newStage}`,
+        newStage
+      );
+
       saveState();
       renderKanban();
       renderHistory();
@@ -1604,10 +1665,21 @@
 
       for (let day = 1; day <= totalDays; day++) {
         const dateStr = `${calYear}-${pad(calMonth + 1)}-${pad(day)}`;
+        const isPast = isPastInterviewDate(dateStr);
         const daySchedules = state.schedules.filter((s) => s.date === dateStr);
 
-        const cell = document.createElement("div");
-        cell.className = "cal-day" + (dateStr === selectedDate ? " selected" : "");
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.className =
+          "cal-day" +
+          (isPast ? " past" : "") +
+          (!isPast && dateStr === selectedDate ? " selected" : "");
+        cell.disabled = isPast;
+        cell.setAttribute("aria-disabled", isPast ? "true" : "false");
+        if (isPast) {
+          cell.title = "Tanggal sudah berlalu (tidak dapat dipilih)";
+        }
+
         cell.innerHTML = `<div class="day-num">${day}</div>`;
 
         daySchedules.slice(0, 2).forEach((s) => {
@@ -1626,15 +1698,19 @@
           cell.appendChild(more);
         }
 
-        cell.addEventListener("click", () => {
-          selectedDate = dateStr;
-          const existing = state.schedules.find((s) => s.candidateId === document.getElementById("schedCandidate").value);
-          if (!existing && dateStr >= minInterviewDate) {
-            document.getElementById("schedDate").value = dateStr;
-          }
-          renderCalendar();
-          renderAgenda();
-        });
+        if (!isPast) {
+          cell.addEventListener("click", () => {
+            selectedDate = dateStr;
+            const existing = state.schedules.find(
+              (s) => s.candidateId === document.getElementById("schedCandidate").value
+            );
+            if (!existing) {
+              document.getElementById("schedDate").value = dateStr;
+            }
+            renderCalendar();
+            renderAgenda();
+          });
+        }
 
         daysEl.appendChild(cell);
       }
@@ -1758,6 +1834,11 @@
       const cand = state.candidates.find((c) => c.id === candId);
       if (!cand) return;
 
+      if (cand.stage === "Hired") {
+        showToast("Kandidat sudah Hired — data tidak dapat diedit");
+        return;
+      }
+
       document.getElementById("candidateModalTitle").textContent = "Edit Data Kandidat";
       document.getElementById("btnSubmitCandidateModal").textContent = "Simpan Perubahan";
       document.getElementById("editCandidateId").value = cand.id;
@@ -1766,7 +1847,7 @@
       document.getElementById("candSalary").value = cand.salary;
       document.getElementById("candAvailability").value = cand.availability;
       document.getElementById("candStage").value = cand.stage;
-      document.getElementById("candStage").disabled = cand.stage === "Hired";
+      document.getElementById("candStage").disabled = false;
       candidateModal.classList.add("open");
     }
 
@@ -1910,18 +1991,25 @@
 
       const cand = state.candidates.find((c) => c.id === item.candidateId);
       activeDetailCandidateId = cand ? cand.id : null;
-      document.getElementById("btnEditFromDetail").style.display = cand ? "inline-flex" : "none";
+
+      const currentStage = cand ? cand.stage : item.stage;
+      const isHired = currentStage === "Hired";
+      const letterNo = cand && state.candidateLetters[cand.id] ? state.candidateLetters[cand.id] : "-";
+
+      const editFromDetailBtn = document.getElementById("btnEditFromDetail");
+      editFromDetailBtn.style.display = cand ? "inline-flex" : "none";
+      editFromDetailBtn.disabled = isHired;
+      editFromDetailBtn.title = isHired ? "Data kandidat Hired tidak dapat diedit" : "";
 
       const candSchedules = state.schedules.filter((s) => s.candidateId === item.candidateId);
       const candLogs = state.histories.filter((h) => h.candidateId === item.candidateId);
-      const currentStage = cand ? cand.stage : item.stage;
 
       document.getElementById("btnOpenLetterFromDetail").style.display =
-        cand && currentStage === "Hired" ? "inline-flex" : "none";
+        cand && isHired ? "inline-flex" : "none";
 
       const badgeEl = document.getElementById("detailCurrentStageBadge");
       badgeEl.textContent = currentStage;
-      badgeEl.className = currentStage === "Hired" ? "badge badge-hired" : "badge";
+      badgeEl.className = isHired ? "badge badge-hired" : "badge";
 
       const schedulesHtml = candSchedules.length
         ? `<ul style="padding-left:18px; font-size:0.82rem; display:flex; flex-direction:column; gap:4px;">
@@ -1946,7 +2034,8 @@
           <div><strong>Posisi Dilamar:</strong> ${escapeHtml(cand ? cand.role : item.role)}</div>
           <div><strong>Ekspektasi Gaji:</strong> ${cand ? formatRupiah(cand.salary) : "-"}</div>
           <div><strong>Ketersediaan Waktu:</strong> ${cand ? escapeHtml(cand.availability) : "-"}</div>
-          <div><strong>Status Saat Ini:</strong> ${escapeHtml(currentStage)}${currentStage === "Hired" ? " (Terkunci — tidak dapat dipindahkan)" : ""}</div>
+          <div><strong>Status Saat Ini:</strong> ${escapeHtml(currentStage)}${isHired ? " (Terkunci — tidak dapat diedit/dipindahkan)" : ""}</div>
+          ${isHired ? `<div><strong>Nomor Surat HR:</strong> ${escapeHtml(letterNo)}</div>` : ""}
           <div><strong>Aktivitas Baris Dipilih:</strong> ${escapeHtml(item.activity)} (${escapeHtml(item.timestamp)})</div>
         </div>
 
@@ -1977,6 +2066,7 @@
           const currentStage = cand ? cand.stage : h.stage;
           const salaryText = cand ? formatRupiah(cand.salary) : "-";
           const availText = cand ? cand.availability : "-";
+          const letterNo = cand && state.candidateLetters[cand.id] ? state.candidateLetters[cand.id] : "-";
 
           return `
             <tr>
@@ -1987,6 +2077,7 @@
               <td>${escapeHtml(salaryText)}</td>
               <td>${escapeHtml(availText)}</td>
               <td>${escapeHtml(currentStage)}</td>
+              <td>${escapeHtml(letterNo)}</td>
               <td>${escapeHtml(h.activity)}</td>
             </tr>
           `;
@@ -2011,6 +2102,7 @@
                 <th>Ekspektasi Gaji</th>
                 <th>Ketersediaan</th>
                 <th>Status Saat Ini</th>
+                <th>No. Surat HR</th>
                 <th>Aktivitas</th>
               </tr>
             </thead>
@@ -2203,6 +2295,11 @@
     });
     document.getElementById("btnEditFromDetail").addEventListener("click", () => {
       if (!activeDetailCandidateId) return;
+      const cand = state.candidates.find((c) => c.id === activeDetailCandidateId);
+      if (!cand || cand.stage === "Hired") {
+        showToast("Kandidat sudah Hired — data tidak dapat diedit");
+        return;
+      }
       detailModal.classList.remove("open");
       openEditCandidateModal(activeDetailCandidateId);
     });
@@ -2237,29 +2334,41 @@
         const cand = state.candidates.find((c) => c.id === editId);
         if (!cand) return;
 
+        if (cand.stage === "Hired") {
+          showToast("Kandidat sudah Hired — perubahan data ditolak");
+          candidateModal.classList.remove("open");
+          return;
+        }
+
         const oldStage = cand.stage;
-        const stageChanged = cand.stage !== "Hired" && cand.stage !== requestedStage;
-        const newStage = cand.stage === "Hired" ? "Hired" : requestedStage;
+        const stageChanged = cand.stage !== requestedStage;
 
         cand.name = name;
         cand.role = role;
         cand.salary = salary;
         cand.availability = availability;
-        cand.stage = newStage;
+        cand.stage = requestedStage;
 
         syncCandidateMetaInLogs(cand);
 
+        let letterNo = "";
+        if (stageChanged && requestedStage === "Hired") {
+          letterNo = getOrCreateLetterNumber(cand.id, new Date());
+        }
+
         const logMsg = stageChanged
-          ? `Data kandidat diedit & tahap berubah: ${oldStage} → ${newStage}`
+          ? requestedStage === "Hired"
+            ? `Data kandidat diedit & tahap berubah: ${oldStage} → Hired (No. Surat: ${letterNo})`
+            : `Data kandidat diedit & tahap berubah: ${oldStage} → ${requestedStage}`
           : "Data kandidat diperbarui (nama/posisi/gaji/ketersediaan)";
 
-        recordHistory(cand.id, logMsg, newStage);
+        recordHistory(cand.id, logMsg, requestedStage);
         saveState();
         candidateModal.classList.remove("open");
         renderAll();
         showToast(`Data ${name} diperbarui`);
 
-        if (stageChanged && newStage === "Hired") {
+        if (stageChanged && requestedStage === "Hired") {
           openHiredLetterModal(cand.id);
         }
       } else {
@@ -2273,7 +2382,19 @@
         };
 
         state.candidates.push(newCand);
-        recordHistory(newCand.id, `Kandidat ditambahkan ke tahap ${requestedStage}`, requestedStage);
+
+        let letterNo = "";
+        if (requestedStage === "Hired") {
+          letterNo = getOrCreateLetterNumber(newCand.id, new Date());
+        }
+
+        recordHistory(
+          newCand.id,
+          requestedStage === "Hired"
+            ? `Kandidat ditambahkan ke tahap Hired (No. Surat: ${letterNo})`
+            : `Kandidat ditambahkan ke tahap ${requestedStage}`,
+          requestedStage
+        );
 
         saveState();
         e.target.reset();
