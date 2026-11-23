@@ -1056,6 +1056,13 @@
               <select id="schedCandidate" required></select>
             </div>
             <div class="field">
+              <label for="schedType">Jenis Wawancara</label>
+              <select id="schedType" required>
+                <option value="HR">Interview HR</option>
+                <option value="User">Interview User</option>
+              </select>
+            </div>
+            <div class="field">
               <label for="schedDate">Tanggal (Mulai Hari Ini)</label>
               <input type="date" id="schedDate" required />
             </div>
@@ -1200,6 +1207,13 @@
           <select id="editSchedCandidate" required disabled></select>
         </div>
         <div class="field">
+          <label for="editSchedType">Jenis Wawancara</label>
+          <select id="editSchedType" required>
+            <option value="HR">Interview HR</option>
+            <option value="User">Interview User</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="editSchedDate">Tanggal</label>
           <input type="date" id="editSchedDate" required />
         </div>
@@ -1302,34 +1316,71 @@
       return Number.isFinite(num) && num >= MIN_SALARY && num <= MAX_SALARY;
     }
 
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return structuredClone(DEFAULT_DATA);
-        const parsed = JSON.parse(raw);
+    
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
 
-        const rawSchedules = Array.isArray(parsed.schedules) ? parsed.schedules : [];
-        const uniqueByCandidate = new Map();
-        rawSchedules.forEach((s) => {
-          if (s && s.candidateId) {
-            uniqueByCandidate.set(s.candidateId, s);
-          }
-        });
-
-        return {
-          candidates: Array.isArray(parsed.candidates) ? parsed.candidates : [],
-          schedules: Array.from(uniqueByCandidate.values()),
-          histories: Array.isArray(parsed.histories) ? parsed.histories : [],
-          letterCounter: Number.isFinite(Number(parsed.letterCounter)) ? Number(parsed.letterCounter) : 0,
-          candidateLetters:
-            parsed.candidateLetters && typeof parsed.candidateLetters === "object"
-              ? parsed.candidateLetters
-              : {}
-        };
-      } catch {
-        return structuredClone(DEFAULT_DATA);
-      }
+    if (!raw) {
+      return structuredClone(DEFAULT_DATA);
     }
+
+    const parsed = JSON.parse(raw);
+
+    // Ambil seluruh data jadwal yang tersimpan
+    const rawSchedules = Array.isArray(parsed.schedules)
+      ? parsed.schedules
+      : [];
+
+    // Pisahkan jadwal berdasarkan kandidat dan jenis interview
+    const uniqueSchedules = new Map();
+
+    rawSchedules.forEach((s) => {
+      if (!s || !s.candidateId) return;
+
+      // Jadwal lama yang belum memiliki type dianggap sebagai HR
+      const type = s.type === "User" ? "User" : "HR";
+
+      const schedule = {
+        ...s,
+        type: type,
+        done: Boolean(s.done)
+      };
+
+      // Satu kandidat maksimal memiliki satu jadwal HR
+      // dan satu jadwal User
+      const key = `${schedule.candidateId}_${type}`;
+
+      uniqueSchedules.set(key, schedule);
+    });
+
+    return {
+      candidates: Array.isArray(parsed.candidates)
+        ? parsed.candidates
+        : [],
+
+      schedules: Array.from(uniqueSchedules.values()),
+
+      histories: Array.isArray(parsed.histories)
+        ? parsed.histories
+        : [],
+
+      letterCounter: Number.isFinite(Number(parsed.letterCounter))
+        ? Number(parsed.letterCounter)
+        : 0,
+
+      candidateLetters:
+        parsed.candidateLetters &&
+        typeof parsed.candidateLetters === "object"
+          ? parsed.candidateLetters
+          : {}
+    };
+
+  } catch (error) {
+    console.error("Gagal membaca data:", error);
+    return structuredClone(DEFAULT_DATA);
+  }
+}
 
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -1752,71 +1803,175 @@
       }
     }
 
-    function syncScheduleFormWithSelectedCandidate() {
-      const candidateId = document.getElementById("schedCandidate").value;
-      const bannerEl = document.getElementById("scheduleModeBanner");
-      const submitBtn = document.getElementById("btnSubmitSchedule");
-      const dateInput = document.getElementById("schedDate");
-      const timeInput = document.getElementById("schedTime");
-      const noteInput = document.getElementById("schedNote");
+ function syncScheduleFormWithSelectedCandidate() {
+  const candidateId =
+    document.getElementById("schedCandidate").value;
 
-      if (!candidateId) return;
+  const type = document.getElementById("schedType").value;
 
-      const existing = state.schedules.find((s) => s.candidateId === candidateId);
-      if (existing) {
-        bannerEl.className = "schedule-mode-banner is-update";
-        bannerEl.textContent = `Kandidat ini sudah memiliki jadwal (${existing.date} ${existing.time}). Menyimpan akan memperbarui jadwal yang ada.`;
-        submitBtn.textContent = "Perbarui Jadwal";
-        dateInput.value = existing.date >= minInterviewDate ? existing.date : minInterviewDate;
-        timeInput.value = existing.time;
-        noteInput.value = existing.note || "";
-      } else {
-        bannerEl.className = "schedule-mode-banner";
-        bannerEl.textContent = "Kandidat belum memiliki jadwal. Jadwal interview hanya dapat dibuat 1x dan bisa diperbarui.";
-        submitBtn.textContent = "Simpan Jadwal";
-        dateInput.value = selectedDate >= minInterviewDate ? selectedDate : minInterviewDate;
-        timeInput.value = "10:00";
-        noteInput.value = "";
-      }
-    }
+  const bannerEl =
+    document.getElementById("scheduleModeBanner");
+
+  const submitBtn =
+    document.getElementById("btnSubmitSchedule");
+
+  const dateInput =
+    document.getElementById("schedDate");
+
+  const timeInput =
+    document.getElementById("schedTime");
+
+  const noteInput =
+    document.getElementById("schedNote");
+
+  const candidate = state.candidates.find(
+    c => c.id === candidateId
+  );
+
+  if (!candidateId || !candidate) return;
+
+  const locked = candidate.stage === "Hired";
+
+  const existing = state.schedules.find(
+    s => s.candidateId === candidateId &&
+         s.type === type
+  );
+
+  if (locked) {
+    bannerEl.className = "schedule-mode-banner";
+    bannerEl.textContent =
+      "Kandidat sudah Hired. Jadwal tidak dapat diubah.";
+
+    submitBtn.disabled = true;
+    dateInput.disabled = true;
+    timeInput.disabled = true;
+    noteInput.disabled = true;
+    return;
+  }
+
+  submitBtn.disabled = false;
+  dateInput.disabled = false;
+  timeInput.disabled = false;
+  noteInput.disabled = false;
+
+  if (existing) {
+    bannerEl.className =
+      "schedule-mode-banner is-update";
+
+    bannerEl.textContent =
+      `Jadwal Interview ${type} sudah tersedia. ` +
+      "Menyimpan akan memperbarui jadwal ini.";
+
+    submitBtn.textContent = "Perbarui Jadwal";
+
+    dateInput.value = existing.date;
+    timeInput.value = existing.time;
+    noteInput.value = existing.note || "";
+  } else {
+    bannerEl.className = "schedule-mode-banner";
+
+    bannerEl.textContent =
+      `Buat jadwal Interview ${type} untuk kandidat ini.`;
+
+    submitBtn.textContent = "Simpan Jadwal";
+
+    dateInput.value =
+      selectedDate >= minInterviewDate
+        ? selectedDate
+        : minInterviewDate;
+
+    timeInput.value = "10:00";
+    noteInput.value = "";
+  }
+}
 
     function renderAgenda() {
-      document.getElementById("selectedDateLabel").textContent = selectedDate;
-      const list = document.getElementById("agendaList");
-      const items = state.schedules
-        .filter((s) => s.date === selectedDate)
-        .sort((a, b) => a.time.localeCompare(b.time));
+  document.getElementById("selectedDateLabel").textContent =
+    selectedDate;
 
-      if (!items.length) {
-        list.innerHTML = `<div style="font-size:0.82rem; color:var(--muted);">Belum ada jadwal wawancara pada tanggal ini.</div>`;
-        return;
-      }
+  const list = document.getElementById("agendaList");
 
-      list.innerHTML = items
-        .map((s) => {
-          const cand = state.candidates.find((c) => c.id === s.candidateId);
-          return `
-            <div class="agenda-item">
-              <div>
-                <strong>${escapeHtml(s.time)}</strong> &bull; <strong>${cand ? escapeHtml(cand.name) : "Kandidat"}</strong>
-                <div style="font-size:0.76rem; color:var(--muted);">
-                  ${cand ? escapeHtml(cand.role) : ""}${s.note ? " — " + escapeHtml(s.note) : ""}
-                </div>
-              </div>
-              <div class="agenda-right">
-                <span class="badge">${cand ? escapeHtml(cand.stage) : ""}</span>
-                <button type="button" class="btn btn-sm btn-edit-sched" data-sched-id="${escapeHtml(s.id)}">Update</button>
-              </div>
-            </div>
-          `;
-        })
-        .join("");
+  const items = state.schedules
+    .filter(s => s.date === selectedDate)
+    .sort((a, b) => a.time.localeCompare(b.time));
 
-      list.querySelectorAll(".btn-edit-sched").forEach((btn) => {
-        btn.addEventListener("click", () => openEditScheduleModal(btn.dataset.schedId));
-      });
-    }
+  if (!items.length) {
+    list.innerHTML = `
+      <div style="font-size:.82rem;color:var(--muted)">
+        Belum ada jadwal wawancara pada tanggal ini.
+      </div>
+    `;
+    return;
+  }
 
+  list.innerHTML = items.map(s => {
+    const cand = state.candidates.find(
+      c => c.id === s.candidateId
+    );
+
+    const isHired = cand?.stage === "Hired";
+    const typeLabel =
+      s.type === "HR" ? "Interview HR" : "Interview User";
+
+    const doneButtonLabel =
+      s.type === "HR" ? "Done HR" : "Done User";
+
+    return `
+      <div class="agenda-item">
+        <div>
+          <strong>${escapeHtml(s.time)}</strong>
+          &bull;
+          <strong>${escapeHtml(cand?.name || "Kandidat")}</strong>
+
+          <div style="font-size:.78rem;color:var(--primary);font-weight:600">
+            ${typeLabel}
+          </div>
+
+          <div style="font-size:.76rem;color:var(--muted)">
+            ${escapeHtml(cand?.role || "")}
+            ${s.note ? " — " + escapeHtml(s.note) : ""}
+          </div>
+
+          <span class="badge ${s.done ? "badge-hired" : ""}">
+            ${s.done ? "Selesai" : "Belum selesai"}
+          </span>
+        </div>
+
+        <div class="agenda-right">
+          <button
+            type="button"
+            class="btn btn-sm btn-edit-sched"
+            data-sched-id="${escapeHtml(s.id)}"
+            ${isHired ? "disabled title='Kandidat Hired'" : ""}
+          >
+            Edit
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-sm ${s.done ? "" : "btn-success"} btn-done-interview"
+            data-sched-id="${escapeHtml(s.id)}"
+            ${s.done || isHired ? "disabled" : ""}
+          >
+            ${s.done ? "✓ " : ""}${doneButtonLabel}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  list.querySelectorAll(".btn-edit-sched").forEach(btn => {
+    btn.addEventListener("click", () => {
+      openEditScheduleModal(btn.dataset.schedId);
+    });
+  });
+
+  list.querySelectorAll(".btn-done-interview").forEach(btn => {
+    btn.addEventListener("click", () => {
+      markInterviewDone(btn.dataset.schedId);
+    });
+  });
+}
     /* Modal Tambah / Edit Kandidat */
     const candidateModal = document.getElementById("candidateModal");
 
@@ -2180,61 +2335,79 @@
       syncScheduleFormWithSelectedCandidate();
     });
 
-    document.getElementById("scheduleForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const candidateId = document.getElementById("schedCandidate").value;
-      const date = document.getElementById("schedDate").value;
-      const time = document.getElementById("schedTime").value;
-      const note = document.getElementById("schedNote").value.trim();
+    document.getElementById("scheduleForm")
+.addEventListener("submit", e => {
+  e.preventDefault();
 
-      if (!candidateId || !date || !time) return;
+  const candidateId =
+    document.getElementById("schedCandidate").value;
 
-      if (isPastInterviewDate(date)) {
-        showToast("Tanggal interview tidak boleh mundur dari hari ini");
-        document.getElementById("schedDate").value = minInterviewDate;
-        return;
-      }
+  const type =
+    document.getElementById("schedType").value;
 
-      const cand = state.candidates.find((c) => c.id === candidateId);
-      const existingIdx = state.schedules.findIndex((s) => s.candidateId === candidateId);
+  const date =
+    document.getElementById("schedDate").value;
 
-      if (existingIdx !== -1) {
-        state.schedules[existingIdx] = {
-          ...state.schedules[existingIdx],
-          date,
-          time,
-          note
-        };
-        recordHistory(
-          candidateId,
-          `Jadwal wawancara diperbarui menjadi ${date} ${time}${note ? " (" + note + ")" : ""}`,
-          cand ? cand.stage : "-"
-        );
-        showToast("Jadwal wawancara diperbarui (1 jadwal per kandidat)");
-      } else {
-        state.schedules.push({
-          id: "s-" + Date.now(),
-          candidateId,
-          date,
-          time,
-          note
-        });
-        recordHistory(
-          candidateId,
-          `Jadwal wawancara diatur pada ${date} ${time}${note ? " (" + note + ")" : ""}`,
-          cand ? cand.stage : "-"
-        );
-        showToast("Jadwal wawancara tersimpan");
-      }
+  const time =
+    document.getElementById("schedTime").value;
 
-      selectedDate = date;
-      const [y, m] = date.split("-").map(Number);
-      calYear = y;
-      calMonth = m - 1;
+  const note =
+    document.getElementById("schedNote").value.trim();
 
-      saveState();
-      renderAll();
+  const cand = state.candidates.find(
+    c => c.id === candidateId
+  );
+
+  if (!cand || !date || !time) return;
+
+  if (cand.stage === "Hired") {
+    showToast("Kandidat Hired tidak dapat mengubah jadwal.");
+    return;
+  }
+
+  if (isPastInterviewDate(date)) {
+    showToast("Tanggal wawancara tidak boleh mundur.");
+    return;
+  }
+
+  const existing = state.schedules.find(
+    s => s.candidateId === candidateId &&
+         s.type === type
+  );
+
+  if (existing) {
+    existing.date = date;
+    existing.time = time;
+    existing.note = note;
+  } else {
+    state.schedules.push({
+      id: "s-" + Date.now(),
+      candidateId,
+      type,
+      date,
+      time,
+      note,
+      done: false
     });
+  }
+
+  recordHistory(
+    candidateId,
+    `Jadwal Interview ${type} diatur pada ${date} ${time}`,
+    cand.stage
+  );
+
+  selectedDate = date;
+
+  const [y, m] = date.split("-").map(Number);
+  calYear = y;
+  calMonth = m - 1;
+
+  saveState();
+  renderAll();
+
+  showToast(`Jadwal Interview ${type} tersimpan.`);
+});
 
     document.getElementById("btnCancelEditSchedule").addEventListener("click", () => {
       editScheduleModal.classList.remove("open");
