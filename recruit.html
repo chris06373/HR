@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRIS - Recruitment System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root { --bs-primary: #0f172a; --bs-primary-rgb: 15, 23, 42; }
+        body { background-color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; }
+        .card { border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-radius: 12px; }
+        .table thead { background-color: #f1f5f9; }
+        .job-card { border-top: 4px solid #0f172a !important; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid py-4">
+    <!-- HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <a href="index.html" class="btn btn-sm btn-outline-secondary mb-2">
+                <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
+            </a>
+            <h2 class="fw-bold mb-0">Pendataan & Riwayat Rekrutmen</h2>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-success btn-sm" onclick="exportExcel()">
+                <i class="bi bi-file-earmark-excel me-1"></i> Download Excel
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="exportPDF()">
+                <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="clearAllData()">
+                <i class="bi bi-trash me-1"></i> Reset Data
+            </button>
+            <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#modalLoker">
+                <i class="bi bi-briefcase-plus me-1"></i> Tambah Posisi & Jobdesk
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="openModalKandidat()">
+                <i class="bi bi-person-plus me-1"></i> Input Calon Kandidat
+            </button>
+        </div>
+    </div>
+
+    <!-- RINGKASAN POSISI DIBUKA & JOBDESK + JUMLAH PELAMAR -->
+    <div class="mb-4">
+        <h5 class="fw-bold mb-3"><i class="bi bi-megaphone me-2"></i>Posisi Dibuka & Jobdesk</h5>
+        <div class="row" id="jobListContainer"></div>
+    </div>
+
+    <!-- PENCARIAN & TABEL PENDATAAN / HISTORI KANDIDAT -->
+    <div class="card p-4">
+        <div class="row g-3 align-items-center justify-content-between mb-3">
+            <div class="col-md-5">
+                <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Data & Histori Calon Kandidat</h5>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Cari nama, posisi, keahlian, status, atau alasan..." oninput="resetPageAndRender()">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select id="filterStatus" class="form-select" onchange="resetPageAndRender()">
+                    <option value="all">Semua Status</option>
+                    <option value="Proses">Dalam Proses</option>
+                    <option value="Berhasil">Berhasil</option>
+                    <option value="Tidak Berhasil">Tidak Berhasil</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama Kandidat</th>
+                        <th>Posisi Dilamar</th>
+                        <th>Keahlian</th>
+                        <th>Tanggal Daftar</th>
+                        <th>Status</th>
+                        <th>Alasan / Catatan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableKandidat"></tbody>
+            </table>
+        </div>
+
+        <!-- PAGINATION HISTORI -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2">
+            <small class="text-muted" id="paginationInfo">Menampilkan 0 data</small>
+            <nav>
+                <ul class="pagination pagination-sm mb-0" id="paginationControls"></ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL TAMBAH POSISI & JOBDESK -->
+<div class="modal fade" id="modalLoker" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Posisi & Jobdesk</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label fw-semibold">Nama Posisi</label>
+                <input type="text" id="lokerTitle" class="form-control mb-3" placeholder="Contoh: Frontend Developer">
+                <label class="form-label fw-semibold">Jobdesk & Kualifikasi</label>
+                <textarea id="lokerDesc" class="form-control" rows="4" placeholder="Tuliskan tanggung jawab pekerjaan (jobdesk) dan kualifikasi..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-dark w-100" onclick="saveLoker()">Simpan Posisi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL INPUT CALON KANDIDAT -->
+<div class="modal fade" id="modalKandidat" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Form Pendataan Calon Kandidat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label fw-semibold">Posisi Dilamar</label>
+                <select id="kanJabatan" class="form-select mb-3"></select>
+                <label class="form-label fw-semibold">Nama Lengkap</label>
+                <input type="text" id="kanNama" class="form-control mb-3" placeholder="Nama lengkap kandidat">
+                <label class="form-label fw-semibold">Keahlian Utama</label>
+                <input type="text" id="kanSkill" class="form-control mb-3" placeholder="Contoh: React, SQL, Excel">
+                <label class="form-label fw-semibold">Status Awal</label>
+                <select id="kanStatus" class="form-select mb-3" onchange="toggleInitialReason()">
+                    <option value="Proses">Dalam Proses</option>
+                    <option value="Berhasil">Berhasil</option>
+                    <option value="Tidak Berhasil">Tidak Berhasil</option>
+                </select>
+                <div id="initialReasonBox" class="d-none">
+                    <label class="form-label fw-semibold text-danger">Alasan Tidak Berhasil</label>
+                    <input type="text" id="kanAlasan" class="form-control" placeholder="Contoh: Kurang sesuai kualifikasi / ekspektasi gaji">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary w-100" onclick="saveKandidat()">Simpan Kandidat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL UPDATE STATUS & ALASAN -->
+<div class="modal fade" id="modalStatus" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Hasil Seleksi: <span id="statusNamaKandidat"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label fw-semibold">Status</label>
+                <select id="updateStatusSelect" class="form-select mb-3" onchange="toggleUpdateReason()">
+                    <option value="Proses">Dalam Proses</option>
+                    <option value="Berhasil">Berhasil</option>
+                    <option value="Tidak Berhasil">Tidak Berhasil</option>
+                </select>
+                <div id="updateReasonBox">
+                    <label class="form-label fw-semibold">Alasan / Catatan</label>
+                    <textarea id="updateAlasanInput" class="form-control" rows="3" placeholder="Wajib diisi jika Tidak Berhasil, atau isi catatan hasil seleksi..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-dark w-100" onclick="saveStatusUpdate()">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+    let dataLoker = JSON.parse(localStorage.getItem('hris_loker_v2')) || [
+        { title: "Staff Accounting", desc: "Menyusun laporan keuangan bulanan, rekonsiliasi bank, dan pajak dasar. Minimal D3/S1 Akuntansi." },
+        { title: "IT Support", desc: "Troubleshooting hardware/software, maintenance jaringan kantor, dan pengelolaan tiket IT." }
+    ];
+
+    let dataKandidat = JSON.parse(localStorage.getItem('hris_kandidat_v2')) || [];
+    let selectedIndex = null;
+    let currentPage = 1;
+    const rowsPerPage = 5;
+
+    function syncData() {
+        localStorage.setItem('hris_loker_v2', JSON.stringify(dataLoker));
+        localStorage.setItem('hris_kandidat_v2', JSON.stringify(dataKandidat));
+        renderAll();
+    }
+
+    function clearAllData() {
+        if (confirm('Hapus semua data lowongan dan kandidat?')) {
+            localStorage.removeItem('hris_loker_v2');
+            localStorage.removeItem('hris_kandidat_v2');
+            dataLoker = [];
+            dataKandidat = [];
+            currentPage = 1;
+            renderAll();
+        }
+    }
+
+    function saveLoker() {
+        const title = document.getElementById('lokerTitle').value.trim();
+        const desc = document.getElementById('lokerDesc').value.trim();
+        if (!title || !desc) return alert('Lengkapi nama posisi dan jobdesk.');
+        dataLoker.push({ title, desc });
+        document.getElementById('lokerTitle').value = '';
+        document.getElementById('lokerDesc').value = '';
+        syncData();
+        bootstrap.Modal.getInstance(document.getElementById('modalLoker')).hide();
+    }
+
+    function toggleInitialReason() {
+        const st = document.getElementById('kanStatus').value;
+        document.getElementById('initialReasonBox').classList.toggle('d-none', st !== 'Tidak Berhasil');
+    }
+
+    function openModalKandidat(preselectedJob = '') {
+        if (dataLoker.length === 0) return alert('Tambahkan posisi & jobdesk terlebih dahulu.');
+        const select = document.getElementById('kanJabatan');
+        select.innerHTML = dataLoker.map(l => `<option value="${escapeHtml(l.title)}" ${l.title === preselectedJob ? 'selected' : ''}>${escapeHtml(l.title)}</option>`).join('');
+        document.getElementById('kanNama').value = '';
+        document.getElementById('kanSkill').value = '';
+        document.getElementById('kanStatus').value = 'Proses';
+        document.getElementById('kanAlasan').value = '';
+        toggleInitialReason();
+        new bootstrap.Modal(document.getElementById('modalKandidat')).show();
+    }
+
+    function saveKandidat() {
+        const jabatan = document.getElementById('kanJabatan').value;
+        const nama = document.getElementById('kanNama').value.trim();
+        const skill = document.getElementById('kanSkill').value.trim() || '-';
+        const status = document.getElementById('kanStatus').value;
+        const alasan = document.getElementById('kanAlasan').value.trim();
+
+        if (!nama) return alert('Nama lengkap wajib diisi.');
+        if (status === 'Tidak Berhasil' && !alasan) return alert('Alasan wajib diisi untuk kandidat Tidak Berhasil.');
+
+        dataKandidat.unshift({
+            nama,
+            jabatan,
+            skill,
+            tanggal: new Date().toLocaleDateString('id-ID'),
+            status,
+            alasan: status === 'Tidak Berhasil' ? alasan : (status === 'Berhasil' ? 'Memenuhi kualifikasi & lolos seleksi' : '-')
+        });
+
+        currentPage = 1;
+        syncData();
+        bootstrap.Modal.getInstance(document.getElementById('modalKandidat')).hide();
+    }
+
+    function openStatusModal(index) {
+        selectedIndex = index;
+        const item = dataKandidat[index];
+        document.getElementById('statusNamaKandidat').innerText = item.nama;
+        document.getElementById('updateStatusSelect').value = item.status;
+        document.getElementById('updateAlasanInput').value = item.alasan === '-' ? '' : item.alasan;
+        toggleUpdateReason();
+        new bootstrap.Modal(document.getElementById('modalStatus')).show();
+    }
+
+    function toggleUpdateReason() {
+        const st = document.getElementById('updateStatusSelect').value;
+        const input = document.getElementById('updateAlasanInput');
+        input.placeholder = st === 'Tidak Berhasil'
+            ? 'Wajib isi alasan tidak berhasil...'
+            : 'Catatan hasil seleksi (opsional)...';
+    }
+
+    function saveStatusUpdate() {
+        const status = document.getElementById('updateStatusSelect').value;
+        const alasan = document.getElementById('updateAlasanInput').value.trim();
+
+        if (status === 'Tidak Berhasil' && !alasan) {
+            return alert('Mohon isi alasan mengapa kandidat tidak berhasil.');
+        }
+
+        dataKandidat[selectedIndex].status = status;
+        dataKandidat[selectedIndex].alasan = alasan || (status === 'Berhasil' ? 'Lolos seleksi' : '-');
+        syncData();
+        bootstrap.Modal.getInstance(document.getElementById('modalStatus')).hide();
+    }
+
+    function getFilteredData() {
+        const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+        const statusFilter = document.getElementById('filterStatus').value;
+
+        return dataKandidat.map((item, realIndex) => ({ ...item, realIndex })).filter(item => {
+            const matchStatus = statusFilter === 'all' || item.status === statusFilter;
+            const matchText = !keyword ||
+                item.nama.toLowerCase().includes(keyword) ||
+                item.jabatan.toLowerCase().includes(keyword) ||
+                item.skill.toLowerCase().includes(keyword) ||
+                item.status.toLowerCase().includes(keyword) ||
+                item.alasan.toLowerCase().includes(keyword);
+            return matchStatus && matchText;
+        });
+    }
+
+    function resetPageAndRender() {
+        currentPage = 1;
+        renderTableAndPagination();
+    }
+
+    function renderJobs() {
+        const container = document.getElementById('jobListContainer');
+        if (dataLoker.length === 0) {
+            container.innerHTML = `<div class="col-12"><div class="card p-4 text-muted">Belum ada posisi dibuka. Klik "Tambah Posisi & Jobdesk".</div></div>`;
+            return;
+        }
+
+        container.innerHTML = dataLoker.map(job => {
+            const pelamarCount = dataKandidat.filter(k => k.jabatan === job.title).length;
+            const berhasilCount = dataKandidat.filter(k => k.jabatan === job.title && k.status === 'Berhasil').length;
+            return `
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card p-3 h-100 job-card d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                        <h6 class="fw-bold mb-0">${escapeHtml(job.title)}</h6>
+                        <span class="badge bg-dark">${pelamarCount} Pelamar</span>
+                    </div>
+                    <p class="small text-muted flex-grow-1 mb-3">${escapeHtml(job.desc)}</p>
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                        <small class="text-success fw-semibold"><i class="bi bi-check-circle me-1"></i>Berhasil: ${berhasilCount}</small>
+                        <button class="btn btn-sm btn-outline-primary" onclick="openModalKandidat('${escapeJs(job.title)}')">
+                            <i class="bi bi-plus me-1"></i>Daftar Kandidat
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderBadge(status) {
+        if (status === 'Berhasil') return `<span class="badge bg-success">Berhasil</span>`;
+        if (status === 'Tidak Berhasil') return `<span class="badge bg-danger">Tidak Berhasil</span>`;
+        return `<span class="badge bg-secondary">Dalam Proses</span>`;
+    }
+
+    function renderTableAndPagination() {
+        const filtered = getFilteredData();
+        const totalItems = filtered.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / rowsPerPage));
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        const startIdx = (currentPage - 1) * rowsPerPage;
+        const paginatedItems = filtered.slice(startIdx, startIdx + rowsPerPage);
+
+        const tbody = document.getElementById('tableKandidat');
+        if (paginatedItems.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">Tidak ada data kandidat yang sesuai.</td></tr>`;
+        } else {
+            tbody.innerHTML = paginatedItems.map((k, idx) => `
+                <tr>
+                    <td>${startIdx + idx + 1}</td>
+                    <td><strong>${escapeHtml(k.nama)}</strong></td>
+                    <td>${escapeHtml(k.jabatan)}</td>
+                    <td><span class="badge bg-light text-dark border">${escapeHtml(k.skill)}</span></td>
+                    <td>${escapeHtml(k.tanggal)}</td>
+                    <td>${renderBadge(k.status)}</td>
+                    <td>${escapeHtml(k.alasan)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-dark" onclick="openStatusModal(${k.realIndex})">
+                            <i class="bi bi-pencil-square me-1"></i>Update
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        const infoEl = document.getElementById('paginationInfo');
+        if (totalItems === 0) {
+            infoEl.innerText = 'Menampilkan 0 data';
+        } else {
+            infoEl.innerText = `Menampilkan ${startIdx + 1}–${Math.min(startIdx + rowsPerPage, totalItems)} dari ${totalItems} kandidat (Halaman ${currentPage} dari ${totalPages})`;
+        }
+
+        const pagEl = document.getElementById('paginationControls');
+        if (totalPages <= 1) {
+            pagEl.innerHTML = '';
+            return;
+        }
+
+        let html = `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <button class="page-link" onclick="goToPage(${currentPage - 1})">Prev</button>
+        </li>`;
+
+        for (let p = 1; p <= totalPages; p++) {
+            html += `<li class="page-item ${p === currentPage ? 'active' : ''}">
+                <button class="page-link" onclick="goToPage(${p})">${p}</button>
+            </li>`;
+        }
+
+        html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <button class="page-link" onclick="goToPage(${currentPage + 1})">Next</button>
+        </li>`;
+
+        pagEl.innerHTML = html;
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        renderTableAndPagination();
+    }
+
+    function exportExcel() {
+        const rows = getFilteredData();
+        if (rows.length === 0) return alert('Tidak ada data untuk diunduh.');
+
+        const headers = ['No', 'Nama Kandidat', 'Posisi Dilamar', 'Keahlian', 'Tanggal Daftar', 'Status', 'Alasan / Catatan'];
+        const csvLines = [
+            headers.map(h => `"${h}"`).join(','),
+            ...rows.map((r, i) => [
+                i + 1,
+                r.nama,
+                r.jabatan,
+                r.skill,
+                r.tanggal,
+                r.status,
+                r.alasan
+            ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
+        ];
+
+        const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `riwayat_rekrutmen_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function exportPDF() {
+        const rows = getFilteredData();
+        if (rows.length === 0) return alert('Tidak ada data untuk diunduh.');
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape' });
+
+        doc.setFontSize(14);
+        doc.text('Laporan Pendataan & Riwayat Rekrutmen', 14, 15);
+        doc.setFontSize(9);
+        doc.text(`Dicetak: ${new Date().toLocaleString('id-ID')}`, 14, 21);
+
+        doc.autoTable({
+            startY: 26,
+            head: [['No', 'Nama Kandidat', 'Posisi Dilamar', 'Keahlian', 'Tanggal', 'Status', 'Alasan / Catatan']],
+            body: rows.map((r, i) => [i + 1, r.nama, r.jabatan, r.skill, r.tanggal, r.status, r.alasan]),
+            styles: { fontSize: 8 }
+        });
+
+        doc.save(`riwayat_rekrutmen_${new Date().toISOString().slice(0, 10)}.pdf`);
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function escapeJs(str) {
+        return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    function renderAll() {
+        renderJobs();
+        renderTableAndPagination();
+    }
+
+    renderAll();
+</script>
+</body>
+</html>
