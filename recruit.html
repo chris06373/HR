@@ -66,12 +66,16 @@
       align-items: center;
     }
 
-    button, select, input {
+    button, select, input, a.btn {
       font-family: inherit;
       font-size: 0.875rem;
+      text-decoration: none;
     }
 
     .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 8px 14px;
       border-radius: 8px;
       border: 1px solid var(--border);
@@ -215,6 +219,16 @@
       padding: 2px 8px;
       border-radius: 999px;
       font-weight: 600;
+    }
+
+    .empty-col {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 24px 8px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.45);
     }
 
     .card {
@@ -491,6 +505,7 @@
       <h1>Recruitment Board</h1>
     </div>
     <div class="header-actions">
+      <a href="index.html" class="btn">Home</a>
       <button class="btn btn-primary" id="btnOpenAddCandidate">+ Tambah Kandidat</button>
       <button class="btn btn-reset" id="btnClearStorage">Clear Storage</button>
     </div>
@@ -502,7 +517,7 @@
       <div class="filter-panel">
         <div class="field">
           <label for="filterSearch">Cari Nama / Posisi</label>
-          <input type="text" id="filterSearch" placeholder="Contoh: Frontend, Budi..." />
+          <input type="text" id="filterSearch" placeholder="Cari nama atau posisi..." />
         </div>
         <div class="field">
           <label for="filterMaxSalary">Maks. Ekspektasi Gaji (Rp)</label>
@@ -570,7 +585,7 @@
             </div>
             <div class="field">
               <label for="schedNote">Catatan / Pewawancara</label>
-              <input type="text" id="schedNote" placeholder="Contoh: User Interview dengan Tech Lead" />
+              <input type="text" id="schedNote" placeholder="Catatan atau nama pewawancara" />
             </div>
             <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
           </form>
@@ -591,15 +606,15 @@
       <form class="form-grid" id="addCandidateForm" style="margin-bottom: 0;">
         <div class="field">
           <label for="candName">Nama Lengkap</label>
-          <input type="text" id="candName" required placeholder="Contoh: Nisa Rahmawati" />
+          <input type="text" id="candName" required placeholder="Nama lengkap kandidat" />
         </div>
         <div class="field">
           <label for="candRole">Posisi Dilamar</label>
-          <input type="text" id="candRole" required placeholder="Contoh: Product Designer" />
+          <input type="text" id="candRole" required placeholder="Posisi yang dilamar" />
         </div>
         <div class="field">
           <label for="candSalary">Ekspektasi Gaji (Rp / bulan)</label>
-          <input type="number" id="candSalary" required min="1000000" step="500000" value="11000000" />
+          <input type="number" id="candSalary" required min="1000000" step="500000" value="10000000" />
         </div>
         <div class="field">
           <label for="candAvailability">Ketersediaan Waktu</label>
@@ -637,70 +652,9 @@
     const pad = (n) => String(n).padStart(2, "0");
     const toDateStr = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-    const dayOffsetStr = (offset) => {
-      const d = new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate() + offset);
-      return toDateStr(d);
-    };
-
     const DEFAULT_DATA = {
-      candidates: [
-        {
-          id: "c-1",
-          name: "Raka Pratama",
-          role: "Frontend Engineer",
-          salary: 12000000,
-          availability: "Langsung (Immediate)",
-          stage: "Applied"
-        },
-        {
-          id: "c-2",
-          name: "Dina Kusuma",
-          role: "HR Generalist",
-          salary: 8000000,
-          availability: "2 Minggu",
-          stage: "Screening"
-        },
-        {
-          id: "c-3",
-          name: "Fajar Nugroho",
-          role: "Backend Engineer",
-          salary: 17500000,
-          availability: "1 Bulan",
-          stage: "Interview"
-        },
-        {
-          id: "c-4",
-          name: "Siti Aminah",
-          role: "QA Specialist",
-          salary: 9500000,
-          availability: "2 Minggu",
-          stage: "Offering"
-        },
-        {
-          id: "c-5",
-          name: "Kevin Wijaya",
-          role: "Data Analyst",
-          salary: 14000000,
-          availability: "Langsung (Immediate)",
-          stage: "Hired"
-        }
-      ],
-      schedules: [
-        {
-          id: "s-1",
-          candidateId: "c-3",
-          date: dayOffsetStr(1),
-          time: "10:00",
-          note: "Technical Interview"
-        },
-        {
-          id: "s-2",
-          candidateId: "c-2",
-          date: dayOffsetStr(2),
-          time: "14:00",
-          note: "HR Screening Call"
-        }
-      ]
+      candidates: [],
+      schedules: []
     };
 
     let state = loadState();
@@ -714,8 +668,8 @@
         if (!raw) return structuredClone(DEFAULT_DATA);
         const parsed = JSON.parse(raw);
         return {
-          candidates: Array.isArray(parsed.candidates) ? parsed.candidates : structuredClone(DEFAULT_DATA.candidates),
-          schedules: Array.isArray(parsed.schedules) ? parsed.schedules : structuredClone(DEFAULT_DATA.schedules)
+          candidates: Array.isArray(parsed.candidates) ? parsed.candidates : [],
+          schedules: Array.isArray(parsed.schedules) ? parsed.schedules : []
         };
       } catch {
         return structuredClone(DEFAULT_DATA);
@@ -789,6 +743,13 @@
         header.className = "col-header";
         header.innerHTML = `<span>${stage}</span><span class="col-count">${items.length}</span>`;
         col.appendChild(header);
+
+        if (!items.length) {
+          const emptyEl = document.createElement("div");
+          emptyEl.className = "empty-col";
+          emptyEl.textContent = "Belum ada kandidat";
+          col.appendChild(emptyEl);
+        }
 
         items.forEach((c) => {
           const sched = state.schedules.find((s) => s.candidateId === c.id);
@@ -906,10 +867,22 @@
 
     function renderCandidateSelect() {
       const sel = document.getElementById("schedCandidate");
+      const submitBtn = document.querySelector("#scheduleForm button[type='submit']");
       const currentVal = sel.value;
+
+      if (!state.candidates.length) {
+        sel.innerHTML = `<option value="">-- Belum ada kandidat --</option>`;
+        sel.disabled = true;
+        submitBtn.disabled = true;
+        return;
+      }
+
+      sel.disabled = false;
+      submitBtn.disabled = false;
       sel.innerHTML = state.candidates
         .map((c) => `<option value="${c.id}">${escapeHtml(c.name)} — ${escapeHtml(c.role)}</option>`)
         .join("");
+
       if (currentVal && state.candidates.some((c) => c.id === currentVal)) {
         sel.value = currentVal;
       }
@@ -1033,7 +1006,7 @@
 
       saveState();
       e.target.reset();
-      document.getElementById("candSalary").value = "11000000";
+      document.getElementById("candSalary").value = "10000000";
       modal.classList.remove("open");
       renderAll();
       showToast(`Kandidat ${name} ditambahkan`);
@@ -1044,7 +1017,7 @@
       state = structuredClone(DEFAULT_DATA);
       saveState();
       renderAll();
-      showToast("Storage dibersihkan & data awal dipulihkan");
+      showToast("Storage dibersihkan");
     });
 
     renderAll();
