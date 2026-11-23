@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soft Skill Training Quiz Portal</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --border: #e2e8f0;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --warn-bg: #fef9c3;
+      --warn-text: #854d0e;
+      --danger-bg: #fee2e2;
+      --danger-text: #991b1b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button, .btn-link {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    button:hover, .btn-link:hover {
+      background: #f1f5f9;
+    }
+
+    button.primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    button.primary:hover {
+      background: var(--primary-hover);
+    }
+
+    button.active {
+      background: var(--text);
+      color: #fff;
+      border-color: var(--text);
+    }
+
+    button.danger {
+      color: var(--danger-text);
+      border-color: #fecaca;
+      background: #fff5f5;
+    }
+
+    button.sm {
+      padding: 5px 10px;
+      font-size: 0.82rem;
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 24px auto;
+      padding: 0 20px 48px;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      margin-bottom: 14px;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.92rem;
+      background: #fff;
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .search-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .search-row input {
+      flex: 1 1 240px;
+    }
+
+    .search-history-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eef2ff;
+      color: #1e40af;
+      border: 1px solid #c7d2fe;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+    }
+
+    .chip button {
+      border: none;
+      background: transparent;
+      padding: 0;
+      font-size: 0.85rem;
+      color: inherit;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .badge.pass { background: var(--success-bg); color: var(--success-text); }
+    .badge.pending { background: var(--warn-bg); color: var(--warn-text); }
+    .badge.fail { background: var(--danger-bg); color: var(--danger-text); }
+
+    .empty {
+      color: var(--muted);
+      font-size: 0.92rem;
+      padding: 16px 0;
+    }
+
+    .question-box {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 14px;
+      background: #fafbfc;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0;
+      font-weight: 400;
+    }
+
+    .option-item input {
+      width: auto;
+    }
+
+    .detail-answer-block {
+      border-left: 3px solid var(--primary);
+      padding-left: 12px;
+      margin-bottom: 14px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .actions-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <a href="index.html" class="btn-link" onclick="goHome(event)">Home (index.html)</a>
+      <span class="brand-title">Soft Skill Training Quiz</span>
+    </div>
+    <nav>
+      <button id="nav-home" class="active" onclick="switchView('home')">Hasil &amp; History</button>
+      <button id="nav-employee" onclick="switchView('employee')">Kerjakan Quiz (Karyawan)</button>
+      <button id="nav-admin" onclick="switchView('admin')">Admin &amp; Backup</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HALAMAN UTAMA: HANYA HASIL PENGERJAAN, HISTORY PENCARIAN, DETAIL HASIL, PENCARIAN HISTORY -->
+    <section id="view-home" class="view active">
+      <div class="card">
+        <h2>Pencarian History Pengerjaan</h2>
+        <div class="search-row">
+          <input type="text" id="search-input" placeholder="Cari nama karyawan, divisi, judul quiz, atau level..." onkeydown="if(event.key==='Enter') runSearch()" />
+          <select id="filter-quiz" style="max-width: 240px;" onchange="renderResults()">
+            <option value="">Semua Quiz</option>
+            <option value="Quiz 1">Quiz 1</option>
+            <option value="Quiz 2">Quiz 2</option>
+            <option value="Quiz 3">Quiz 3</option>
+            <option value="Quiz 4">Quiz 4</option>
+          </select>
+          <button class="primary" onclick="runSearch()">Cari</button>
+          <button onclick="resetSearch()">Reset</button>
+        </div>
+
+        <div>
+          <span class="muted">History Pencarian:</span>
+          <div id="search-history-container" class="search-history-list" style="margin-top: 6px;"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Hasil Pengerjaan Quiz</h2>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>Karyawan</th>
+                <th>Quiz &amp; Level</th>
+                <th>Skor</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="results-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="detail-card">
+        <h2>Detail Hasil Pengerjaan</h2>
+        <div id="detail-content" class="empty">Pilih salah satu hasil pengerjaan di atas untuk melihat detail jawaban.</div>
+      </div>
+    </section>
+
+    <!-- HALAMAN KARYAWAN: MENGERJAKAN QUIZ -->
+    <section id="view-employee" class="view">
+      <div class="card">
+        <h2>Mode Karyawan — Kerjakan Quiz</h2>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="emp-name">Nama Karyawan</label>
+            <input type="text" id="emp-name" placeholder="Masukkan nama lengkap" />
+          </div>
+          <div class="form-group">
+            <label for="emp-dept">Divisi / Peran</label>
+            <input type="text" id="emp-dept" placeholder="Contoh: Product, Finance, Engineering" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="select-quiz-slot">Pilih Quiz (1 - 4)</label>
+            <select id="select-quiz-slot" onchange="loadQuizQuestions()">
+              <option value="Quiz 1">Quiz 1</option>
+              <option value="Quiz 2">Quiz 2</option>
+              <option value="Quiz 3">Quiz 3</option>
+              <option value="Quiz 4">Quiz 4</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="select-level">Filter Level Soal</label>
+            <select id="select-level" onchange="loadQuizQuestions()">
+              <option value="">Semua Level</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+              <option value="Essay">Essay</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="quiz-questions-container"></div>
+
+        <div class="actions-inline">
+          <button class="primary" onclick="submitQuizAttempt()">Kirim Jawaban Quiz</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HALAMAN ADMIN: TAMBAH SOAL, NILAI ESSAY, BACKUP & RESTORE -->
+    <section id="view-admin" class="view">
+      <div class="grid-2">
+        <div class="card">
+          <h2>Tambah Soal Baru</h2>
+          <div class="form-group">
+            <label for="q-quiz">Slot Quiz</label>
+            <select id="q-quiz">
+              <option value="Quiz 1">Quiz 1</option>
+              <option value="Quiz 2">Quiz 2</option>
+              <option value="Quiz 3">Quiz 3</option>
+              <option value="Quiz 4">Quiz 4</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="q-level">Level Kesulitan</label>
+            <select id="q-level" onchange="toggleQuestionTypeFields()">
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+              <option value="Essay">Essay</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="q-type">Tipe Soal</label>
+            <select id="q-type" onchange="toggleQuestionTypeFields()">
+              <option value="mcq">Pilihan Ganda</option>
+              <option value="essay">Essay</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="q-text">Pertanyaan / Skenario Soal</label>
+            <textarea id="q-text" placeholder="Tulis pertanyaan atau studi kasus soft skill..."></textarea>
+          </div>
+
+          <div id="mcq-fields">
+            <div class="form-group">
+              <label for="q-opt-a">Pilihan A</label>
+              <input type="text" id="q-opt-a" />
+            </div>
+            <div class="form-group">
+              <label for="q-opt-b">Pilihan B</label>
+              <input type="text" id="q-opt-b" />
+            </div>
+            <div class="form-group">
+              <label for="q-opt-c">Pilihan C</label>
+              <input type="text" id="q-opt-c" />
+            </div>
+            <div class="form-group">
+              <label for="q-opt-d">Pilihan D</label>
+              <input type="text" id="q-opt-d" />
+            </div>
+            <div class="form-group">
+              <label for="q-correct">Kunci Jawaban Benar</label>
+              <select id="q-correct">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="essay-fields" style="display: none;">
+            <div class="form-group">
+              <label for="q-rubric">Panduan / Rubrik Jawaban Essay</label>
+              <textarea id="q-rubric" placeholder="Poin utama yang dinilai pada jawaban esai..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="q-points">Bobot Poin</label>
+            <input type="number" id="q-points" value="25" min="1" max="100" />
+          </div>
+
+          <button class="primary" onclick="addQuestion()">Simpan Soal</button>
+        </div>
+
+        <div class="card">
+          <h2>Backup &amp; Restore Soal + Jawaban</h2>
+          <p class="muted" style="margin-bottom: 12px;">
+            Ekspor atau impor seluruh soal, kunci/jawaban karyawan, dan history pencarian dalam format JSON.
+          </p>
+          <div class="actions-inline" style="margin-bottom: 18px;">
+            <button class="primary" onclick="exportBackupJSON()">Download Backup (.json)</button>
+            <button onclick="document.getElementById('import-file').click()">Import Backup (.json)</button>
+            <input type="file" id="import-file" accept=".json,application/json" style="display: none;" onchange="importBackupJSON(event)" />
+            <button class="danger" onclick="clearAllStorage()">Hapus Semua Data Lokal</button>
+          </div>
+
+          <h3>Bank Soal Tersimpan (<span id="bank-count">0</span>)</h3>
+          <div id="question-bank-list"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Penilaian Jawaban Essay Karyawan</h2>
+        <div id="essay-grading-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEYS = {
+      QUESTIONS: "ss_quiz_questions_v1",
+      RESULTS: "ss_quiz_results_v1",
+      SEARCH_HISTORY: "ss_quiz_search_history_v1"
+    };
+
+    let state = {
+      questions: [],
+      results: [],
+      searchHistory: [],
+      activeQuery: "",
+      selectedResultId: null
+    };
+
+    function loadState() {
+      try {
+        state.questions = JSON.parse(localStorage.getItem(STORAGE_KEYS.QUESTIONS) || "[]");
+        state.results = JSON.parse(localStorage.getItem(STORAGE_KEYS.RESULTS) || "[]");
+        state.searchHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.SEARCH_HISTORY) || "[]");
+      } catch {
+        state.questions = [];
+        state.results = [];
+        state.searchHistory = [];
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEYS.QUESTIONS, JSON.stringify(state.questions));
+      localStorage.setItem(STORAGE_KEYS.RESULTS, JSON.stringify(state.results));
+      localStorage.setItem(STORAGE_KEYS.SEARCH_HISTORY, JSON.stringify(state.searchHistory));
+    }
+
+    function goHome(e) {
+      if (e) e.preventDefault();
+      switchView("home");
+    }
+
+    function switchView(viewName) {
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+
+      document.getElementById(`view-${viewName}`).classList.add("active");
+      document.getElementById(`nav-${viewName}`).classList.add("active");
+
+      if (viewName === "home") {
+        renderSearchHistory();
+        renderResults();
+        renderDetail();
+      } else if (viewName === "employee") {
+        loadQuizQuestions();
+      } else if (viewName === "admin") {
+        toggleQuestionTypeFields();
+        renderQuestionBank();
+        renderEssayGrading();
+      }
+    }
+
+    // --- PENCARIAN & HISTORY PENCARIAN ---
+    function runSearch() {
+      const input = document.getElementById("search-input");
+      const q = input.value.trim();
+      state.activeQuery = q;
+
+      if (q) {
+        state.searchHistory = [q, ...state.searchHistory.filter(item => item.toLowerCase() !== q.toLowerCase())].slice(0, 15);
+        saveState();
+      }
+      renderSearchHistory();
+      renderResults();
+    }
+
+    function resetSearch() {
+      document.getElementById("search-input").value = "";
+      document.getElementById("filter-quiz").value = "";
+      state.activeQuery = "";
+      renderResults();
+    }
+
+    function applyHistoryQuery(q) {
+      document.getElementById("search-input").value = q;
+      state.activeQuery = q;
+      renderResults();
+    }
+
+    function deleteHistoryQuery(q) {
+      state.searchHistory = state.searchHistory.filter(item => item !== q);
+      saveState();
+      renderSearchHistory();
+    }
+
+    function renderSearchHistory() {
+      const container = document.getElementById("search-history-container");
+      if (!state.searchHistory.length) {
+        container.innerHTML = `<span class="muted">Belum ada history pencarian.</span>`;
+        return;
+      }
+      container.innerHTML = state.searchHistory.map(q => `
+        <span class="chip">
+          <button type="button" onclick="applyHistoryQuery(${JSON.stringify(q)})">${escapeHtml(q)}</button>
+          <button type="button" title="Hapus" onclick="deleteHistoryQuery(${JSON.stringify(q)})">×</button>
+        </span>
+      `).join("");
+    }
+
+    // --- HASIL & DETAIL ---
+    function renderResults() {
+      const tbody = document.getElementById("results-tbody");
+      const quizFilter = document.getElementById("filter-quiz").value;
+      const q = state.activeQuery.toLowerCase();
+
+      const filtered = state.results.filter(r => {
+        const matchQuiz = !quizFilter || r.quizSlot === quizFilter;
+        const haystack = `${r.employeeName} ${r.department} ${r.quizSlot} ${r.levelFilter || ""}`.toLowerCase();
+        const matchText = !q || haystack.includes(q);
+        return matchQuiz && matchText;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="empty">Belum ada data hasil pengerjaan yang sesuai.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => {
+        let badgeClass = r.needsEssayReview ? "pending" : (r.score >= 75 ? "pass" : "fail");
+        let statusLabel = r.needsEssayReview ? "Menunggu Nilai Essay" : (r.score >= 75 ? "Lulus" : "Belum Lulus");
+        return `
+          <tr>
+            <td>${escapeHtml(r.submittedAt)}</td>
+            <td><strong>${escapeHtml(r.employeeName)}</strong><br><span class="muted">${escapeHtml(r.department)}</span></td>
+            <td>${escapeHtml(r.quizSlot)} <span class="muted">(${escapeHtml(r.levelFilter || "Semua")})</span></td>
+            <td><strong>${r.score}</strong> / ${r.maxScore}</td>
+            <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
+            <td><button class="sm" onclick="selectResultDetail('${r.id}')">Detail</button></td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function selectResultDetail(id) {
+      state.selectedResultId = id;
+      renderDetail();
+      document.getElementById("detail-card").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function renderDetail() {
+      const container = document.getElementById("detail-content");
+      const item = state.results.find(r => r.id === state.selectedResultId);
+      if (!item) {
+        container.innerHTML = `<div class="empty">Pilih salah satu hasil pengerjaan di atas untuk melihat detail jawaban.</div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <p><strong>Karyawan:</strong> ${escapeHtml(item.employeeName)} (${escapeHtml(item.department)})</p>
+        <p><strong>Quiz:</strong> ${escapeHtml(item.quizSlot)} | <strong>Level:</strong> ${escapeHtml(item.levelFilter || "Semua")} | <strong>Waktu:</strong> ${escapeHtml(item.submittedAt)}</p>
+        <p style="margin-bottom: 14px;"><strong>Total Skor:</strong> ${item.score} / ${item.maxScore}</p>
+        ${item.answers.map((a, idx) => `
+          <div class="detail-answer-block">
+            <p><strong>Soal ${idx + 1} [${escapeHtml(a.level)} - ${a.type.toUpperCase()}]:</strong> ${escapeHtml(a.questionText)}</p>
+            <p><strong>Jawaban Karyawan:</strong> ${escapeHtml(a.userAnswer || "(Kosong)")}</p>
+            ${a.type === "mcq"
+              ? `<p class="muted">Kunci: ${escapeHtml(a.correctAnswer)} | Poin: ${a.earnedPoints}/${a.points}</p>`
+              : `<p class="muted">Rubrik: ${escapeHtml(a.rubric || "-")} | Poin Essay: ${a.graded ? `${a.earnedPoints}/${a.points}` : "Belum dinilai"}</p>`
+            }
+          </div>
+        `).join("")}
+      `;
+    }
+
+    // --- MODE KARYAWAN ---
+    function loadQuizQuestions() {
+      const slot = document.getElementById("select-quiz-slot").value;
+      const level = document.getElementById("select-level").value;
+      const container = document.getElementById("quiz-questions-container");
+
+      const qs = state.questions.filter(q => q.quizSlot === slot && (!level || q.level === level));
+      if (!qs.length) {
+        container.innerHTML = `<div class="empty">Belum ada soal untuk filter ini. Tambahkan soal melalui menu Admin.</div>`;
+        return;
+      }
+
+      container.innerHTML = qs.map((q, i) => `
+        <div class="question-box">
+          <p><strong>${i + 1}. [${escapeHtml(q.level)}] ${escapeHtml(q.text)}</strong> <span class="muted">(${q.points} poin)</span></p>
+          ${q.type === "mcq"
+            ? ["A", "B", "C", "D"].map(opt => `
+                <label class="option-item">
+                  <input type="radio" name="ans_${q.id}" value="${opt}" />
+                  <span><strong>${opt}.</strong> ${escapeHtml(q.options[opt] || "")}</span>
+                </label>
+              `).join("")
+            : `<textarea id="essay_ans_${q.id}" placeholder="Tulis jawaban esai Anda di sini..."></textarea>`
+          }
+        </div>
+      `).join("");
+    }
+
+    function submitQuizAttempt() {
+      const employeeName = document.getElementById("emp-name").value.trim();
+      const department = document.getElementById("emp-dept").value.trim();
+      const quizSlot = document.getElementById("select-quiz-slot").value;
+      const levelFilter = document.getElementById("select-level").value;
+
+      if (!employeeName) {
+        alert("Nama karyawan wajib diisi.");
+        return;
+      }
+
+      const qs = state.questions.filter(q => q.quizSlot === quizSlot && (!levelFilter || q.level === levelFilter));
+      if (!qs.length) {
+        alert("Tidak ada soal yang tersedia untuk dikirim.");
+        return;
+      }
+
+      let totalScore = 0;
+      let maxScore = 0;
+      let needsEssayReview = false;
+
+      const answers = qs.map(q => {
+        const pts = Number(q.points) || 0;
+        maxScore += pts;
+
+        if (q.type === "mcq") {
+          const checked = document.querySelector(`input[name="ans_${q.id}"]:checked`);
+          const userAnswer = checked ? checked.value : "";
+          const isCorrect = userAnswer === q.correctAnswer;
+          const earnedPoints = isCorrect ? pts : 0;
+          totalScore += earnedPoints;
+
+          return {
+            questionId: q.id,
+            questionText: q.text,
+            type: "mcq",
+            level: q.level,
+            points: pts,
+            userAnswer,
+            correctAnswer: q.correctAnswer,
+            earnedPoints,
+            graded: true
+          };
+        } else {
+          needsEssayReview = true;
+          const essayVal = document.getElementById(`essay_ans_${q.id}`)?.value.trim() || "";
+          return {
+            questionId: q.id,
+            questionText: q.text,
+            type: "essay",
+            level: q.level,
+            points: pts,
+            rubric: q.rubric || "",
+            userAnswer: essayVal,
+            earnedPoints: 0,
+            graded: false
+          };
+        }
+      });
+
+      const attempt = {
+        id: "RES-" + Date.now(),
+        employeeName,
+        department: department || "-",
+        quizSlot,
+        levelFilter,
+        submittedAt: new Date().toLocaleString("id-ID"),
+        score: totalScore,
+        maxScore,
+        needsEssayReview,
+        answers
+      };
+
+      state.results.unshift(attempt);
+      state.selectedResultId = attempt.id;
+      saveState();
+
+      document.getElementById("emp-name").value = "";
+      document.getElementById("emp-dept").value = "";
+      switchView("home");
+    }
+
+    // --- MODE ADMIN ---
+    function toggleQuestionTypeFields() {
+      const level = document.getElementById("q-level").value;
+      const typeSelect = document.getElementById("q-type");
+      if (level === "Essay") {
+        typeSelect.value = "essay";
+      }
+      const isEssay = typeSelect.value === "essay";
+      document.getElementById("mcq-fields").style.display = isEssay ? "none" : "block";
+      document.getElementById("essay-fields").style.display = isEssay ? "block" : "none";
+    }
+
+    function addQuestion() {
+      const quizSlot = document.getElementById("q-quiz").value;
+      const level = document.getElementById("q-level").value;
+      const type = document.getElementById("q-type").value;
+      const text = document.getElementById("q-text").value.trim();
+      const points = Number(document.getElementById("q-points").value) || 10;
+
+      if (!text) {
+        alert("Pertanyaan soal tidak boleh kosong.");
+        return;
+      }
+
+      const newQ = {
+        id: "Q-" + Date.now(),
+        quizSlot,
+        level,
+        type,
+        text,
+        points
+      };
+
+      if (type === "mcq") {
+        newQ.options = {
+          A: document.getElementById("q-opt-a").value.trim(),
+          B: document.getElementById("q-opt-b").value.trim(),
+          C: document.getElementById("q-opt-c").value.trim(),
+          D: document.getElementById("q-opt-d").value.trim()
+        };
+        newQ.correctAnswer = document.getElementById("q-correct").value;
+      } else {
+        newQ.rubric = document.getElementById("q-rubric").value.trim();
+      }
+
+      state.questions.push(newQ);
+      saveState();
+
+      document.getElementById("q-text").value = "";
+      document.getElementById("q-opt-a").value = "";
+      document.getElementById("q-opt-b").value = "";
+      document.getElementById("q-opt-c").value = "";
+      document.getElementById("q-opt-d").value = "";
+      document.getElementById("q-rubric").value = "";
+
+      renderQuestionBank();
+      alert("Soal berhasil ditambahkan.");
+    }
+
+    function deleteQuestion(id) {
+      state.questions = state.questions.filter(q => q.id !== id);
+      saveState();
+      renderQuestionBank();
+    }
+
+    function renderQuestionBank() {
+      document.getElementById("bank-count").textContent = state.questions.length;
+      const list = document.getElementById("question-bank-list");
+      if (!state.questions.length) {
+        list.innerHTML = `<div class="empty">Bank soal masih kosong.</div>`;
+        return;
+      }
+      list.innerHTML = state.questions.map(q => `
+        <div class="question-box">
+          <p><strong>${escapeHtml(q.quizSlot)}</strong> · <span class="muted">${escapeHtml(q.level)} (${q.type.toUpperCase()}, ${q.points} poin)</span></p>
+          <p style="margin: 6px 0;">${escapeHtml(q.text)}</p>
+          ${q.type === "mcq"
+            ? `<p class="muted">Kunci: ${escapeHtml(q.correctAnswer)}</p>`
+            : `<p class="muted">Rubrik: ${escapeHtml(q.rubric || "-")}</p>`
+          }
+          <button class="sm danger" style="margin-top: 8px;" onclick="deleteQuestion('${q.id}')">Hapus</button>
+        </div>
+      `).join("");
+    }
+
+    function renderEssayGrading() {
+      const container = document.getElementById("essay-grading-list");
+      const pendingItems = [];
+
+      state.results.forEach(res => {
+        res.answers.forEach((ans, idx) => {
+          if (ans.type === "essay") {
+            pendingItems.push({ res, ans, idx });
+          }
+        });
+      });
+
+      if (!pendingItems.length) {
+        container.innerHTML = `<div class="empty">Belum ada jawaban esai yang perlu dinilai.</div>`;
+        return;
+      }
+
+      container.innerHTML = pendingItems.map(({ res, ans, idx }) => `
+        <div class="question-box">
+          <p><strong>${escapeHtml(res.employeeName)}</strong> (${escapeHtml(res.quizSlot)}) — Soal: ${escapeHtml(ans.questionText)}</p>
+          <p style="margin: 8px 0;"><strong>Jawaban:</strong> ${escapeHtml(ans.userAnswer || "(Kosong)")}</p>
+          <p class="muted">Rubrik: ${escapeHtml(ans.rubric || "-")} (Maks: ${ans.points} poin)</p>
+          <div class="actions-inline">
+            <input type="number" id="grade_${res.id}_${idx}" min="0" max="${ans.points}" value="${ans.earnedPoints}" style="max-width: 110px;" />
+            <button class="primary sm" onclick="saveEssayGrade('${res.id}', ${idx})">Simpan Nilai</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function saveEssayGrade(resultId, answerIndex) {
+      const res = state.results.find(r => r.id === resultId);
+      if (!res) return;
+      const ans = res.answers[answerIndex];
+      const input = document.getElementById(`grade_${resultId}_${answerIndex}`);
+      const val = Math.max(0, Math.min(Number(ans.points), Number(input.value) || 0));
+
+      ans.earnedPoints = val;
+      ans.graded = true;
+      res.score = res.answers.reduce((sum, a) => sum + (Number(a.earnedPoints) || 0), 0);
+      res.needsEssayReview = res.answers.some(a => a.type === "essay" && !a.graded);
+
+      saveState();
+      renderEssayGrading();
+      renderResults();
+      renderDetail();
+      alert("Nilai esai tersimpan.");
+    }
+
+    // --- BACKUP & RESTORE ---
+    function exportBackupJSON() {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        questions: state.questions,
+        results: state.results,
+        searchHistory: state.searchHistory
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `softskill-quiz-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importBackupJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (Array.isArray(data.questions)) state.questions = data.questions;
+          if (Array.isArray(data.results)) state.results = data.results;
+          if (Array.isArray(data.searchHistory)) state.searchHistory = data.searchHistory;
+          saveState();
+          renderSearchHistory();
+          renderResults();
+          renderDetail();
+          renderQuestionBank();
+          renderEssayGrading();
+          alert("Backup berhasil diimpor.");
+        } catch {
+          alert("File JSON tidak valid.");
+        }
+        event.target.value = "";
+      };
+      reader.readAsText(file);
+    }
+
+    function clearAllStorage() {
+      if (!confirm("Hapus seluruh soal, hasil pengerjaan, dan history pencarian di browser ini?")) return;
+      state.questions = [];
+      state.results = [];
+      state.searchHistory = [];
+      state.activeQuery = "";
+      state.selectedResultId = null;
+      saveState();
+      renderSearchHistory();
+      renderResults();
+      renderDetail();
+      renderQuestionBank();
+      renderEssayGrading();
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Inisialisasi awal tanpa data dummy
+    loadState();
+    renderSearchHistory();
+    renderResults();
+    renderDetail();
+  </script>
+</body>
+</html>
