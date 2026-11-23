@@ -179,6 +179,27 @@
       background: var(--surface);
     }
 
+    .field-hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .schedule-mode-banner {
+      font-size: 0.78rem;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: var(--accent-bg);
+      color: var(--primary);
+      border: 1px solid #bfdbfe;
+      font-weight: 500;
+    }
+
+    .schedule-mode-banner.is-update {
+      background: #fffbeb;
+      color: #b45309;
+      border-color: #fde68a;
+    }
+
     .filter-summary {
       font-size: 0.82rem;
       color: var(--muted);
@@ -658,18 +679,18 @@
       background: #ffffff;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      padding: 24px;
+      padding: 20px 24px;
       color: #0f172a;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      font-size: 0.9rem;
-      line-height: 1.65;
+      gap: 11px;
+      font-size: 0.88rem;
+      line-height: 1.55;
     }
 
     .letter-header {
       border-bottom: 2px solid #0f172a;
-      padding-bottom: 12px;
+      padding-bottom: 9px;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -677,7 +698,7 @@
     }
 
     .letter-title {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.03em;
@@ -687,13 +708,13 @@
       width: 100%;
       min-width: 0;
       border-collapse: collapse;
-      margin: 4px 0;
-      font-size: 0.86rem;
+      margin: 2px 0;
+      font-size: 0.84rem;
     }
 
     .letter-table td {
       border: none;
-      padding: 5px 8px 5px 0;
+      padding: 3px 8px 3px 0;
       vertical-align: top;
     }
 
@@ -704,8 +725,8 @@
     }
 
     .letter-sign {
-      margin-top: 10px;
-      padding-top: 12px;
+      margin-top: 6px;
+      padding-top: 9px;
       border-top: 1px dashed #cbd5e1;
       display: flex;
       justify-content: space-between;
@@ -773,20 +794,82 @@
       transform: translateY(0);
     }
 
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+
     @media print {
-      body * {
-        visibility: hidden;
+      html, body {
+        width: 100%;
+        height: auto;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        overflow: visible !important;
       }
-      #hiredLetterModal, #hiredLetterModal * {
-        visibility: visible;
-      }
-      #hiredLetterModal {
-        position: static;
-        background: none;
-        padding: 0;
-      }
-      .modal-actions, #btnCloseLetterModal, #btnPrintLetter {
+
+      body > *:not(#hiredLetterModal) {
         display: none !important;
+      }
+
+      #hiredLetterModal.open {
+        position: static !important;
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #ffffff !important;
+        overflow: visible !important;
+      }
+
+      #hiredLetterModal .modal {
+        max-width: 100% !important;
+        max-height: none !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        gap: 8px !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      #hiredLetterModal .modal > div:first-child,
+      #hiredLetterModal .modal-actions {
+        display: none !important;
+      }
+
+      #hiredLetterBody.offer-letter {
+        border: 1px solid #94a3b8 !important;
+        border-radius: 4px !important;
+        padding: 14px 18px !important;
+        font-size: 10.5pt !important;
+        line-height: 1.42 !important;
+        gap: 7px !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      .letter-header {
+        padding-bottom: 6px !important;
+      }
+
+      .letter-title {
+        font-size: 12pt !important;
+      }
+
+      .letter-table {
+        font-size: 10pt !important;
+        margin: 0 !important;
+      }
+
+      .letter-table td {
+        padding: 2px 6px 2px 0 !important;
+      }
+
+      .letter-sign {
+        margin-top: 4px !important;
+        padding-top: 7px !important;
       }
     }
 
@@ -902,11 +985,12 @@
         <div class="field">
           <label for="filterMaxSalary">Maks. Ekspektasi Gaji (Rp)</label>
           <select id="filterMaxSalary">
-            <option value="">Semua Gaji</option>
-            <option value="8000000">Hingga Rp 8.000.000</option>
-            <option value="12000000">Hingga Rp 12.000.000</option>
-            <option value="18000000">Hingga Rp 18.000.000</option>
-            <option value="25000000">Hingga Rp 25.000.000</option>
+            <option value="">Semua Gaji (Rp 5 jt – 65 jt)</option>
+            <option value="5315000">Hingga Rp 5.315.000</option>
+            <option value="10000000">Hingga Rp 10.000.000</option>
+            <option value="20000000">Hingga Rp 20.000.000</option>
+            <option value="35000000">Hingga Rp 35.000.000</option>
+            <option value="65000000">Hingga Rp 65.000.000</option>
           </select>
         </div>
         <div class="field">
@@ -949,8 +1033,11 @@
         </div>
 
         <div class="panel">
-          <h3 style="font-size: 0.95rem; margin-bottom: 12px;">Atur Jadwal Wawancara</h3>
+          <h3 style="font-size: 0.95rem; margin-bottom: 12px;">Atur Jadwal Wawancara (1x per Kandidat)</h3>
           <form class="form-grid" id="scheduleForm">
+            <div class="schedule-mode-banner" id="scheduleModeBanner">
+              Pilih kandidat untuk mengatur jadwal wawancara.
+            </div>
             <div class="field">
               <label for="schedCandidate">Pilih Kandidat</label>
               <select id="schedCandidate" required></select>
@@ -967,7 +1054,7 @@
               <label for="schedNote">Catatan / Pewawancara</label>
               <input type="text" id="schedNote" placeholder="Catatan atau nama pewawancara" />
             </div>
-            <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
+            <button type="submit" class="btn btn-primary" id="btnSubmitSchedule">Simpan Jadwal</button>
           </form>
 
           <h3 style="font-size: 0.9rem; margin-bottom: 8px; color: var(--muted);">
@@ -1051,7 +1138,17 @@
         </div>
         <div class="field">
           <label for="candSalary">Ekspektasi Gaji (Rp / bulan)</label>
-          <input type="number" id="candSalary" required min="1000000" step="500000" value="10000000" />
+          <input
+            type="number"
+            id="candSalary"
+            required
+            min="5000000"
+            max="65000000"
+            step="1"
+            value="5315000"
+            placeholder="Contoh: 5315000"
+          />
+          <span class="field-hint">Minimal Rp 5.000.000 — Maksimal Rp 65.000.000 (bebas nominal)</span>
         </div>
         <div class="field">
           <label for="candAvailability">Ketersediaan Waktu</label>
@@ -1082,12 +1179,12 @@
   <!-- Modal Edit Jadwal Wawancara -->
   <div class="modal-backdrop" id="editScheduleModal">
     <div class="modal">
-      <h3 style="font-size: 1rem;">Edit Jadwal Wawancara</h3>
+      <h3 style="font-size: 1rem;">Perbarui Jadwal Wawancara</h3>
       <form class="form-grid" id="editScheduleForm" style="margin-bottom: 0;">
         <input type="hidden" id="editScheduleId" />
         <div class="field">
           <label for="editSchedCandidate">Kandidat</label>
-          <select id="editSchedCandidate" required></select>
+          <select id="editSchedCandidate" required disabled></select>
         </div>
         <div class="field">
           <label for="editSchedDate">Tanggal (Mulai Hari Ini)</label>
@@ -1130,11 +1227,11 @@
     <div class="modal modal-letter">
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
         <h3 style="font-size: 1rem; color: var(--success);">Surat Pemberitahuan Diterima Bekerja</h3>
-        <span class="badge badge-hired">Status: Hired</span>
+        <span class="badge badge-hired">Status: Hired (1 Halaman)</span>
       </div>
       <div class="offer-letter" id="hiredLetterBody"></div>
       <div class="modal-actions">
-        <button type="button" class="btn" id="btnPrintLetter">Cetak Surat</button>
+        <button type="button" class="btn" id="btnPrintLetter">Cetak Surat (1 Halaman)</button>
         <button type="button" class="btn btn-primary" id="btnCloseLetterModal">Selesai</button>
       </div>
     </div>
@@ -1143,8 +1240,10 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const STORAGE_KEY = "recruitment_hub_data_v4";
+    const STORAGE_KEY = "recruitment_hub_data_v5";
     const STAGES = ["Applied", "Screening", "Interview", "Offering", "Hired"];
+    const MIN_SALARY = 5000000;
+    const MAX_SALARY = 65000000;
 
     const todayObj = new Date();
     const pad = (n) => String(n).padStart(2, "0");
@@ -1183,14 +1282,29 @@
       return !dateStr || dateStr < minInterviewDate;
     }
 
+    function isValidSalary(val) {
+      const num = Number(val);
+      return Number.isFinite(num) && num >= MIN_SALARY && num <= MAX_SALARY;
+    }
+
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return structuredClone(DEFAULT_DATA);
         const parsed = JSON.parse(raw);
+
+        // Pastikan setiap kandidat maksimal memiliki 1 jadwal interview
+        const rawSchedules = Array.isArray(parsed.schedules) ? parsed.schedules : [];
+        const uniqueByCandidate = new Map();
+        rawSchedules.forEach((s) => {
+          if (s && s.candidateId) {
+            uniqueByCandidate.set(s.candidateId, s);
+          }
+        });
+
         return {
           candidates: Array.isArray(parsed.candidates) ? parsed.candidates : [],
-          schedules: Array.isArray(parsed.schedules) ? parsed.schedules : [],
+          schedules: Array.from(uniqueByCandidate.values()),
           histories: Array.isArray(parsed.histories) ? parsed.histories : []
         };
       } catch {
@@ -1228,7 +1342,7 @@
       const el = document.getElementById("toast");
       el.textContent = msg;
       el.classList.add("show");
-      setTimeout(() => el.classList.remove("show"), 2500);
+      setTimeout(() => el.classList.remove("show"), 2600);
     }
 
     function formatRupiah(num) {
@@ -1257,21 +1371,19 @@
         <div class="letter-header">
           <div>
             <div class="letter-title">Surat Pemberitahuan Diterima Bekerja</div>
-            <div style="font-size:0.78rem; color:var(--muted);">No. Dokumen: ${escapeHtml(docNumber)}</div>
+            <div style="font-size:0.76rem; color:var(--muted);">No. Dokumen: ${escapeHtml(docNumber)}</div>
           </div>
-          <div style="text-align:right; font-size:0.8rem; color:var(--muted);">
+          <div style="text-align:right; font-size:0.78rem; color:var(--muted);">
             <div>Tanggal Terbit</div>
             <strong style="color:var(--text);">${escapeHtml(issuedDate)}</strong>
           </div>
         </div>
 
-        <p>Kepada Yth.<br /><strong>${escapeHtml(cand.name)}</strong><br />di Tempat</p>
-
-        <p>Dengan hormat,</p>
+        <p>Kepada Yth. <strong>${escapeHtml(cand.name)}</strong><br />di Tempat</p>
 
         <p>
-          Selamat! Berdasarkan hasil evaluasi dan proses rekrutmen yang telah dilaksanakan, kami dengan senang hati
-          menyatakan bahwa Anda <strong>DITERIMA BEKERJA</strong> dengan rincian penawaran sebagai berikut:
+          Selamat! Berdasarkan hasil seleksi dan evaluasi wawancara, kami menyatakan bahwa Anda
+          <strong>DITERIMA BEKERJA</strong> dengan rincian posisi dan kompensasi sebagai berikut:
         </p>
 
         <table class="letter-table">
@@ -1284,11 +1396,11 @@
             <td>: <strong>${escapeHtml(cand.role)}</strong></td>
           </tr>
           <tr>
-            <td>Gaji / Kompensasi</td>
-            <td>: <strong>${formatRupiah(cand.salary)} / bulan</strong></td>
+            <td>Gaji / Bulan</td>
+            <td>: <strong>${formatRupiah(cand.salary)}</strong></td>
           </tr>
           <tr>
-            <td>Ketersediaan Bergabung</td>
+            <td>Ketersediaan Gabung</td>
             <td>: <strong>${escapeHtml(cand.availability)}</strong></td>
           </tr>
           <tr>
@@ -1298,14 +1410,14 @@
         </table>
 
         <p>
-          Mohon konfirmasi kesiapan bergabung serta kelengkapan administrasi awal kepada tim HRD. Kami menantikan
-          kontribusi dan kolaborasi terbaik Anda bersama tim.
+          Silakan melakukan konfirmasi kesediaan bergabung serta melengkapi berkas administrasi kepada tim HRD.
+          Terima kasih atas partisipasi Anda dan selamat bergabung bersama kami.
         </p>
 
         <div class="letter-sign">
           <div>
-            <div style="font-size:0.78rem; color:var(--muted);">Ditetapkan oleh,</div>
-            <div style="font-weight:700; margin-top:4px;">Recruitment &amp; HR Team</div>
+            <div style="font-size:0.75rem; color:var(--muted);">Hormat kami,</div>
+            <div style="font-weight:700; margin-top:2px;">Recruitment &amp; HR Team</div>
           </div>
           <span class="badge badge-hired">Terverifikasi Diterima</span>
         </div>
@@ -1331,6 +1443,7 @@
       renderKanban();
       renderCalendar();
       renderCandidateSelects();
+      syncScheduleFormWithSelectedCandidate();
       renderAgenda();
       renderHistory();
     }
@@ -1411,7 +1524,7 @@
               <div class="card-actions">
                 ${isHired ? `<button type="button" class="btn btn-sm btn-success btn-letter">Surat</button>` : ""}
                 <button type="button" class="btn btn-sm btn-edit-cand">Edit</button>
-                <button type="button" class="btn btn-sm btn-schedule">Jadwal</button>
+                <button type="button" class="btn btn-sm btn-schedule">${sched ? "Update Jadwal" : "Jadwal"}</button>
               </div>
             </div>
           `;
@@ -1431,10 +1544,10 @@
           });
 
           card.querySelector(".btn-schedule").addEventListener("click", () => {
-            document.getElementById("schedCandidate").value = c.id;
-            document.getElementById("schedDate").value =
-              selectedDate >= minInterviewDate ? selectedDate : minInterviewDate;
-            document.getElementById("schedCandidate").scrollIntoView({ behavior: "smooth", block: "center" });
+            const selCand = document.getElementById("schedCandidate");
+            selCand.value = c.id;
+            syncScheduleFormWithSelectedCandidate();
+            selCand.scrollIntoView({ behavior: "smooth", block: "center" });
           });
 
           col.appendChild(card);
@@ -1515,7 +1628,8 @@
 
         cell.addEventListener("click", () => {
           selectedDate = dateStr;
-          if (dateStr >= minInterviewDate) {
+          const existing = state.schedules.find((s) => s.candidateId === document.getElementById("schedCandidate").value);
+          if (!existing && dateStr >= minInterviewDate) {
             document.getElementById("schedDate").value = dateStr;
           }
           renderCalendar();
@@ -1529,19 +1643,27 @@
     function renderCandidateSelects() {
       const sel = document.getElementById("schedCandidate");
       const editSel = document.getElementById("editSchedCandidate");
-      const submitBtn = document.querySelector("#scheduleForm button[type='submit']");
+      const submitBtn = document.getElementById("btnSubmitSchedule");
+      const bannerEl = document.getElementById("scheduleModeBanner");
       const currentVal = sel.value;
 
       const optionsHtml = state.candidates
-        .map((c) => `<option value="${c.id}">${escapeHtml(c.name)} — ${escapeHtml(c.role)}</option>`)
+        .map((c) => {
+          const hasSched = state.schedules.some((s) => s.candidateId === c.id);
+          return `<option value="${c.id}">${escapeHtml(c.name)} — ${escapeHtml(c.role)}${hasSched ? " [Sudah Terjadwal]" : ""}</option>`;
+        })
         .join("");
 
-      editSel.innerHTML = optionsHtml;
+      editSel.innerHTML = state.candidates
+        .map((c) => `<option value="${c.id}">${escapeHtml(c.name)} — ${escapeHtml(c.role)}</option>`)
+        .join("");
 
       if (!state.candidates.length) {
         sel.innerHTML = `<option value="">-- Belum ada kandidat --</option>`;
         sel.disabled = true;
         submitBtn.disabled = true;
+        bannerEl.className = "schedule-mode-banner";
+        bannerEl.textContent = "Tambahkan kandidat terlebih dahulu untuk mengatur jadwal wawancara.";
         return;
       }
 
@@ -1551,6 +1673,34 @@
 
       if (currentVal && state.candidates.some((c) => c.id === currentVal)) {
         sel.value = currentVal;
+      }
+    }
+
+    function syncScheduleFormWithSelectedCandidate() {
+      const candidateId = document.getElementById("schedCandidate").value;
+      const bannerEl = document.getElementById("scheduleModeBanner");
+      const submitBtn = document.getElementById("btnSubmitSchedule");
+      const dateInput = document.getElementById("schedDate");
+      const timeInput = document.getElementById("schedTime");
+      const noteInput = document.getElementById("schedNote");
+
+      if (!candidateId) return;
+
+      const existing = state.schedules.find((s) => s.candidateId === candidateId);
+      if (existing) {
+        bannerEl.className = "schedule-mode-banner is-update";
+        bannerEl.textContent = `Kandidat ini sudah memiliki jadwal (${existing.date} ${existing.time}). Menyimpan akan memperbarui jadwal yang ada.`;
+        submitBtn.textContent = "Perbarui Jadwal";
+        dateInput.value = existing.date >= minInterviewDate ? existing.date : minInterviewDate;
+        timeInput.value = existing.time;
+        noteInput.value = existing.note || "";
+      } else {
+        bannerEl.className = "schedule-mode-banner";
+        bannerEl.textContent = "Kandidat belum memiliki jadwal. Jadwal interview hanya dapat dibuat 1x dan bisa diperbarui.";
+        submitBtn.textContent = "Simpan Jadwal";
+        dateInput.value = selectedDate >= minInterviewDate ? selectedDate : minInterviewDate;
+        timeInput.value = "10:00";
+        noteInput.value = "";
       }
     }
 
@@ -1579,7 +1729,7 @@
               </div>
               <div class="agenda-right">
                 <span class="badge">${cand ? escapeHtml(cand.stage) : ""}</span>
-                <button type="button" class="btn btn-sm btn-edit-sched" data-sched-id="${escapeHtml(s.id)}">Edit</button>
+                <button type="button" class="btn btn-sm btn-edit-sched" data-sched-id="${escapeHtml(s.id)}">Update</button>
               </div>
             </div>
           `;
@@ -1599,7 +1749,7 @@
       document.getElementById("btnSubmitCandidateModal").textContent = "Simpan Kandidat";
       document.getElementById("candidateForm").reset();
       document.getElementById("editCandidateId").value = "";
-      document.getElementById("candSalary").value = "10000000";
+      document.getElementById("candSalary").value = "5315000";
       document.getElementById("candStage").disabled = false;
       candidateModal.classList.add("open");
     }
@@ -1934,6 +2084,10 @@
     document.getElementById("schedDate").value = selectedDate;
     applyDateConstraints();
 
+    document.getElementById("schedCandidate").addEventListener("change", () => {
+      syncScheduleFormWithSelectedCandidate();
+    });
+
     document.getElementById("scheduleForm").addEventListener("submit", (e) => {
       e.preventDefault();
       const candidateId = document.getElementById("schedCandidate").value;
@@ -1950,20 +2104,36 @@
       }
 
       const cand = state.candidates.find((c) => c.id === candidateId);
+      const existingIdx = state.schedules.findIndex((s) => s.candidateId === candidateId);
 
-      state.schedules.push({
-        id: "s-" + Date.now(),
-        candidateId,
-        date,
-        time,
-        note
-      });
-
-      recordHistory(
-        candidateId,
-        `Jadwal wawancara diatur pada ${date} ${time}${note ? " (" + note + ")" : ""}`,
-        cand ? cand.stage : "-"
-      );
+      if (existingIdx !== -1) {
+        state.schedules[existingIdx] = {
+          ...state.schedules[existingIdx],
+          date,
+          time,
+          note
+        };
+        recordHistory(
+          candidateId,
+          `Jadwal wawancara diperbarui menjadi ${date} ${time}${note ? " (" + note + ")" : ""}`,
+          cand ? cand.stage : "-"
+        );
+        showToast("Jadwal wawancara diperbarui (1 jadwal per kandidat)");
+      } else {
+        state.schedules.push({
+          id: "s-" + Date.now(),
+          candidateId,
+          date,
+          time,
+          note
+        });
+        recordHistory(
+          candidateId,
+          `Jadwal wawancara diatur pada ${date} ${time}${note ? " (" + note + ")" : ""}`,
+          cand ? cand.stage : "-"
+        );
+        showToast("Jadwal wawancara tersimpan");
+      }
 
       selectedDate = date;
       const [y, m] = date.split("-").map(Number);
@@ -1971,9 +2141,7 @@
       calMonth = m - 1;
 
       saveState();
-      document.getElementById("schedNote").value = "";
       renderAll();
-      showToast("Jadwal wawancara tersimpan");
     });
 
     document.getElementById("btnCancelEditSchedule").addEventListener("click", () => {
@@ -1989,7 +2157,7 @@
       const sched = state.schedules.find((s) => s.id === schedId);
       if (!sched) return;
 
-      const candidateId = document.getElementById("editSchedCandidate").value;
+      const candidateId = sched.candidateId;
       const date = document.getElementById("editSchedDate").value;
       const time = document.getElementById("editSchedTime").value;
       const note = document.getElementById("editSchedNote").value.trim();
@@ -2000,7 +2168,6 @@
         return;
       }
 
-      sched.candidateId = candidateId;
       sched.date = date;
       sched.time = time;
       sched.note = note;
@@ -2061,6 +2228,11 @@
       const availability = document.getElementById("candAvailability").value;
       const requestedStage = document.getElementById("candStage").value;
 
+      if (!isValidSalary(salary)) {
+        showToast("Gaji harus antara Rp 5.000.000 sampai Rp 65.000.000");
+        return;
+      }
+
       if (editId) {
         const cand = state.candidates.find((c) => c.id === editId);
         if (!cand) return;
@@ -2105,7 +2277,7 @@
 
         saveState();
         e.target.reset();
-        document.getElementById("candSalary").value = "10000000";
+        document.getElementById("candSalary").value = "5315000";
         candidateModal.classList.remove("open");
         historyPage = 1;
         renderAll();
