@@ -13,6 +13,8 @@
       --primary: #0f766e;
       --primary-hover: #115e59;
       --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --warn: #d97706;
       --danger: #dc2626;
       --border: #e2e8f0;
     }
@@ -27,8 +29,12 @@
     body {
       background: var(--bg);
       color: var(--text);
-      padding: 24px;
+      padding: 16px;
       line-height: 1.5;
+    }
+
+    @media (min-width: 768px) {
+      body { padding: 24px; }
     }
 
     .container {
@@ -38,20 +44,30 @@
 
     header {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
       gap: 12px;
       margin-bottom: 20px;
     }
 
+    @media (min-width: 768px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
     header h1 {
-      font-size: 1.5rem;
+      font-size: 1.35rem;
       color: var(--primary);
     }
 
+    @media (min-width: 768px) {
+      header h1 { font-size: 1.5rem; }
+    }
+
     header p {
-      font-size: 0.9rem;
+      font-size: 0.86rem;
       color: var(--muted);
     }
 
@@ -65,14 +81,21 @@
     button, a.btn-link {
       border: none;
       border-radius: 6px;
-      padding: 9px 14px;
-      font-size: 0.88rem;
+      padding: 9px 13px;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       transition: 0.15s ease;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 540px) {
+      .toolbar button, .toolbar a.btn-link {
+        flex: 1 1 calc(50% - 4px);
+      }
     }
 
     .btn-primary {
@@ -91,7 +114,15 @@
       background: var(--accent);
       color: #fff;
     }
-    .btn-accent:hover { background: #1d4ed8; }
+    .btn-accent:hover { background: var(--accent-hover); }
+
+    .btn-edit {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 5px 9px;
+      font-size: 0.78rem;
+    }
+    .btn-edit:hover { background: #fde68a; }
 
     .btn-danger {
       background: #fee2e2;
@@ -110,34 +141,67 @@
 
     .grid-main {
       display: grid;
-      grid-template-columns: 1fr 1.25fr;
-      gap: 20px;
-      margin-bottom: 24px;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      margin-bottom: 20px;
     }
 
-    @media (max-width: 960px) {
-      .grid-main { grid-template-columns: 1fr; }
+    @media (min-width: 960px) {
+      .grid-main {
+        grid-template-columns: 1fr 1.25fr;
+        gap: 20px;
+        margin-bottom: 24px;
+      }
     }
 
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 18px;
+      padding: 15px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
 
-    .card h2 {
-      font-size: 1.05rem;
+    @media (min-width: 768px) {
+      .card { padding: 18px; }
+    }
+
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 14px;
       padding-bottom: 8px;
       border-bottom: 1px solid var(--border);
     }
 
+    .card-header-row h2 {
+      font-size: 1.02rem;
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+
+    .edit-badge {
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
       gap: 12px;
+    }
+
+    @media (min-width: 540px) {
+      .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     .form-group {
@@ -147,7 +211,14 @@
     }
 
     .form-group.full {
-      grid-column: span 2;
+      grid-column: 1 / -1;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
     }
 
     label {
@@ -159,9 +230,10 @@
     input, select {
       border: 1px solid #cbd5e1;
       border-radius: 6px;
-      padding: 8px 10px;
+      padding: 9px 10px;
       font-size: 0.9rem;
       width: 100%;
+      background: #fff;
     }
 
     input:focus, select:focus {
@@ -176,9 +248,16 @@
       padding: 12px;
       margin-top: 12px;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      grid-template-columns: 1fr;
+      gap: 8px;
       font-size: 0.85rem;
+    }
+
+    @media (min-width: 540px) {
+      .preview-box {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
     }
 
     .preview-box span {
@@ -195,40 +274,50 @@
     .payslip {
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      padding: 20px;
+      padding: 16px;
       background: #fff;
+    }
+
+    @media (min-width: 768px) {
+      .payslip { padding: 20px; }
     }
 
     .payslip-header {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
+      gap: 8px;
       border-bottom: 2px solid var(--text);
       padding-bottom: 10px;
       margin-bottom: 14px;
     }
 
     .payslip-header h3 {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       letter-spacing: 0.5px;
     }
 
     .payslip-meta {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
       gap: 6px 16px;
       font-size: 0.86rem;
       margin-bottom: 14px;
     }
 
+    @media (min-width: 540px) {
+      .payslip-meta { grid-template-columns: repeat(2, 1fr); }
+    }
+
     .payslip-cols {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 16px;
       margin-bottom: 14px;
     }
 
-    @media (max-width: 600px) {
-      .payslip-cols { grid-template-columns: 1fr; }
+    @media (min-width: 600px) {
+      .payslip-cols { grid-template-columns: 1fr 1fr; }
     }
 
     .slip-section h4 {
@@ -243,13 +332,15 @@
     .slip-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.86rem;
+      gap: 8px;
+      font-size: 0.85rem;
       margin-bottom: 5px;
     }
 
     .slip-total {
       display: flex;
       justify-content: space-between;
+      gap: 8px;
       font-weight: 700;
       font-size: 0.9rem;
       border-top: 1px solid #94a3b8;
@@ -264,9 +355,11 @@
       padding: 12px 14px;
       border-radius: 8px;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      font-size: 1rem;
+      gap: 6px;
+      font-size: 0.96rem;
       font-weight: 700;
       margin-top: 8px;
     }
@@ -274,12 +367,14 @@
     /* Table */
     .table-wrap {
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.84rem;
+      font-size: 0.83rem;
+      min-width: 880px;
     }
 
     th, td {
@@ -295,13 +390,18 @@
       color: #334155;
     }
 
-    tr:hover {
+    tbody tr:hover {
       background: #f8fafc;
       cursor: pointer;
     }
 
     tr.selected {
       background: #e6fffa;
+    }
+
+    .action-cell {
+      display: flex;
+      gap: 6px;
     }
 
     .badge {
@@ -334,20 +434,23 @@
     <header>
       <div>
         <h1>Sistem Payroll</h1>
-        <p>Input gaji, lembur & potongan per level (Staff, SPV, Manager) hingga cetak slip gaji</p>
+        <p>Input & edit gaji, lembur & potongan per level (Staff, SPV, Manager) hingga cetak slip gaji</p>
       </div>
       <div class="toolbar no-print">
         <a href="index.html" class="btn-link btn-secondary">Home</a>
-        <button class="btn-accent" onclick="window.print()">Cetak / Simpan PDF Slip</button>
-        <button class="btn-secondary" onclick="exportJSON()">Export Data</button>
+        <button class="btn-accent" onclick="window.print()">Cetak / PDF Slip</button>
+        <button class="btn-primary" onclick="exportExcel()">Export Excel</button>
         <button class="btn-reset" onclick="resetAllData()">Reset</button>
       </div>
     </header>
 
     <div class="grid-main">
-      <!-- Form Input Payroll -->
+      <!-- Form Input / Edit Payroll -->
       <div class="card">
-        <h2>1. Input Data Payroll Karyawan</h2>
+        <div class="card-header-row">
+          <h2 id="formTitle">1. Input Data Payroll Karyawan</h2>
+          <span id="editIndicator" class="edit-badge" style="display: none;">Mode Edit</span>
+        </div>
         <form id="payrollForm" onsubmit="handleSaveEmployee(event)">
           <div class="form-grid">
             <div class="form-group">
@@ -408,9 +511,12 @@
               </select>
             </div>
 
-            <div class="form-group full" style="flex-direction: row; gap: 10px; margin-top: 4px;">
-              <button type="submit" class="btn-primary" style="flex: 1;">Simpan & Tampilkan Slip</button>
-              <button type="button" class="btn-secondary" onclick="clearForm()">Bersihkan</button>
+            <div class="form-group full">
+              <div class="form-actions">
+                <button type="submit" id="submitBtn" class="btn-primary" style="flex: 1;">Simpan & Tampilkan Slip</button>
+                <button type="button" id="cancelEditBtn" class="btn-secondary" style="display: none;" onclick="cancelEdit()">Batal Edit</button>
+                <button type="button" class="btn-secondary" onclick="clearForm()">Bersihkan</button>
+              </div>
             </div>
           </div>
 
@@ -433,14 +539,18 @@
 
       <!-- Slip Gaji -->
       <div class="card">
-        <h2>2. Pratinjau Slip Gaji</h2>
+        <div class="card-header-row">
+          <h2>2. Pratinjau Slip Gaji</h2>
+        </div>
         <div id="payslipContainer" class="payslip"></div>
       </div>
     </div>
 
     <!-- Tabel Rekap -->
     <div class="card table-card">
-      <h2>3. Rekap Daftar Payroll (Klik baris untuk melihat slip gaji)</h2>
+      <div class="card-header-row">
+        <h2>3. Rekap Daftar Payroll (Klik baris untuk slip, atau klik Edit untuk mengubah)</h2>
+      </div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -465,7 +575,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "mini_payroll_data_v2";
+    const STORAGE_KEY = "mini_payroll_data_v3";
 
     const LEVEL_DEFAULTS = {
       Staff: {
@@ -490,6 +600,7 @@
 
     let employees = loadEmployees();
     let selectedId = employees[0]?.id || null;
+    let editingId = null;
 
     function loadEmployees() {
       try {
@@ -567,7 +678,9 @@
       document.getElementById("gajiPokok").value = cfg.gajiPokok;
       document.getElementById("tunjTetap").value = cfg.tunjTetap;
       document.getElementById("tarifLembur").value = cfg.tarifLembur;
-      document.getElementById("potAbsensi").value = cfg.defaultPotAbsensi;
+      if (!editingId) {
+        document.getElementById("potAbsensi").value = cfg.defaultPotAbsensi;
+      }
       updateLiveCalc();
     }
 
@@ -593,27 +706,79 @@
       document.getElementById("liveThp").textContent = formatIDR(calc.thp);
     }
 
+    function setEditMode(isEditing) {
+      document.getElementById("editIndicator").style.display = isEditing ? "inline-block" : "none";
+      document.getElementById("cancelEditBtn").style.display = isEditing ? "inline-flex" : "none";
+      document.getElementById("submitBtn").textContent = isEditing ? "Simpan Perubahan" : "Simpan & Tampilkan Slip";
+      document.getElementById("formTitle").textContent = isEditing
+        ? "1. Edit Data Payroll Karyawan"
+        : "1. Input Data Payroll Karyawan";
+    }
+
+    function startEditEmployee(id, event) {
+      event.stopPropagation();
+      const emp = employees.find(e => e.id === id);
+      if (!emp) return;
+
+      editingId = emp.id;
+      selectedId = emp.id;
+
+      document.getElementById("periode").value = emp.periode || "2026-11";
+      document.getElementById("nik").value = emp.nik;
+      document.getElementById("nama").value = emp.nama;
+      document.getElementById("level").value = emp.level;
+      document.getElementById("gajiPokok").value = emp.gajiPokok;
+      document.getElementById("tunjTetap").value = emp.tunjTetap;
+      document.getElementById("jamLembur").value = emp.jamLembur;
+      document.getElementById("tarifLembur").value = emp.tarifLembur;
+      document.getElementById("potAbsensi").value = emp.potAbsensi;
+      document.getElementById("statusPtkp").value = emp.statusPtkp;
+
+      setEditMode(true);
+      updateLiveCalc();
+      renderAll();
+      document.getElementById("payrollForm").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function cancelEdit() {
+      editingId = null;
+      setEditMode(false);
+      clearForm(true);
+    }
+
     function handleSaveEmployee(e) {
       e.preventDefault();
       const vals = getFormValues();
       if (!vals.nik || !vals.nama) return;
 
-      const existingIndex = employees.findIndex(emp => emp.nik.toLowerCase() === vals.nik.toLowerCase());
-      if (existingIndex >= 0) {
-        employees[existingIndex] = { ...employees[existingIndex], ...vals };
-        selectedId = employees[existingIndex].id;
+      if (editingId) {
+        const idx = employees.findIndex(emp => emp.id === editingId);
+        if (idx >= 0) {
+          employees[idx] = { ...employees[idx], ...vals };
+          selectedId = employees[idx].id;
+        }
+        editingId = null;
+        setEditMode(false);
       } else {
-        const newEmp = { id: crypto.randomUUID(), ...vals };
-        employees.push(newEmp);
-        selectedId = newEmp.id;
+        const existingIndex = employees.findIndex(emp => emp.nik.toLowerCase() === vals.nik.toLowerCase());
+        if (existingIndex >= 0) {
+          employees[existingIndex] = { ...employees[existingIndex], ...vals };
+          selectedId = employees[existingIndex].id;
+        } else {
+          const newEmp = { id: crypto.randomUUID(), ...vals };
+          employees.push(newEmp);
+          selectedId = newEmp.id;
+        }
       }
 
       saveEmployees();
       renderAll();
-      clearForm(false);
+      clearForm(true);
     }
 
     function clearForm(resetLevel = true) {
+      editingId = null;
+      setEditMode(false);
       document.getElementById("nik").value = "";
       document.getElementById("nama").value = "";
       document.getElementById("jamLembur").value = 0;
@@ -629,6 +794,9 @@
     function deleteEmployee(id, event) {
       event.stopPropagation();
       employees = employees.filter(emp => emp.id !== id);
+      if (editingId === id) {
+        cancelEdit();
+      }
       if (selectedId === id) {
         selectedId = employees[0]?.id || null;
       }
@@ -670,7 +838,10 @@
             <td class="num">${formatIDR(bpjsAndTax)}</td>
             <td class="num" style="color:var(--primary);font-weight:700;">${formatIDR(c.thp)}</td>
             <td class="no-print">
-              <button class="btn-danger" onclick="deleteEmployee('${emp.id}', event)">Hapus</button>
+              <div class="action-cell">
+                <button class="btn-edit" onclick="startEditEmployee('${emp.id}', event)">Edit</button>
+                <button class="btn-danger" onclick="deleteEmployee('${emp.id}', event)">Hapus</button>
+              </div>
             </td>
           </tr>
         `;
@@ -731,12 +902,59 @@
       `;
     }
 
-    function exportJSON() {
-      const blob = new Blob([JSON.stringify(employees, null, 2)], { type: "application/json" });
+    function escapeXml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function exportExcel() {
+      if (!employees.length) {
+        alert("Belum ada data payroll untuk di-export.");
+        return;
+      }
+
+      const headers = [
+        "Periode", "NIK", "Nama Karyawan", "Level Jabatan", "Status PTKP",
+        "Gaji Pokok", "Tunjangan Tetap", "Jam Lembur", "Tarif Lembur/Jam", "Upah Lembur",
+        "Total Bruto", "Potongan Absensi", "BPJS Kesehatan (1%)", "BPJS TK (3%)",
+        "Estimasi PPh 21", "Total Potongan", "Gaji Bersih (THP)"
+      ];
+
+      const rowsHtml = employees.map(emp => {
+        const c = calculatePayroll(emp);
+        const cells = [
+          emp.periode, emp.nik, emp.nama, emp.level, emp.statusPtkp,
+          Math.round(emp.gajiPokok), Math.round(emp.tunjTetap),
+          Number(emp.jamLembur), Math.round(emp.tarifLembur), Math.round(c.upahLembur),
+          Math.round(c.totalBruto), Math.round(emp.potAbsensi),
+          Math.round(c.bpjsKes), Math.round(c.bpjsTk),
+          Math.round(c.pph21), Math.round(c.totalPotongan), Math.round(c.thp)
+        ];
+        return "<tr>" + cells.map(val => `<td>${escapeXml(val)}</td>`).join("") + "</tr>";
+      }).join("");
+
+      const excelTemplate = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office"
+              xmlns:x="urn:schemas-microsoft-com:office:excel"
+              xmlns="http://www.w3.org/TR/REC-html40">
+        <head><meta charset="UTF-8" /></head>
+        <body>
+          <table border="1">
+            <thead><tr>${headers.map(h => `<th>${escapeXml(h)}</th>`).join("")}</tr></thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob([excelTemplate], { type: "application/vnd.ms-excel;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "data-payroll.json";
+      a.download = "rekap-payroll.xls";
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -745,6 +963,8 @@
       if (!confirm("Hapus seluruh data payroll tersimpan dan kosongkan form?")) return;
       employees = [];
       selectedId = null;
+      editingId = null;
+      setEditMode(false);
       localStorage.removeItem(STORAGE_KEY);
       clearForm(true);
       renderAll();
