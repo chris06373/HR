@@ -76,6 +76,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
       padding: 8px 14px;
       border-radius: 8px;
       border: 1px solid var(--border);
@@ -86,8 +87,13 @@
       transition: all 0.15s ease;
     }
 
-    .btn:hover {
+    .btn:hover:not(:disabled) {
       background: var(--surface-alt);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .btn-primary {
@@ -96,8 +102,18 @@
       border-color: var(--primary);
     }
 
-    .btn-primary:hover {
+    .btn-primary:hover:not(:disabled) {
       background: var(--primary-hover);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+      border-color: var(--success);
+    }
+
+    .btn-success:hover:not(:disabled) {
+      background: #047857;
     }
 
     .btn-reset {
@@ -106,7 +122,7 @@
       border-color: #fde68a;
     }
 
-    .btn-reset:hover {
+    .btn-reset:hover:not(:disabled) {
       background: #fef3c7;
     }
 
@@ -168,8 +184,10 @@
 
     .section-header {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
       margin-bottom: 12px;
     }
 
@@ -247,6 +265,12 @@
       cursor: grabbing;
     }
 
+    .card.is-hired {
+      cursor: default;
+      border-color: #a7f3d0;
+      background: #fafffd;
+    }
+
     .card-top {
       display: flex;
       justify-content: space-between;
@@ -279,6 +303,12 @@
     .badge-time {
       background: #f1f5f9;
       color: #334155;
+    }
+
+    .badge-hired {
+      background: #ecfdf5;
+      color: var(--success);
+      border: 1px solid #a7f3d0;
     }
 
     .card-meta {
@@ -442,6 +472,122 @@
       font-size: 0.84rem;
     }
 
+    /* History Table & Pagination */
+    .history-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .history-search-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .history-search-group input,
+    .history-search-group select {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-alt);
+      color: var(--text);
+    }
+
+    .history-search-group input {
+      min-width: 240px;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      text-align: left;
+    }
+
+    thead th {
+      background: var(--surface-alt);
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .pagination-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 14px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .pagination-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .page-btn {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: var(--surface-alt);
+    }
+
+    .page-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .page-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
     /* Modal */
     .modal-backdrop {
       position: fixed;
@@ -468,6 +614,38 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+
+    .modal-lg {
+      max-width: 560px;
+    }
+
+    .detail-box {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.84rem;
+    }
+
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .timeline-item {
+      border-left: 3px solid var(--primary);
+      background: var(--surface-alt);
+      padding: 8px 10px;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.8rem;
     }
 
     .modal-actions {
@@ -597,6 +775,62 @@
         </div>
       </div>
     </section>
+
+    <!-- Tabel Histori Kandidat -->
+    <section aria-label="Tabel Histori Kandidat">
+      <div class="section-header">
+        <h2>Histori Kandidat</h2>
+        <button type="button" class="btn btn-success" id="btnExportExcel">Download Excel</button>
+      </div>
+      <div class="panel">
+        <div class="history-toolbar">
+          <div class="history-search-group">
+            <input
+              type="text"
+              id="historySearch"
+              placeholder="Cari nama, posisi, status, atau aktivitas..."
+            />
+            <select id="historyStageFilter" aria-label="Filter status di histori">
+              <option value="">Semua Status</option>
+              <option value="Applied">Applied</option>
+              <option value="Screening">Screening</option>
+              <option value="Interview">Interview</option>
+              <option value="Offering">Offering</option>
+              <option value="Hired">Hired</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--muted);">
+            <label for="historyPageSize">Baris:</label>
+            <select id="historyPageSize" style="padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-alt);">
+              <option value="5" selected>5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>Nama Kandidat</th>
+                <th>Posisi</th>
+                <th>Status Saat Ini</th>
+                <th>Aktivitas</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination-bar">
+          <div id="historyPaginationInfo">Menampilkan 0 data</div>
+          <div class="pagination-controls" id="historyPaginationControls"></div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- Modal Tambah Kandidat (Tanpa Fitur Hapus) -->
@@ -642,10 +876,24 @@
     </div>
   </div>
 
+  <!-- Modal Detail Status Kandidat -->
+  <div class="modal-backdrop" id="detailModal">
+    <div class="modal modal-lg">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-size: 1rem;">Detail Status Kandidat</h3>
+        <span class="badge" id="detailCurrentStageBadge">-</span>
+      </div>
+      <div id="detailModalContent"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" id="btnCloseDetailModal">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
-    const STORAGE_KEY = "recruitment_hub_data_v1";
+    const STORAGE_KEY = "recruitment_hub_data_v2";
     const STAGES = ["Applied", "Screening", "Interview", "Offering", "Hired"];
 
     const todayObj = new Date();
@@ -654,13 +902,20 @@
 
     const DEFAULT_DATA = {
       candidates: [],
-      schedules: []
+      schedules: [],
+      histories: []
     };
 
     let state = loadState();
     let calYear = todayObj.getFullYear();
     let calMonth = todayObj.getMonth();
     let selectedDate = toDateStr(todayObj);
+    let historyPage = 1;
+
+    function nowTimestamp() {
+      const d = new Date();
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
 
     function loadState() {
       try {
@@ -669,7 +924,8 @@
         const parsed = JSON.parse(raw);
         return {
           candidates: Array.isArray(parsed.candidates) ? parsed.candidates : [],
-          schedules: Array.isArray(parsed.schedules) ? parsed.schedules : []
+          schedules: Array.isArray(parsed.schedules) ? parsed.schedules : [],
+          histories: Array.isArray(parsed.histories) ? parsed.histories : []
         };
       } catch {
         return structuredClone(DEFAULT_DATA);
@@ -680,11 +936,24 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
+    function recordHistory(candidateId, activity, stageSnapshot) {
+      const cand = state.candidates.find((c) => c.id === candidateId);
+      state.histories.unshift({
+        id: "h-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6),
+        timestamp: nowTimestamp(),
+        candidateId,
+        candidateName: cand ? cand.name : "Kandidat",
+        role: cand ? cand.role : "-",
+        stage: stageSnapshot || (cand ? cand.stage : "-"),
+        activity
+      });
+    }
+
     function showToast(msg) {
       const el = document.getElementById("toast");
       el.textContent = msg;
       el.classList.add("show");
-      setTimeout(() => el.classList.remove("show"), 2200);
+      setTimeout(() => el.classList.remove("show"), 2400);
     }
 
     function formatRupiah(num) {
@@ -709,6 +978,7 @@
       renderCalendar();
       renderCandidateSelect();
       renderAgenda();
+      renderHistory();
     }
 
     function renderKanban() {
@@ -752,15 +1022,18 @@
         }
 
         items.forEach((c) => {
+          const isHired = c.stage === "Hired";
           const sched = state.schedules.find((s) => s.candidateId === c.id);
           const card = document.createElement("div");
-          card.className = "card";
-          card.draggable = true;
+          card.className = "card" + (isHired ? " is-hired" : "");
+          card.draggable = !isHired;
           card.dataset.id = c.id;
 
-          card.addEventListener("dragstart", (e) => {
-            e.dataTransfer.setData("text/plain", c.id);
-          });
+          if (!isHired) {
+            card.addEventListener("dragstart", (e) => {
+              e.dataTransfer.setData("text/plain", c.id);
+            });
+          }
 
           const stageOptions = STAGES.map(
             (st) => `<option value="${st}" ${st === c.stage ? "selected" : ""}>${st}</option>`
@@ -772,6 +1045,7 @@
                 <div class="card-name">${escapeHtml(c.name)}</div>
                 <div class="card-role">${escapeHtml(c.role)}</div>
               </div>
+              ${isHired ? `<span class="badge badge-hired">Hired (Terkunci)</span>` : ""}
             </div>
             <div class="card-meta">
               <span>Gaji: <strong>${formatRupiah(c.salary)}</strong></span>
@@ -779,13 +1053,14 @@
             </div>
             ${sched ? `<div class="schedule-tag">Jadwal: ${sched.date} ${sched.time}</div>` : ""}
             <div class="card-footer">
-              <select class="stage-select" aria-label="Pindah tahap ${escapeHtml(c.name)}">${stageOptions}</select>
+              <select class="stage-select" ${isHired ? "disabled" : ""} aria-label="Pindah tahap ${escapeHtml(c.name)}">${stageOptions}</select>
               <button type="button" class="btn btn-sm btn-schedule">Jadwalkan</button>
             </div>
           `;
 
-          card.querySelector(".stage-select").addEventListener("change", (e) => {
-            moveCandidateStage(c.id, e.target.value);
+          const selectEl = card.querySelector(".stage-select");
+          selectEl.addEventListener("change", (e) => {
+            moveCandidateStage(c.id, e.target.value, selectEl);
           });
 
           card.querySelector(".btn-schedule").addEventListener("click", () => {
@@ -801,12 +1076,24 @@
       });
     }
 
-    function moveCandidateStage(id, newStage) {
+    function moveCandidateStage(id, newStage, selectEl = null) {
       const cand = state.candidates.find((c) => c.id === id);
-      if (!cand || cand.stage === newStage) return;
+      if (!cand) return;
+
+      if (cand.stage === "Hired") {
+        if (selectEl) selectEl.value = "Hired";
+        showToast(`${cand.name} sudah Hired dan tidak bisa dipindahkan lagi`);
+        return;
+      }
+
+      if (cand.stage === newStage) return;
+
+      const oldStage = cand.stage;
       cand.stage = newStage;
+      recordHistory(cand.id, `Tahap berubah: ${oldStage} → ${newStage}`, newStage);
       saveState();
       renderKanban();
+      renderHistory();
       showToast(`${cand.name} dipindahkan ke ${newStage}`);
     }
 
@@ -918,6 +1205,244 @@
         .join("");
     }
 
+    /* Histori Kandidat: Pencarian, Pagination, Detail & Export Excel */
+    function getFilteredHistory() {
+      const q = document.getElementById("historySearch").value.trim().toLowerCase();
+      const stageFilter = document.getElementById("historyStageFilter").value;
+
+      return state.histories.filter((h) => {
+        const cand = state.candidates.find((c) => c.id === h.candidateId);
+        const currentStage = cand ? cand.stage : h.stage;
+
+        const matchStage = !stageFilter || currentStage === stageFilter || h.stage === stageFilter;
+        const matchText =
+          !q ||
+          (h.candidateName && h.candidateName.toLowerCase().includes(q)) ||
+          (h.role && h.role.toLowerCase().includes(q)) ||
+          (h.activity && h.activity.toLowerCase().includes(q)) ||
+          (currentStage && currentStage.toLowerCase().includes(q)) ||
+          (h.timestamp && h.timestamp.toLowerCase().includes(q));
+
+        return matchStage && matchText;
+      });
+    }
+
+    function renderHistory() {
+      const tbody = document.getElementById("historyTableBody");
+      const infoEl = document.getElementById("historyPaginationInfo");
+      const controlsEl = document.getElementById("historyPaginationControls");
+      const pageSize = Number(document.getElementById("historyPageSize").value || 5);
+
+      const filtered = getFilteredHistory();
+      const totalItems = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+
+      if (historyPage > totalPages) historyPage = totalPages;
+      if (historyPage < 1) historyPage = 1;
+
+      const startIdx = (historyPage - 1) * pageSize;
+      const pageItems = filtered.slice(startIdx, startIdx + pageSize);
+
+      if (!pageItems.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; color:var(--muted); padding:24px;">
+              Belum ada data histori kandidat yang sesuai.
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = pageItems
+          .map((h) => {
+            const cand = state.candidates.find((c) => c.id === h.candidateId);
+            const currentStage = cand ? cand.stage : h.stage;
+            const badgeClass = currentStage === "Hired" ? "badge badge-hired" : "badge";
+
+            return `
+              <tr>
+                <td style="white-space:nowrap; color:var(--muted);">${escapeHtml(h.timestamp)}</td>
+                <td><strong>${escapeHtml(h.candidateName)}</strong></td>
+                <td>${escapeHtml(h.role)}</td>
+                <td><span class="${badgeClass}">${escapeHtml(currentStage)}</span></td>
+                <td>${escapeHtml(h.activity)}</td>
+                <td>
+                  <button type="button" class="btn btn-sm btn-detail" data-history-id="${escapeHtml(h.id)}">
+                    Detail
+                  </button>
+                </td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        tbody.querySelectorAll(".btn-detail").forEach((btn) => {
+          btn.addEventListener("click", () => openHistoryDetail(btn.dataset.historyId));
+        });
+      }
+
+      const shownStart = totalItems === 0 ? 0 : startIdx + 1;
+      const shownEnd = Math.min(startIdx + pageSize, totalItems);
+      infoEl.textContent = `Menampilkan ${shownStart}–${shownEnd} dari ${totalItems} histori (Halaman ${historyPage} / ${totalPages})`;
+
+      controlsEl.innerHTML = "";
+
+      const prevBtn = document.createElement("button");
+      prevBtn.type = "button";
+      prevBtn.className = "page-btn";
+      prevBtn.textContent = "Sebelumnya";
+      prevBtn.disabled = historyPage <= 1;
+      prevBtn.addEventListener("click", () => {
+        historyPage--;
+        renderHistory();
+      });
+      controlsEl.appendChild(prevBtn);
+
+      for (let p = 1; p <= totalPages; p++) {
+        const pBtn = document.createElement("button");
+        pBtn.type = "button";
+        pBtn.className = "page-btn" + (p === historyPage ? " active" : "");
+        pBtn.textContent = String(p);
+        pBtn.addEventListener("click", () => {
+          historyPage = p;
+          renderHistory();
+        });
+        controlsEl.appendChild(pBtn);
+      }
+
+      const nextBtn = document.createElement("button");
+      nextBtn.type = "button";
+      nextBtn.className = "page-btn";
+      nextBtn.textContent = "Berikutnya";
+      nextBtn.disabled = historyPage >= totalPages;
+      nextBtn.addEventListener("click", () => {
+        historyPage++;
+        renderHistory();
+      });
+      controlsEl.appendChild(nextBtn);
+    }
+
+    function openHistoryDetail(historyId) {
+      const item = state.histories.find((h) => h.id === historyId);
+      if (!item) return;
+
+      const cand = state.candidates.find((c) => c.id === item.candidateId);
+      const candSchedules = state.schedules.filter((s) => s.candidateId === item.candidateId);
+      const candLogs = state.histories.filter((h) => h.candidateId === item.candidateId);
+      const currentStage = cand ? cand.stage : item.stage;
+
+      const badgeEl = document.getElementById("detailCurrentStageBadge");
+      badgeEl.textContent = currentStage;
+      badgeEl.className = currentStage === "Hired" ? "badge badge-hired" : "badge";
+
+      const schedulesHtml = candSchedules.length
+        ? `<ul style="padding-left:18px; font-size:0.82rem; display:flex; flex-direction:column; gap:4px;">
+            ${candSchedules.map((s) => `<li><strong>${escapeHtml(s.date)} ${escapeHtml(s.time)}</strong>${s.note ? " — " + escapeHtml(s.note) : ""}</li>`).join("")}
+           </ul>`
+        : `<div style="font-size:0.82rem; color:var(--muted);">Belum ada jadwal wawancara tercatat.</div>`;
+
+      const logsHtml = candLogs.length
+        ? `<div class="timeline-list">
+            ${candLogs.map((l) => `
+              <div class="timeline-item">
+                <div style="font-weight:600;">${escapeHtml(l.activity)}</div>
+                <div style="color:var(--muted); font-size:0.74rem;">${escapeHtml(l.timestamp)} &bull; Status: ${escapeHtml(l.stage)}</div>
+              </div>
+            `).join("")}
+           </div>`
+        : `<div style="font-size:0.82rem; color:var(--muted);">Tidak ada log aktivitas.</div>`;
+
+      document.getElementById("detailModalContent").innerHTML = `
+        <div class="detail-box">
+          <div><strong>Nama Kandidat:</strong> ${escapeHtml(cand ? cand.name : item.candidateName)}</div>
+          <div><strong>Posisi Dilamar:</strong> ${escapeHtml(cand ? cand.role : item.role)}</div>
+          <div><strong>Ekspektasi Gaji:</strong> ${cand ? formatRupiah(cand.salary) : "-"}</div>
+          <div><strong>Ketersediaan Waktu:</strong> ${cand ? escapeHtml(cand.availability) : "-"}</div>
+          <div><strong>Status Saat Ini:</strong> ${escapeHtml(currentStage)}${currentStage === "Hired" ? " (Terkunci — tidak dapat dipindahkan)" : ""}</div>
+          <div><strong>Aktivitas Baris Dipilih:</strong> ${escapeHtml(item.activity)} (${escapeHtml(item.timestamp)})</div>
+        </div>
+
+        <div style="margin-top: 8px;">
+          <h4 style="font-size: 0.88rem; margin-bottom: 6px;">Jadwal Wawancara Kandidat</h4>
+          ${schedulesHtml}
+        </div>
+
+        <div style="margin-top: 8px;">
+          <h4 style="font-size: 0.88rem; margin-bottom: 6px;">Riwayat Perubahan Status Kandidat</h4>
+          ${logsHtml}
+        </div>
+      `;
+
+      document.getElementById("detailModal").classList.add("open");
+    }
+
+    function exportHistoryToExcel() {
+      const rows = getFilteredHistory();
+      if (!rows.length) {
+        showToast("Tidak ada data histori untuk diunduh");
+        return;
+      }
+
+      const tableRows = rows
+        .map((h, idx) => {
+          const cand = state.candidates.find((c) => c.id === h.candidateId);
+          const currentStage = cand ? cand.stage : h.stage;
+          const salaryText = cand ? formatRupiah(cand.salary) : "-";
+          const availText = cand ? cand.availability : "-";
+
+          return `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${escapeHtml(h.timestamp)}</td>
+              <td>${escapeHtml(h.candidateName)}</td>
+              <td>${escapeHtml(h.role)}</td>
+              <td>${escapeHtml(salaryText)}</td>
+              <td>${escapeHtml(availText)}</td>
+              <td>${escapeHtml(currentStage)}</td>
+              <td>${escapeHtml(h.activity)}</td>
+            </tr>
+          `;
+        })
+        .join("");
+
+      const excelHtml = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office"
+              xmlns:x="urn:schemas-microsoft-com:office:excel"
+              xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+          <meta charset="UTF-8" />
+        </head>
+        <body>
+          <table border="1">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Waktu</th>
+                <th>Nama Kandidat</th>
+                <th>Posisi</th>
+                <th>Ekspektasi Gaji</th>
+                <th>Ketersediaan</th>
+                <th>Status Saat Ini</th>
+                <th>Aktivitas</th>
+              </tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob([excelHtml], { type: "application/vnd.ms-excel;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `histori-kandidat-${toDateStr(new Date())}.xls`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast("File Excel histori berhasil diunduh");
+    }
+
     function escapeHtml(str) {
       return String(str)
         .replace(/&/g, "&amp;")
@@ -931,6 +1456,23 @@
       document.getElementById(id).addEventListener("input", renderKanban);
       document.getElementById(id).addEventListener("change", renderKanban);
     });
+
+    document.getElementById("historySearch").addEventListener("input", () => {
+      historyPage = 1;
+      renderHistory();
+    });
+
+    document.getElementById("historyStageFilter").addEventListener("change", () => {
+      historyPage = 1;
+      renderHistory();
+    });
+
+    document.getElementById("historyPageSize").addEventListener("change", () => {
+      historyPage = 1;
+      renderHistory();
+    });
+
+    document.getElementById("btnExportExcel").addEventListener("click", exportHistoryToExcel);
 
     document.getElementById("prevMonth").addEventListener("click", () => {
       calMonth--;
@@ -961,6 +1503,8 @@
 
       if (!candidateId || !date || !time) return;
 
+      const cand = state.candidates.find((c) => c.id === candidateId);
+
       state.schedules.push({
         id: "s-" + Date.now(),
         candidateId,
@@ -968,6 +1512,12 @@
         time,
         note
       });
+
+      recordHistory(
+        candidateId,
+        `Jadwal wawancara diatur pada ${date} ${time}${note ? " (" + note + ")" : ""}`,
+        cand ? cand.stage : "-"
+      );
 
       selectedDate = date;
       const [y, m] = date.split("-").map(Number);
@@ -980,11 +1530,17 @@
       showToast("Jadwal wawancara tersimpan");
     });
 
-    const modal = document.getElementById("addModal");
-    document.getElementById("btnOpenAddCandidate").addEventListener("click", () => modal.classList.add("open"));
-    document.getElementById("btnCancelModal").addEventListener("click", () => modal.classList.remove("open"));
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) modal.classList.remove("open");
+    const addModal = document.getElementById("addModal");
+    document.getElementById("btnOpenAddCandidate").addEventListener("click", () => addModal.classList.add("open"));
+    document.getElementById("btnCancelModal").addEventListener("click", () => addModal.classList.remove("open"));
+    addModal.addEventListener("click", (e) => {
+      if (e.target === addModal) addModal.classList.remove("open");
+    });
+
+    const detailModal = document.getElementById("detailModal");
+    document.getElementById("btnCloseDetailModal").addEventListener("click", () => detailModal.classList.remove("open"));
+    detailModal.addEventListener("click", (e) => {
+      if (e.target === detailModal) detailModal.classList.remove("open");
     });
 
     document.getElementById("addCandidateForm").addEventListener("submit", (e) => {
@@ -995,19 +1551,23 @@
       const availability = document.getElementById("candAvailability").value;
       const stage = document.getElementById("candStage").value;
 
-      state.candidates.push({
+      const newCand = {
         id: "c-" + Date.now(),
         name,
         role,
         salary,
         availability,
         stage
-      });
+      };
+
+      state.candidates.push(newCand);
+      recordHistory(newCand.id, `Kandidat ditambahkan ke tahap ${stage}`, stage);
 
       saveState();
       e.target.reset();
       document.getElementById("candSalary").value = "10000000";
-      modal.classList.remove("open");
+      addModal.classList.remove("open");
+      historyPage = 1;
       renderAll();
       showToast(`Kandidat ${name} ditambahkan`);
     });
@@ -1015,6 +1575,7 @@
     document.getElementById("btnClearStorage").addEventListener("click", () => {
       localStorage.removeItem(STORAGE_KEY);
       state = structuredClone(DEFAULT_DATA);
+      historyPage = 1;
       saveState();
       renderAll();
       showToast("Storage dibersihkan");
