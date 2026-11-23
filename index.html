@@ -664,6 +664,12 @@ function showModule(moduleName) {
         window.location.href = "trainer.html";
         return;
     }
+
+    // Redirect ke halaman sp.html
+    if (moduleName === "sp") {
+        window.location.href = "sp.html";
+        return;
+    }
     
     const module = modules[moduleName];
 
