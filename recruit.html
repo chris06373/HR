@@ -32,12 +32,13 @@
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
+      -webkit-text-size-adjust: 100%;
     }
 
     header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
+      padding: 14px 24px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -62,7 +63,7 @@
     .header-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
     }
 
@@ -85,6 +86,7 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.15s ease;
+      white-space: nowrap;
     }
 
     .btn:hover:not(:disabled) {
@@ -168,6 +170,7 @@
       border-radius: 8px;
       background: var(--surface-alt);
       color: var(--text);
+      width: 100%;
     }
 
     .field input:focus, .field select:focus {
@@ -199,21 +202,23 @@
     /* Kanban Board */
     .kanban-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(240px, 1fr));
+      grid-template-columns: repeat(5, minmax(245px, 1fr));
       gap: 14px;
       overflow-x: auto;
-      padding-bottom: 6px;
+      padding-bottom: 8px;
+      scroll-snap-type: x proximity;
     }
 
     .kanban-col {
       background: #e2e8f0;
       border-radius: var(--radius);
       padding: 12px;
-      min-height: 360px;
+      min-height: 320px;
       display: flex;
       flex-direction: column;
       gap: 10px;
       transition: background 0.15s ease;
+      scroll-snap-align: start;
     }
 
     .kanban-col.drag-over {
@@ -298,6 +303,7 @@
       color: var(--primary);
       font-weight: 600;
       width: fit-content;
+      white-space: nowrap;
     }
 
     .badge-time {
@@ -331,11 +337,18 @@
 
     .card-footer {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 6px;
       padding-top: 6px;
       border-top: 1px solid var(--border);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 4px;
+      align-items: center;
     }
 
     .stage-select {
@@ -344,11 +357,12 @@
       border-radius: 6px;
       border: 1px solid var(--border);
       background: var(--surface-alt);
+      max-width: 110px;
     }
 
     .btn-sm {
-      padding: 4px 8px;
-      font-size: 0.75rem;
+      padding: 5px 8px;
+      font-size: 0.74rem;
       border-radius: 6px;
     }
 
@@ -377,17 +391,19 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
       margin-bottom: 14px;
     }
 
     .cal-title {
       font-weight: 700;
       font-size: 0.98rem;
+      text-align: center;
     }
 
     .cal-weekdays, .cal-days {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 6px;
       text-align: center;
     }
@@ -410,6 +426,7 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
+      min-width: 0;
       transition: border-color 0.15s ease;
     }
 
@@ -472,6 +489,13 @@
       font-size: 0.84rem;
     }
 
+    .agenda-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
     /* History Table & Pagination */
     .history-toolbar {
       display: flex;
@@ -488,7 +512,7 @@
       gap: 10px;
       align-items: center;
       flex: 1;
-      min-width: 240px;
+      min-width: 220px;
     }
 
     .history-search-group input,
@@ -501,12 +525,14 @@
     }
 
     .history-search-group input {
-      min-width: 240px;
+      flex: 1;
+      min-width: 200px;
     }
 
     .table-wrap {
       width: 100%;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       border: 1px solid var(--border);
       border-radius: 8px;
     }
@@ -516,6 +542,7 @@
       border-collapse: collapse;
       font-size: 0.84rem;
       text-align: left;
+      min-width: 680px;
     }
 
     thead th {
@@ -563,7 +590,7 @@
     }
 
     .page-btn {
-      padding: 5px 10px;
+      padding: 6px 10px;
       border-radius: 6px;
       border: 1px solid var(--border);
       background: var(--surface);
@@ -596,7 +623,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 14px;
       z-index: 50;
     }
 
@@ -614,7 +641,7 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      max-height: 88vh;
+      max-height: 90vh;
       overflow-y: auto;
     }
 
@@ -650,6 +677,7 @@
 
     .modal-actions {
       display: flex;
+      flex-wrap: wrap;
       justify-content: flex-end;
       gap: 8px;
       margin-top: 6px;
@@ -657,13 +685,17 @@
 
     .toast {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      bottom: 16px;
+      right: 16px;
+      left: 16px;
+      max-width: 420px;
+      margin-left: auto;
       background: var(--text);
       color: #fff;
       padding: 10px 16px;
       border-radius: 8px;
       font-size: 0.84rem;
+      text-align: center;
       opacity: 0;
       transform: translateY(8px);
       transition: all 0.2s ease;
@@ -674,6 +706,85 @@
     .toast.show {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    /* Mobile Breakpoints */
+    @media (max-width: 640px) {
+      header {
+        padding: 12px 14px;
+      }
+
+      .brand h1 {
+        font-size: 1.05rem;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: stretch;
+      }
+
+      .header-actions .btn {
+        flex: 1;
+        padding: 8px 10px;
+        font-size: 0.8rem;
+      }
+
+      main {
+        padding: 14px 12px 36px;
+        gap: 18px;
+      }
+
+      .filter-panel,
+      .panel {
+        padding: 14px;
+      }
+
+      .kanban-grid {
+        grid-template-columns: repeat(5, 82vw);
+        gap: 10px;
+      }
+
+      .kanban-col {
+        min-height: 260px;
+      }
+
+      .cal-weekdays, .cal-days {
+        gap: 3px;
+      }
+
+      .cal-day {
+        min-height: 54px;
+        padding: 4px;
+      }
+
+      .day-num {
+        font-size: 0.72rem;
+      }
+
+      .event-dot {
+        font-size: 0.62rem;
+        padding: 1px 3px;
+      }
+
+      .agenda-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .agenda-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .history-search-group,
+      .history-search-group input,
+      .history-search-group select {
+        width: 100%;
+      }
+
+      .modal {
+        padding: 16px;
+      }
     }
   </style>
 </head>
@@ -833,11 +944,12 @@
     </section>
   </main>
 
-  <!-- Modal Tambah Kandidat (Tanpa Fitur Hapus) -->
-  <div class="modal-backdrop" id="addModal">
+  <!-- Modal Tambah / Edit Kandidat (Tanpa Fitur Hapus) -->
+  <div class="modal-backdrop" id="candidateModal">
     <div class="modal">
-      <h3 style="font-size: 1rem;">Tambah Kandidat Baru</h3>
-      <form class="form-grid" id="addCandidateForm" style="margin-bottom: 0;">
+      <h3 style="font-size: 1rem;" id="candidateModalTitle">Tambah Kandidat Baru</h3>
+      <form class="form-grid" id="candidateForm" style="margin-bottom: 0;">
+        <input type="hidden" id="editCandidateId" />
         <div class="field">
           <label for="candName">Nama Lengkap</label>
           <input type="text" id="candName" required placeholder="Nama lengkap kandidat" />
@@ -859,7 +971,7 @@
           </select>
         </div>
         <div class="field">
-          <label for="candStage">Tahap Awal</label>
+          <label for="candStage">Tahap</label>
           <select id="candStage">
             <option value="Applied">Applied</option>
             <option value="Screening">Screening</option>
@@ -869,8 +981,38 @@
           </select>
         </div>
         <div class="modal-actions">
-          <button type="button" class="btn" id="btnCancelModal">Batal</button>
-          <button type="submit" class="btn btn-primary">Simpan Kandidat</button>
+          <button type="button" class="btn" id="btnCancelCandidateModal">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitCandidateModal">Simpan Kandidat</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Edit Jadwal Wawancara -->
+  <div class="modal-backdrop" id="editScheduleModal">
+    <div class="modal">
+      <h3 style="font-size: 1rem;">Edit Jadwal Wawancara</h3>
+      <form class="form-grid" id="editScheduleForm" style="margin-bottom: 0;">
+        <input type="hidden" id="editScheduleId" />
+        <div class="field">
+          <label for="editSchedCandidate">Kandidat</label>
+          <select id="editSchedCandidate" required></select>
+        </div>
+        <div class="field">
+          <label for="editSchedDate">Tanggal</label>
+          <input type="date" id="editSchedDate" required />
+        </div>
+        <div class="field">
+          <label for="editSchedTime">Jam</label>
+          <input type="time" id="editSchedTime" required />
+        </div>
+        <div class="field">
+          <label for="editSchedNote">Catatan / Pewawancara</label>
+          <input type="text" id="editSchedNote" placeholder="Catatan atau nama pewawancara" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="btnCancelEditSchedule">Batal</button>
+          <button type="submit" class="btn btn-primary">Perbarui Jadwal</button>
         </div>
       </form>
     </div>
@@ -879,12 +1021,13 @@
   <!-- Modal Detail Status Kandidat -->
   <div class="modal-backdrop" id="detailModal">
     <div class="modal modal-lg">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
         <h3 style="font-size: 1rem;">Detail Status Kandidat</h3>
         <span class="badge" id="detailCurrentStageBadge">-</span>
       </div>
       <div id="detailModalContent"></div>
       <div class="modal-actions">
+        <button type="button" class="btn" id="btnEditFromDetail">Edit Kandidat</button>
         <button type="button" class="btn btn-primary" id="btnCloseDetailModal">Tutup</button>
       </div>
     </div>
@@ -893,7 +1036,7 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const STORAGE_KEY = "recruitment_hub_data_v2";
+    const STORAGE_KEY = "recruitment_hub_data_v3";
     const STAGES = ["Applied", "Screening", "Interview", "Offering", "Hired"];
 
     const todayObj = new Date();
@@ -911,6 +1054,7 @@
     let calMonth = todayObj.getMonth();
     let selectedDate = toDateStr(todayObj);
     let historyPage = 1;
+    let activeDetailCandidateId = null;
 
     function nowTimestamp() {
       const d = new Date();
@@ -934,6 +1078,15 @@
 
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function syncCandidateMetaInLogs(cand) {
+      state.histories.forEach((h) => {
+        if (h.candidateId === cand.id) {
+          h.candidateName = cand.name;
+          h.role = cand.role;
+        }
+      });
     }
 
     function recordHistory(candidateId, activity, stageSnapshot) {
@@ -976,7 +1129,7 @@
     function renderAll() {
       renderKanban();
       renderCalendar();
-      renderCandidateSelect();
+      renderCandidateSelects();
       renderAgenda();
       renderHistory();
     }
@@ -1054,13 +1207,20 @@
             ${sched ? `<div class="schedule-tag">Jadwal: ${sched.date} ${sched.time}</div>` : ""}
             <div class="card-footer">
               <select class="stage-select" ${isHired ? "disabled" : ""} aria-label="Pindah tahap ${escapeHtml(c.name)}">${stageOptions}</select>
-              <button type="button" class="btn btn-sm btn-schedule">Jadwalkan</button>
+              <div class="card-actions">
+                <button type="button" class="btn btn-sm btn-edit-cand">Edit</button>
+                <button type="button" class="btn btn-sm btn-schedule">Jadwal</button>
+              </div>
             </div>
           `;
 
           const selectEl = card.querySelector(".stage-select");
           selectEl.addEventListener("change", (e) => {
             moveCandidateStage(c.id, e.target.value, selectEl);
+          });
+
+          card.querySelector(".btn-edit-cand").addEventListener("click", () => {
+            openEditCandidateModal(c.id);
           });
 
           card.querySelector(".btn-schedule").addEventListener("click", () => {
@@ -1152,10 +1312,17 @@
       }
     }
 
-    function renderCandidateSelect() {
+    function renderCandidateSelects() {
       const sel = document.getElementById("schedCandidate");
+      const editSel = document.getElementById("editSchedCandidate");
       const submitBtn = document.querySelector("#scheduleForm button[type='submit']");
       const currentVal = sel.value;
+
+      const optionsHtml = state.candidates
+        .map((c) => `<option value="${c.id}">${escapeHtml(c.name)} — ${escapeHtml(c.role)}</option>`)
+        .join("");
+
+      editSel.innerHTML = optionsHtml;
 
       if (!state.candidates.length) {
         sel.innerHTML = `<option value="">-- Belum ada kandidat --</option>`;
@@ -1166,9 +1333,7 @@
 
       sel.disabled = false;
       submitBtn.disabled = false;
-      sel.innerHTML = state.candidates
-        .map((c) => `<option value="${c.id}">${escapeHtml(c.name)} — ${escapeHtml(c.role)}</option>`)
-        .join("");
+      sel.innerHTML = optionsHtml;
 
       if (currentVal && state.candidates.some((c) => c.id === currentVal)) {
         sel.value = currentVal;
@@ -1193,16 +1358,68 @@
           return `
             <div class="agenda-item">
               <div>
-                <strong>${s.time}</strong> &bull; <strong>${cand ? escapeHtml(cand.name) : "Kandidat"}</strong>
+                <strong>${escapeHtml(s.time)}</strong> &bull; <strong>${cand ? escapeHtml(cand.name) : "Kandidat"}</strong>
                 <div style="font-size:0.76rem; color:var(--muted);">
                   ${cand ? escapeHtml(cand.role) : ""}${s.note ? " — " + escapeHtml(s.note) : ""}
                 </div>
               </div>
-              <span class="badge">${cand ? cand.stage : ""}</span>
+              <div class="agenda-right">
+                <span class="badge">${cand ? escapeHtml(cand.stage) : ""}</span>
+                <button type="button" class="btn btn-sm btn-edit-sched" data-sched-id="${escapeHtml(s.id)}">Edit</button>
+              </div>
             </div>
           `;
         })
         .join("");
+
+      list.querySelectorAll(".btn-edit-sched").forEach((btn) => {
+        btn.addEventListener("click", () => openEditScheduleModal(btn.dataset.schedId));
+      });
+    }
+
+    /* Modal Tambah / Edit Kandidat */
+    const candidateModal = document.getElementById("candidateModal");
+
+    function openAddCandidateModal() {
+      document.getElementById("candidateModalTitle").textContent = "Tambah Kandidat Baru";
+      document.getElementById("btnSubmitCandidateModal").textContent = "Simpan Kandidat";
+      document.getElementById("candidateForm").reset();
+      document.getElementById("editCandidateId").value = "";
+      document.getElementById("candSalary").value = "10000000";
+      document.getElementById("candStage").disabled = false;
+      candidateModal.classList.add("open");
+    }
+
+    function openEditCandidateModal(candId) {
+      const cand = state.candidates.find((c) => c.id === candId);
+      if (!cand) return;
+
+      document.getElementById("candidateModalTitle").textContent = "Edit Data Kandidat";
+      document.getElementById("btnSubmitCandidateModal").textContent = "Simpan Perubahan";
+      document.getElementById("editCandidateId").value = cand.id;
+      document.getElementById("candName").value = cand.name;
+      document.getElementById("candRole").value = cand.role;
+      document.getElementById("candSalary").value = cand.salary;
+      document.getElementById("candAvailability").value = cand.availability;
+      document.getElementById("candStage").value = cand.stage;
+      document.getElementById("candStage").disabled = cand.stage === "Hired";
+      candidateModal.classList.add("open");
+    }
+
+    /* Modal Edit Jadwal */
+    const editScheduleModal = document.getElementById("editScheduleModal");
+
+    function openEditScheduleModal(schedId) {
+      const sched = state.schedules.find((s) => s.id === schedId);
+      if (!sched) return;
+
+      renderCandidateSelects();
+      document.getElementById("editScheduleId").value = sched.id;
+      document.getElementById("editSchedCandidate").value = sched.candidateId;
+      document.getElementById("editSchedDate").value = sched.date;
+      document.getElementById("editSchedTime").value = sched.time;
+      document.getElementById("editSchedNote").value = sched.note || "";
+      editScheduleModal.classList.add("open");
     }
 
     /* Histori Kandidat: Pencarian, Pagination, Detail & Export Excel */
@@ -1326,6 +1543,9 @@
       if (!item) return;
 
       const cand = state.candidates.find((c) => c.id === item.candidateId);
+      activeDetailCandidateId = cand ? cand.id : null;
+      document.getElementById("btnEditFromDetail").style.display = cand ? "inline-flex" : "none";
+
       const candSchedules = state.schedules.filter((s) => s.candidateId === item.candidateId);
       const candLogs = state.histories.filter((h) => h.candidateId === item.candidateId);
       const currentStage = cand ? cand.stage : item.stage;
@@ -1530,11 +1750,51 @@
       showToast("Jadwal wawancara tersimpan");
     });
 
-    const addModal = document.getElementById("addModal");
-    document.getElementById("btnOpenAddCandidate").addEventListener("click", () => addModal.classList.add("open"));
-    document.getElementById("btnCancelModal").addEventListener("click", () => addModal.classList.remove("open"));
-    addModal.addEventListener("click", (e) => {
-      if (e.target === addModal) addModal.classList.remove("open");
+    document.getElementById("btnCancelEditSchedule").addEventListener("click", () => {
+      editScheduleModal.classList.remove("open");
+    });
+    editScheduleModal.addEventListener("click", (e) => {
+      if (e.target === editScheduleModal) editScheduleModal.classList.remove("open");
+    });
+
+    document.getElementById("editScheduleForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const schedId = document.getElementById("editScheduleId").value;
+      const sched = state.schedules.find((s) => s.id === schedId);
+      if (!sched) return;
+
+      const candidateId = document.getElementById("editSchedCandidate").value;
+      const date = document.getElementById("editSchedDate").value;
+      const time = document.getElementById("editSchedTime").value;
+      const note = document.getElementById("editSchedNote").value.trim();
+
+      sched.candidateId = candidateId;
+      sched.date = date;
+      sched.time = time;
+      sched.note = note;
+
+      const cand = state.candidates.find((c) => c.id === candidateId);
+      recordHistory(
+        candidateId,
+        `Jadwal wawancara diperbarui menjadi ${date} ${time}${note ? " (" + note + ")" : ""}`,
+        cand ? cand.stage : "-"
+      );
+
+      selectedDate = date;
+      const [y, m] = date.split("-").map(Number);
+      calYear = y;
+      calMonth = m - 1;
+
+      saveState();
+      editScheduleModal.classList.remove("open");
+      renderAll();
+      showToast("Jadwal wawancara diperbarui");
+    });
+
+    document.getElementById("btnOpenAddCandidate").addEventListener("click", openAddCandidateModal);
+    document.getElementById("btnCancelCandidateModal").addEventListener("click", () => candidateModal.classList.remove("open"));
+    candidateModal.addEventListener("click", (e) => {
+      if (e.target === candidateModal) candidateModal.classList.remove("open");
     });
 
     const detailModal = document.getElementById("detailModal");
@@ -1542,34 +1802,67 @@
     detailModal.addEventListener("click", (e) => {
       if (e.target === detailModal) detailModal.classList.remove("open");
     });
+    document.getElementById("btnEditFromDetail").addEventListener("click", () => {
+      if (!activeDetailCandidateId) return;
+      detailModal.classList.remove("open");
+      openEditCandidateModal(activeDetailCandidateId);
+    });
 
-    document.getElementById("addCandidateForm").addEventListener("submit", (e) => {
+    document.getElementById("candidateForm").addEventListener("submit", (e) => {
       e.preventDefault();
+      const editId = document.getElementById("editCandidateId").value;
       const name = document.getElementById("candName").value.trim();
       const role = document.getElementById("candRole").value.trim();
       const salary = Number(document.getElementById("candSalary").value);
       const availability = document.getElementById("candAvailability").value;
-      const stage = document.getElementById("candStage").value;
+      const requestedStage = document.getElementById("candStage").value;
 
-      const newCand = {
-        id: "c-" + Date.now(),
-        name,
-        role,
-        salary,
-        availability,
-        stage
-      };
+      if (editId) {
+        const cand = state.candidates.find((c) => c.id === editId);
+        if (!cand) return;
 
-      state.candidates.push(newCand);
-      recordHistory(newCand.id, `Kandidat ditambahkan ke tahap ${stage}`, stage);
+        const oldStage = cand.stage;
+        const stageChanged = cand.stage !== "Hired" && cand.stage !== requestedStage;
+        const newStage = cand.stage === "Hired" ? "Hired" : requestedStage;
 
-      saveState();
-      e.target.reset();
-      document.getElementById("candSalary").value = "10000000";
-      addModal.classList.remove("open");
-      historyPage = 1;
-      renderAll();
-      showToast(`Kandidat ${name} ditambahkan`);
+        cand.name = name;
+        cand.role = role;
+        cand.salary = salary;
+        cand.availability = availability;
+        cand.stage = newStage;
+
+        syncCandidateMetaInLogs(cand);
+
+        const logMsg = stageChanged
+          ? `Data kandidat diedit & tahap berubah: ${oldStage} → ${newStage}`
+          : "Data kandidat diperbarui (nama/posisi/gaji/ketersediaan)";
+
+        recordHistory(cand.id, logMsg, newStage);
+        saveState();
+        candidateModal.classList.remove("open");
+        renderAll();
+        showToast(`Data ${name} diperbarui`);
+      } else {
+        const newCand = {
+          id: "c-" + Date.now(),
+          name,
+          role,
+          salary,
+          availability,
+          stage: requestedStage
+        };
+
+        state.candidates.push(newCand);
+        recordHistory(newCand.id, `Kandidat ditambahkan ke tahap ${requestedStage}`, requestedStage);
+
+        saveState();
+        e.target.reset();
+        document.getElementById("candSalary").value = "10000000";
+        candidateModal.classList.remove("open");
+        historyPage = 1;
+        renderAll();
+        showToast(`Kandidat ${name} ditambahkan`);
+      }
     });
 
     document.getElementById("btnClearStorage").addEventListener("click", () => {
