@@ -1,85 +1,331 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Payroll System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Payroll & Slip Gaji</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --primary: #0f766e;
+      --primary-hover: #115e59;
+      --accent: #2563eb;
+      --danger: #dc2626;
+      --border: #e2e8f0;
+    }
 
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #fcfcfd;
-            color: #1a1d23;
-        }
-        .card {
-            border: 1px solid #f0f0f0;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-        }
-        .form-control, .form-select {
-            border-radius: 10px;
-            padding: 12px;
-            border: 1px solid #e2e8f0;
-        }
-        .form-control:focus, .form-select:focus {
-            box-shadow: 0 0 0 4px rgba(78, 115, 223, 0.1);
-            border-color: #4e73df;
-        }
-        .btn-save {
-            background: #1a1d23;
-            color: #ffffff;
-            border-radius: 10px;
-            padding: 12px;
-            border: none;
-            font-weight: 600;
-        }
-        .btn-save:hover {
-            background: #333333;
-            color: #ffffff;
-        }
-        .search-container {
-            position: relative;
-            max-width: 300px;
-            width: 100%;
-        }
-        .search-container i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-        }
-        .search-input {
-            padding-left: 42px !important;
-            background: #f8fafc !important;
-            border: 1px solid #e2e8f0 !important;
-        }
-        .table-custom thead {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #64748b;
-        }
-        .badge-pos {
-            font-weight: 500;
-            padding: 6px 12px;
-            border-radius: 8px;
-        }
-        #overtimeField {
-            display: none;
-        }
-        @media print {
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-        }
-    </style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    header p {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      padding: 9px 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: #cbd5e1; }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-accent:hover { background: #1d4ed8; }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: var(--danger);
+      padding: 5px 9px;
+      font-size: 0.78rem;
+    }
+    .btn-danger:hover { background: #fecaca; }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 960px) {
+      .grid-main { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .card h2 {
+      font-size: 1.05rem;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-group.full {
+      grid-column: span 2;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    input, select {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .preview-box {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+
+    .preview-box span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .preview-box strong {
+      font-size: 0.95rem;
+    }
+
+    /* Payslip Preview */
+    .payslip {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      background: #fff;
+    }
+
+    .payslip-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--text);
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    .payslip-header h3 {
+      font-size: 1.15rem;
+      letter-spacing: 0.5px;
+    }
+
+    .payslip-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 16px;
+      font-size: 0.86rem;
+      margin-bottom: 14px;
+    }
+
+    .payslip-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .payslip-cols { grid-template-columns: 1fr; }
+    }
+
+    .slip-section h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+    }
+
+    .slip-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.86rem;
+      margin-bottom: 5px;
+    }
+
+    .slip-total {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-top: 1px solid #94a3b8;
+      padding-top: 6px;
+      margin-top: 6px;
+    }
+
+    .thp-box {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      padding: 12px 14px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 9px 10px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    tr:hover {
+      background: #f8fafc;
+      cursor: pointer;
+    }
+
+    tr.selected {
+      background: #e6fffa;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .badge-staff { background: #e0f2fe; color: #0369a1; }
+    .badge-spv { background: #fef3c7; color: #b45309; }
+    .badge-manager { background: #ede9fe; color: #6d28d9; }
+
+    .num { text-align: right; }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      header, .grid-main > .card:first-child, .table-card, .no-print {
+        display: none !important;
+      }
+      .grid-main { display: block; margin: 0; }
+      .card { border: none; box-shadow: none; padding: 0; }
+      .payslip { border: 1px solid #000; }
+    }
+  </style>
 </head>
 <body>
-
-<div class="container-fluid px-4 py-4 py-md-5">
+  <div class="container">
+    <header>
+      <div>
+        <h1>Sistem Payroll</h1>
+        <p>Input gaji, lembur & potongan per level (Staff, SPV, Manager) hingga cetak slip gaji</p>
+      </div>
+        <div class="container-fluid px-4 py-4 py-md-5">
     <div class="row g-4">
         <!-- Header & Navigation -->
         <div class="col-12 d-flex flex-wrap justify-content-between align-items-center gap-3 mb-2 no-print">
@@ -88,414 +334,471 @@
                     <i class="bi bi-arrow-left"></i>
                     <span id="t-home-btn">Home</span>
                 </a>
-                <div>
-                    <h3 class="fw-bold mb-0" id="t-app-title">Payroll System</h3>
-                    <span class="text-muted small" id="t-last-sync">Local Storage Active</span>
-                </div>
+            </div>
+      <div class="toolbar no-print">
+        <button class="btn-accent" onclick="window.print()">Cetak / Simpan PDF Slip</button>
+        <button class="btn-secondary" onclick="exportJSON()">Export JSON</button>
+        <button class="btn-secondary" onclick="resetSampleData()">Reset Contoh</button>
+      </div>
+    </header>
+
+    <div class="grid-main">
+      <!-- Form Input Payroll -->
+      <div class="card">
+        <h2>1. Input Data Payroll Karyawan</h2>
+        <form id="payrollForm" onsubmit="handleSaveEmployee(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="periode">Periode Gaji</label>
+              <input type="month" id="periode" value="2026-11" required />
             </div>
 
-            <div class="d-flex align-items-center gap-2">
-                <select class="form-select form-select-sm border bg-white w-auto" style="padding: 6px 28px 6px 12px;" onchange="changeLang(this.value)">
-                    <option value="id">🇮🇩 Indonesia</option>
-                    <option value="en" selected>🇺🇸 English</option>
-                    <option value="cn">🇨🇳 Mandarin</option>
-                </select>
-                <button type="button" class="btn btn-outline-danger btn-sm rounded-3 d-inline-flex align-items-center gap-1" onclick="clearStorage()">
-                    <i class="bi bi-trash3"></i>
-                    <span id="t-clear-btn">Clear Storage</span>
-                </button>
+            <div class="form-group">
+              <label for="nik">NIK</label>
+              <input type="text" id="nik" placeholder="Contoh: EMP-003" required />
             </div>
-        </div>
 
-        <!-- Form Column -->
-        <div class="col-lg-4 no-print">
-            <div class="card p-4 sticky-top" style="top: 2rem;">
-                <h5 class="fw-bold mb-4" id="t-form-title">Employee Data</h5>
-                <form id="payForm">
-                    <input type="hidden" id="editIdx" value="-1">
-                    <input type="hidden" id="createdAt">
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold" id="l-name">Full Name</label>
-                        <input type="text" id="name" class="form-control" placeholder="Enter name" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold" id="l-pos">Position</label>
-                        <select id="position" class="form-select" onchange="handlePositionChange()">
-                            <option value="Staff">Staff</option>
-                            <option value="Supervisor">Supervisor</option>
-                            <option value="Manager">Manager</option>
-                            <option value="General Manager">General Manager</option>
-                            <option value="Director">Director</option>
-                        </select>
-                    </div>
-
-                    <div id="overtimeField" class="mb-3">
-                        <label class="form-label small fw-semibold" id="l-ot">Overtime (Hours)</label>
-                        <input type="number" id="overtime" class="form-control" value="0" min="0" step="0.5">
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label small fw-semibold" id="l-salary">Basic Salary</label>
-                        <input type="number" id="salary" class="form-control" placeholder="0" min="0" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-save w-100 mb-2" id="btn-submit">Add Record</button>
-                    <button type="button" class="btn btn-light w-100 text-muted small" id="btn-reset" onclick="resetForm()">Reset</button>
-                </form>
+            <div class="form-group">
+              <label for="nama">Nama Karyawan</label>
+              <input type="text" id="nama" placeholder="Nama lengkap" required />
             </div>
-        </div>
 
-        <!-- Table Column -->
-        <div class="col-lg-8 no-print">
-            <div class="card p-0 overflow-hidden">
-                <div class="p-4 d-flex flex-wrap justify-content-between align-items-center gap-3 border-bottom bg-white">
-                    <h6 class="fw-bold mb-0" id="t-list-title">Payroll List</h6>
-                    <div class="search-container">
-                        <i class="bi bi-search"></i>
-                        <input type="text" id="fuzzySearch" class="form-control search-input" placeholder="Quick search..." onkeyup="searchFuzzy()">
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-custom table-hover align-middle mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th class="ps-4" id="th-emp">Employee</th>
-                                <th id="th-pos">Position</th>
-                                <th id="th-net">Net Salary</th>
-                                <th class="text-end pe-4" id="th-act">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableData"></tbody>
-                    </table>
-                </div>
+            <div class="form-group">
+              <label for="level">Level Jabatan</label>
+              <select id="level" onchange="applyLevelDefaults()">
+                <option value="Staff">Staff</option>
+                <option value="SPV">SPV (Supervisor)</option>
+                <option value="Manager">Manager</option>
+              </select>
             </div>
-        </div>
+
+            <div class="form-group">
+              <label for="gajiPokok">Gaji Pokok (Rp)</label>
+              <input type="number" id="gajiPokok" min="0" step="50000" required oninput="updateLiveCalc()" />
+            </div>
+
+            <div class="form-group">
+              <label for="tunjTetap">Tunjangan Tetap (Rp)</label>
+              <input type="number" id="tunjTetap" min="0" step="50000" required oninput="updateLiveCalc()" />
+            </div>
+
+            <div class="form-group">
+              <label for="jamLembur">Jam Lembur (Jam)</label>
+              <input type="number" id="jamLembur" min="0" step="0.5" value="0" oninput="updateLiveCalc()" />
+            </div>
+
+            <div class="form-group">
+              <label for="tarifLembur">Tarif Lembur / Jam (Rp)</label>
+              <input type="number" id="tarifLembur" min="0" step="5000" oninput="updateLiveCalc()" />
+            </div>
+
+            <div class="form-group">
+              <label for="potAbsensi">Potongan Absensi / Terlambat (Rp)</label>
+              <input type="number" id="potAbsensi" min="0" step="10000" value="0" oninput="updateLiveCalc()" />
+            </div>
+
+            <div class="form-group">
+              <label for="statusPtkp">Status PTKP (Estimasi PPh 21)</label>
+              <select id="statusPtkp" onchange="updateLiveCalc()">
+                <option value="TK/0">TK/0 (Tarif 0.5% - 1.5%)</option>
+                <option value="K/0">K/0 (Tarif 0.5% - 1.25%)</option>
+                <option value="K/1">K/1 (Tarif 0.25% - 1%)</option>
+              </select>
+            </div>
+
+            <div class="form-group full" style="flex-direction: row; gap: 10px; margin-top: 4px;">
+              <button type="submit" class="btn-primary" style="flex: 1;">Simpan & Tampilkan Slip</button>
+              <button type="button" class="btn-secondary" onclick="clearForm()">Bersihkan</button>
+            </div>
+          </div>
+
+          <div class="preview-box">
+            <div>
+              <span>Total Bruto</span>
+              <strong id="liveBruto">Rp 0</strong>
+            </div>
+            <div>
+              <span>Total Potongan</span>
+              <strong id="livePotongan" style="color: var(--danger);">Rp 0</strong>
+            </div>
+            <div>
+              <span>Take Home Pay</span>
+              <strong id="liveThp" style="color: var(--primary);">Rp 0</strong>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Slip Gaji -->
+      <div class="card">
+        <h2>2. Pratinjau Slip Gaji</h2>
+        <div id="payslipContainer" class="payslip"></div>
+      </div>
     </div>
-</div>
 
-<!-- Detail Modal -->
-<div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0">
-            <div class="modal-body p-4 text-center" id="viewContent"></div>
-        </div>
+    <!-- Tabel Rekap -->
+    <div class="card table-card">
+      <h2>3. Rekap Daftar Payroll (Klik baris untuk melihat slip gaji)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>NIK</th>
+              <th>Nama</th>
+              <th>Level</th>
+              <th class="num">Gaji Pokok</th>
+              <th class="num">Tunj. Tetap</th>
+              <th class="num">Lembur</th>
+              <th class="num">Bruto</th>
+              <th class="num">Pot. Absensi</th>
+              <th class="num">BPJS & PPh 21</th>
+              <th class="num">Gaji Bersih</th>
+              <th class="no-print">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="payrollTableBody"></tbody>
+        </table>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- Print Slip Area -->
-<div id="printArea" class="d-none print-only"></div>
+  <script>
+    const STORAGE_KEY = "mini_payroll_data_v1";
 
-<script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    const STORAGE_KEY = 'payroll_db';
-    let db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    let curLang = 'en';
-
-    const trans = {
-        en: {
-            home: "Home",
-            appTitle: "Payroll System",
-            sync: "Local Storage Active",
-            formTitle: "Employee Data",
-            name: "Full Name",
-            pos: "Position",
-            salary: "Basic Salary",
-            ot: "Overtime (Hours)",
-            add: "Add Record",
-            update: "Update Record",
-            reset: "Reset",
-            list: "Payroll List",
-            search: "Quick search...",
-            thEmp: "Employee",
-            thPos: "Position",
-            thNet: "Net Salary",
-            thAct: "Action",
-            clear: "Clear Storage",
-            confirmClear: "Clear all payroll data from storage?",
-            confirmDelete: "Delete this employee record?",
-            empty: "No payroll records found."
-        },
-        id: {
-            home: "Beranda",
-            appTitle: "Sistem Payroll",
-            sync: "Local Storage Aktif",
-            formTitle: "Data Karyawan",
-            name: "Nama Lengkap",
-            pos: "Jabatan",
-            salary: "Gaji Pokok",
-            ot: "Lembur (Jam)",
-            add: "Tambah Data",
-            update: "Perbarui Data",
-            reset: "Reset",
-            list: "Daftar Gaji",
-            search: "Cari cepat...",
-            thEmp: "Karyawan",
-            thPos: "Jabatan",
-            thNet: "Gaji Bersih",
-            thAct: "Aksi",
-            clear: "Hapus Storage",
-            confirmClear: "Hapus semua data gaji dari penyimpanan?",
-            confirmDelete: "Hapus data karyawan ini?",
-            empty: "Belum ada data gaji tersimpan."
-        },
-        cn: {
-            home: "首页",
-            appTitle: "薪资系统",
-            sync: "本地存储已启用",
-            formTitle: "员工数据",
-            name: "姓名",
-            pos: "职位",
-            salary: "基本工资",
-            ot: "加班时间（小时）",
-            add: "添加记录",
-            update: "更新记录",
-            reset: "重置",
-            list: "工资表",
-            search: "快速搜索...",
-            thEmp: "员工",
-            thPos: "职位",
-            thNet: "净工资",
-            thAct: "操作",
-            clear: "清除缓存",
-            confirmClear: "确定要清除存储中的所有薪资数据吗？",
-            confirmDelete: "确定要删除此员工记录吗？",
-            empty: "暂无薪资记录。"
-        }
+    // Konfigurasi standar per level jabatan
+    const LEVEL_DEFAULTS = {
+      Staff: {
+        gajiPokok: 5500000,
+        tunjTetap: 500000,
+        tarifLembur: 35000,
+        defaultPotAbsensi: 0
+      },
+      SPV: {
+        gajiPokok: 8500000,
+        tunjTetap: 1500000,
+        tarifLembur: 55000,
+        defaultPotAbsensi: 0
+      },
+      Manager: {
+        gajiPokok: 14000000,
+        tunjTetap: 3000000,
+        tarifLembur: 85000,
+        defaultPotAbsensi: 0
+      }
     };
 
-    const allowances = {
-        "Staff": 0,
-        "Supervisor": 1500000,
-        "Manager": 3000000,
-        "General Manager": 6000000,
-        "Director": 12000000
-    };
+    const SAMPLE_DATA = [
+      {
+        id: crypto.randomUUID(),
+        periode: "2026-11",
+        nik: "STF-001",
+        nama: "Budi Santoso",
+        level: "Staff",
+        gajiPokok: 5500000,
+        tunjTetap: 500000,
+        jamLembur: 8,
+        tarifLembur: 35000,
+        potAbsensi: 50000,
+        statusPtkp: "TK/0"
+      },
+      {
+        id: crypto.randomUUID(),
+        periode: "2026-11",
+        nik: "SPV-002",
+        nama: "Rina Wijaya",
+        level: "SPV",
+        gajiPokok: 8500000,
+        tunjTetap: 1500000,
+        jamLembur: 5,
+        tarifLembur: 55000,
+        potAbsensi: 0,
+        statusPtkp: "K/1"
+      },
+      {
+        id: crypto.randomUUID(),
+        periode: "2026-11",
+        nik: "MGR-003",
+        nama: "Andi Pratama",
+        level: "Manager",
+        gajiPokok: 14000000,
+        tunjTetap: 3000000,
+        jamLembur: 2,
+        tarifLembur: 85000,
+        potAbsensi: 0,
+        statusPtkp: "K/1"
+      }
+    ];
 
-    function formatRupiah(num) {
-        return "Rp " + Number(num || 0).toLocaleString('id-ID');
+    let employees = loadEmployees();
+    let selectedId = employees[0]?.id || null;
+
+    function loadEmployees() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [...SAMPLE_DATA];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) && parsed.length ? parsed : [...SAMPLE_DATA];
+      } catch {
+        return [...SAMPLE_DATA];
+      }
     }
 
-    function handlePositionChange() {
-        const pos = document.getElementById('position').value;
-        const otField = document.getElementById('overtimeField');
-        otField.style.display = (pos === 'Staff') ? 'block' : 'none';
-        if (pos !== 'Staff') {
-            document.getElementById('overtime').value = 0;
-        }
+    function saveEmployees() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(employees));
     }
 
-    function calculate(sal, pos, ot) {
-        const allow = allowances[pos] || 0;
-        const extra = (pos === 'Staff') ? (ot * 50000) : 0;
-        const bpjs = sal * 0.02;
-        const pph = (sal + allow + extra) * 0.05;
-        const net = (sal + allow + extra) - (bpjs + pph);
-        return { allow, extra, bpjs, pph, net };
+    function formatIDR(num) {
+      return "Rp " + Math.round(num || 0).toLocaleString("id-ID");
     }
 
-    document.getElementById('payForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const idx = parseInt(document.getElementById('editIdx').value, 10);
-        const name = document.getElementById('name').value.trim();
-        const pos = document.getElementById('position').value;
-        const sal = parseFloat(document.getElementById('salary').value) || 0;
-        const ot = (pos === 'Staff') ? (parseFloat(document.getElementById('overtime').value) || 0) : 0;
-        const now = new Date().toLocaleString('id-ID');
-
-        if (!name) return;
-
-        const calc = calculate(sal, pos, ot);
-        const entry = {
-            name,
-            pos,
-            sal,
-            ot,
-            ...calc,
-            createdAt: (idx === -1) ? now : (document.getElementById('createdAt').value || now),
-            updatedAt: now
-        };
-
-        if (idx === -1) {
-            db.push(entry);
-        } else {
-            db[idx] = entry;
-        }
-
-        save();
-        resetForm();
-    });
-
-    function save() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-        searchFuzzy();
+    function getTerRate(bruto, statusPtkp) {
+      if (bruto <= 5400000) return 0;
+      if (statusPtkp === "K/1") {
+        if (bruto <= 9000000) return 0.0025;
+        if (bruto <= 15000000) return 0.0075;
+        return 0.015;
+      }
+      if (statusPtkp === "K/0") {
+        if (bruto <= 8000000) return 0.005;
+        if (bruto <= 14000000) return 0.01;
+        return 0.02;
+      }
+      // TK/0
+      if (bruto <= 7500000) return 0.005;
+      if (bruto <= 13000000) return 0.0125;
+      return 0.025;
     }
 
-    function render(rows) {
-        const body = document.getElementById('tableData');
-        body.innerHTML = '';
+    function calculatePayroll(item) {
+      const gajiPokok = Number(item.gajiPokok) || 0;
+      const tunjTetap = Number(item.tunjTetap) || 0;
+      const jamLembur = Number(item.jamLembur) || 0;
+      const tarifLembur = Number(item.tarifLembur) || 0;
+      const potAbsensi = Number(item.potAbsensi) || 0;
 
-        if (!rows.length) {
-            body.innerHTML = `
-                <tr>
-                    <td colspan="4" class="text-center text-muted py-5">${trans[curLang].empty}</td>
-                </tr>`;
-            return;
-        }
+      const upahLembur = jamLembur * tarifLembur;
+      const totalBruto = gajiPokok + tunjTetap + upahLembur;
 
-        rows.forEach(({ item, realIndex }) => {
-            body.innerHTML += `
-                <tr>
-                    <td class="ps-4">
-                        <div class="fw-bold">${item.name}</div>
-                        <div class="text-muted" style="font-size: 0.7rem">Updated: ${item.updatedAt}</div>
-                    </td>
-                    <td><span class="badge bg-light text-dark border badge-pos">${item.pos}</span></td>
-                    <td class="fw-semibold">${formatRupiah(item.net)}</td>
-                    <td class="text-end pe-4">
-                        <div class="btn-group shadow-sm border rounded-3 overflow-hidden bg-white">
-                            <button type="button" class="btn btn-white btn-sm px-2" onclick="view(${realIndex})" title="View"><i class="bi bi-eye"></i></button>
-                            <button type="button" class="btn btn-white btn-sm px-2 border-start" onclick="edit(${realIndex})" title="Edit"><i class="bi bi-pencil"></i></button>
-                            <button type="button" class="btn btn-white btn-sm px-2 border-start" onclick="printSlip(${realIndex})" title="Print"><i class="bi bi-printer"></i></button>
-                            <button type="button" class="btn btn-white btn-sm px-2 border-start text-danger" onclick="deleteItem(${realIndex})" title="Delete"><i class="bi bi-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>`;
-        });
+      // Dasar BPJS dibatasi upah tetap (maksimal basis Rp12.000.000 untuk BPJS Kes)
+      const basisBpjsKes = Math.min(gajiPokok + tunjTetap, 12000000);
+      const basisBpjsTk = gajiPokok + tunjTetap;
+
+      const bpjsKes = basisBpjsKes * 0.01;
+      const bpjsTk = basisBpjsTk * 0.03; // JHT 2% + JP 1%
+      const terRate = getTerRate(totalBruto, item.statusPtkp);
+      const pph21 = totalBruto * terRate;
+
+      const totalPotongan = potAbsensi + bpjsKes + bpjsTk + pph21;
+      const thp = totalBruto - totalPotongan;
+
+      return {
+        upahLembur,
+        totalBruto,
+        bpjsKes,
+        bpjsTk,
+        pph21,
+        terRate,
+        potAbsensi,
+        totalPotongan,
+        thp
+      };
     }
 
-    function searchFuzzy() {
-        const val = document.getElementById('fuzzySearch').value.trim();
-        const indexedDb = db.map((item, realIndex) => ({ item, realIndex }));
-
-        if (!val) {
-            return render(indexedDb);
-        }
-
-        const fuse = new Fuse(indexedDb, {
-            keys: ['item.name', 'item.pos'],
-            threshold: 0.3
-        });
-        render(fuse.search(val).map(r => r.item));
+    function applyLevelDefaults() {
+      const level = document.getElementById("level").value;
+      const cfg = LEVEL_DEFAULTS[level] || LEVEL_DEFAULTS.Staff;
+      document.getElementById("gajiPokok").value = cfg.gajiPokok;
+      document.getElementById("tunjTetap").value = cfg.tunjTetap;
+      document.getElementById("tarifLembur").value = cfg.tarifLembur;
+      document.getElementById("potAbsensi").value = cfg.defaultPotAbsensi;
+      updateLiveCalc();
     }
 
-    function edit(i) {
-        const item = db[i];
-        if (!item) return;
-
-        document.getElementById('editIdx').value = i;
-        document.getElementById('name').value = item.name;
-        document.getElementById('position').value = item.pos;
-        document.getElementById('salary').value = item.sal;
-        document.getElementById('overtime').value = item.ot;
-        document.getElementById('createdAt').value = item.createdAt;
-        document.getElementById('btn-submit').innerText = trans[curLang].update;
-        handlePositionChange();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    function getFormValues() {
+      return {
+        periode: document.getElementById("periode").value,
+        nik: document.getElementById("nik").value.trim(),
+        nama: document.getElementById("nama").value.trim(),
+        level: document.getElementById("level").value,
+        gajiPokok: Number(document.getElementById("gajiPokok").value) || 0,
+        tunjTetap: Number(document.getElementById("tunjTetap").value) || 0,
+        jamLembur: Number(document.getElementById("jamLembur").value) || 0,
+        tarifLembur: Number(document.getElementById("tarifLembur").value) || 0,
+        potAbsensi: Number(document.getElementById("potAbsensi").value) || 0,
+        statusPtkp: document.getElementById("statusPtkp").value
+      };
     }
 
-    function deleteItem(i) {
-        if (!confirm(trans[curLang].confirmDelete)) return;
-        db.splice(i, 1);
-        save();
-        if (parseInt(document.getElementById('editIdx').value, 10) === i) {
-            resetForm();
-        }
+    function updateLiveCalc() {
+      const calc = calculatePayroll(getFormValues());
+      document.getElementById("liveBruto").textContent = formatIDR(calc.totalBruto);
+      document.getElementById("livePotongan").textContent = formatIDR(calc.totalPotongan);
+      document.getElementById("liveThp").textContent = formatIDR(calc.thp);
     }
 
-    function view(i) {
-        const item = db[i];
-        if (!item) return;
+    function handleSaveEmployee(e) {
+      e.preventDefault();
+      const vals = getFormValues();
+      if (!vals.nik || !vals.nama) return;
 
-        document.getElementById('viewContent').innerHTML = `
-            <div class="mb-3"><i class="bi bi-person-circle fs-1 text-primary"></i></div>
-            <h4 class="fw-bold mb-1">${item.name}</h4>
-            <p class="text-muted mb-4">${item.pos}</p>
-            <div class="text-start small bg-light p-3 rounded-3">
-                <div class="d-flex justify-content-between mb-2"><span>Basic Salary</span> <span>${formatRupiah(item.sal)}</span></div>
-                <div class="d-flex justify-content-between mb-2"><span>Allowance</span> <span>${formatRupiah(item.allow)}</span></div>
-                ${item.pos === 'Staff' ? `<div class="d-flex justify-content-between mb-2"><span>Overtime (${item.ot}h)</span> <span>${formatRupiah(item.extra)}</span></div>` : ''}
-                <hr>
-                <div class="d-flex justify-content-between text-danger mb-2"><span>BPJS TK (2%)</span> <span>- ${formatRupiah(item.bpjs)}</span></div>
-                <div class="d-flex justify-content-between text-danger mb-2"><span>PPh21 (5%)</span> <span>- ${formatRupiah(item.pph)}</span></div>
-                <hr>
-                <div class="d-flex justify-content-between fw-bold fs-6"><span>Total Net</span> <span class="text-success">${formatRupiah(item.net)}</span></div>
-            </div>
-            <div class="mt-3 text-muted" style="font-size: 0.7rem">Created: ${item.createdAt}</div>
+      const existingIndex = employees.findIndex(emp => emp.nik.toLowerCase() === vals.nik.toLowerCase());
+      if (existingIndex >= 0) {
+        employees[existingIndex] = { ...employees[existingIndex], ...vals };
+        selectedId = employees[existingIndex].id;
+      } else {
+        const newEmp = { id: crypto.randomUUID(), ...vals };
+        employees.push(newEmp);
+        selectedId = newEmp.id;
+      }
+
+      saveEmployees();
+      renderAll();
+      clearForm(false);
+    }
+
+    function clearForm(resetLevel = true) {
+      document.getElementById("nik").value = "";
+      document.getElementById("nama").value = "";
+      document.getElementById("jamLembur").value = 0;
+      document.getElementById("potAbsensi").value = 0;
+      if (resetLevel) {
+        document.getElementById("level").value = "Staff";
+        applyLevelDefaults();
+      } else {
+        updateLiveCalc();
+      }
+    }
+
+    function deleteEmployee(id, event) {
+      event.stopPropagation();
+      employees = employees.filter(emp => emp.id !== id);
+      if (selectedId === id) {
+        selectedId = employees[0]?.id || null;
+      }
+      saveEmployees();
+      renderAll();
+    }
+
+    function selectEmployee(id) {
+      selectedId = id;
+      renderAll();
+    }
+
+    function renderBadge(level) {
+      const cls = level === "Manager" ? "badge-manager" : level === "SPV" ? "badge-spv" : "badge-staff";
+      return `<span class="badge ${cls}">${level}</span>`;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("payrollTableBody");
+      if (!employees.length) {
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:#64748b;">Belum ada data karyawan.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = employees.map(emp => {
+        const c = calculatePayroll(emp);
+        const bpjsAndTax = c.bpjsKes + c.bpjsTk + c.pph21;
+        const activeClass = emp.id === selectedId ? "selected" : "";
+        return `
+          <tr class="${activeClass}" onclick="selectEmployee('${emp.id}')">
+            <td><strong>${emp.nik}</strong></td>
+            <td>${emp.nama}</td>
+            <td>${renderBadge(emp.level)}</td>
+            <td class="num">${formatIDR(emp.gajiPokok)}</td>
+            <td class="num">${formatIDR(emp.tunjTetap)}</td>
+            <td class="num">${formatIDR(c.upahLembur)} (${emp.jamLembur}j)</td>
+            <td class="num"><strong>${formatIDR(c.totalBruto)}</strong></td>
+            <td class="num">${formatIDR(emp.potAbsensi)}</td>
+            <td class="num">${formatIDR(bpjsAndTax)}</td>
+            <td class="num" style="color:var(--primary);font-weight:700;">${formatIDR(c.thp)}</td>
+            <td class="no-print">
+              <button class="btn-danger" onclick="deleteEmployee('${emp.id}', event)">Hapus</button>
+            </td>
+          </tr>
         `;
-        new bootstrap.Modal('#viewModal').show();
+      }).join("");
     }
 
-    function printSlip(i) {
-        const item = db[i];
-        if (!item) return;
+    function renderPayslip() {
+      const container = document.getElementById("payslipContainer");
+      const emp = employees.find(e => e.id === selectedId) || employees[0];
 
-        const area = document.getElementById('printArea');
-        area.innerHTML = `
-            <div style="padding: 40px; border: 1px solid #eee; font-family: sans-serif;">
-                <h3 style="text-align: center; margin-top: 0;">PAYROLL SLIP</h3>
-                <hr>
-                <p><strong>Employee:</strong> ${item.name} (${item.pos})</p>
-                <p><strong>Date:</strong> ${item.updatedAt}</p>
-                <table width="100%" border="0" cellpadding="10" style="border-collapse: collapse;">
-                    <tr><td>Basic Salary</td><td align="right">${formatRupiah(item.sal)}</td></tr>
-                    <tr><td>Allowance</td><td align="right">${formatRupiah(item.allow)}</td></tr>
-                    ${item.pos === 'Staff' ? `<tr><td>Overtime (${item.ot}h)</td><td align="right">${formatRupiah(item.extra)}</td></tr>` : ''}
-                    <tr><td>Deductions (BPJS + PPh21)</td><td align="right">- ${formatRupiah(item.bpjs + item.pph)}</td></tr>
-                    <tr style="background: #f9f9f9;"><td><strong>Total Net Pay</strong></td><td align="right"><strong>${formatRupiah(item.net)}</strong></td></tr>
-                </table>
-            </div>`;
-        window.print();
+      if (!emp) {
+        container.innerHTML = `<p style="color:#64748b;">Pilih atau tambahkan karyawan untuk melihat slip gaji.</p>`;
+        return;
+      }
+
+      const c = calculatePayroll(emp);
+
+      container.innerHTML = `
+        <div class="payslip-header">
+          <div>
+            <h3>SLIP GAJI KARYAWAN</h3>
+            <div style="font-size:0.82rem;color:#64748b;">Periode: ${emp.periode}</div>
+          </div>
+          <div style="text-align:right;font-size:0.84rem;">
+            <strong>Level: ${emp.level}</strong><br/>
+            PTKP: ${emp.statusPtkp}
+          </div>
+        </div>
+
+        <div class="payslip-meta">
+          <div><strong>NIK:</strong> ${emp.nik}</div>
+          <div><strong>Nama:</strong> ${emp.nama}</div>
+        </div>
+
+        <div class="payslip-cols">
+          <div class="slip-section">
+            <h4>Penerimaan</h4>
+            <div class="slip-row"><span>Gaji Pokok</span><span>${formatIDR(emp.gajiPokok)}</span></div>
+            <div class="slip-row"><span>Tunjangan Tetap</span><span>${formatIDR(emp.tunjTetap)}</span></div>
+            <div class="slip-row"><span>Lembur (${emp.jamLembur} jam × ${formatIDR(emp.tarifLembur)})</span><span>${formatIDR(c.upahLembur)}</span></div>
+            <div class="slip-total"><span>Total Bruto</span><span>${formatIDR(c.totalBruto)}</span></div>
+          </div>
+
+          <div class="slip-section">
+            <h4>Potongan</h4>
+            <div class="slip-row"><span>Absensi / Terlambat</span><span>${formatIDR(emp.potAbsensi)}</span></div>
+            <div class="slip-row"><span>BPJS Kesehatan (1%)</span><span>${formatIDR(c.bpjsKes)}</span></div>
+            <div class="slip-row"><span>BPJS TK (JHT 2% + JP 1%)</span><span>${formatIDR(c.bpjsTk)}</span></div>
+            <div class="slip-row"><span>Estimasi PPh 21 (${(c.terRate * 100).toFixed(2)}%)</span><span>${formatIDR(c.pph21)}</span></div>
+            <div class="slip-total"><span>Total Potongan</span><span>${formatIDR(c.totalPotongan)}</span></div>
+          </div>
+        </div>
+
+        <div class="thp-box">
+          <span>GAJI BERSIH (TAKE HOME PAY)</span>
+          <span>${formatIDR(c.thp)}</span>
+        </div>
+      `;
     }
 
-    function resetForm() {
-        document.getElementById('payForm').reset();
-        document.getElementById('editIdx').value = "-1";
-        document.getElementById('createdAt').value = "";
-        document.getElementById('btn-submit').innerText = trans[curLang].add;
-        handlePositionChange();
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify(employees, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "data-payroll.json";
+      a.click();
+      URL.revokeObjectURL(url);
     }
 
-    function clearStorage() {
-        if (confirm(trans[curLang].confirmClear)) {
-            localStorage.removeItem(STORAGE_KEY);
-            db = [];
-            resetForm();
-            render([]);
-        }
+    function resetSampleData() {
+      employees = [...SAMPLE_DATA];
+      selectedId = employees[0].id;
+      saveEmployees();
+      renderAll();
     }
 
-    function changeLang(l) {
-        curLang = l;
-        const d = trans[l];
-        const isEditing = parseInt(document.getElementById('editIdx').value, 10) !== -1;
-
-        document.getElementById('t-home-btn').innerText = d.home;
-        document.getElementById('t-app-title').innerText = d.appTitle;
-        document.getElementById('t-last-sync').innerText = d.sync;
-        document.getElementById('t-form-title').innerText = d.formTitle;
-        document.getElementById('l-name').innerText = d.name;
-        document.getElementById('l-pos').innerText = d.pos;
-        document.getElementById('l-salary').innerText = d.salary;
-        document.getElementById('l-ot').innerText = d.ot;
-        document.getElementById('btn-submit').innerText = isEditing ? d.update : d.add;
-        document.getElementById('btn-reset').innerText = d.reset;
-        document.getElementById('t-list-title').innerText = d.list;
-        document.getElementById('fuzzySearch').placeholder = d.search;
-        document.getElementById('th-emp').innerText = d.thEmp;
-        document.getElementById('th-pos').innerText = d.thPos;
-        document.getElementById('th-net').innerText = d.thNet;
-        document.getElementById('th-act').innerText = d.thAct;
-        document.getElementById('t-clear-btn').innerText = d.clear;
-
-        searchFuzzy();
+    function renderAll() {
+      renderTable();
+      renderPayslip();
     }
 
-    handlePositionChange();
-    searchFuzzy();
-</script>
+    // Inisialisasi awal
+    applyLevelDefaults();
+    renderAll();
+  </script>
 </body>
 </html>
