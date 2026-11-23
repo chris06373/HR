@@ -653,6 +653,12 @@ function showModule(moduleName) {
         window.location.href = "payroll.html";
         return;
     }
+
+    // Redirect ke halaman recruit.html
+    if (moduleName === "recruitment") {
+        window.location.href = "recruit.html";
+        return;
+    }
     
     const module = modules[moduleName];
 
