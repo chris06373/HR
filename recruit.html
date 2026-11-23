@@ -1,491 +1,1054 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HRIS - Recruitment System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-        :root { --bs-primary: #0f172a; --bs-primary-rgb: 15, 23, 42; }
-        body { background-color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; }
-        .card { border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-radius: 12px; }
-        .table thead { background-color: #f1f5f9; }
-        .job-card { border-top: 4px solid #0f172a !important; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recruitment Hub - Kanban & Kalender Penjadwalan</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --accent-bg: #eff6ff;
+      --success: #059669;
+      --warning: #d97706;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --radius: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button, select, input {
+      font-family: inherit;
+      font-size: 0.875rem;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--surface-alt);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-reset {
+      color: #b45309;
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+
+    .btn-reset:hover {
+      background: #fef3c7;
+    }
+
+    main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 20px 24px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Filter Bar */
+    .filter-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .field input, .field select {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-alt);
+      color: var(--text);
+    }
+
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--surface);
+    }
+
+    .filter-summary {
+      font-size: 0.82rem;
+      color: var(--muted);
+      padding-bottom: 8px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .section-header h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    /* Kanban Board */
+    .kanban-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(240px, 1fr));
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .kanban-col {
+      background: #e2e8f0;
+      border-radius: var(--radius);
+      padding: 12px;
+      min-height: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: background 0.15s ease;
+    }
+
+    .kanban-col.drag-over {
+      background: #dbeafe;
+      outline: 2px dashed var(--primary);
+    }
+
+    .col-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 2px 4px;
+    }
+
+    .col-count {
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      cursor: grab;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card:active {
+      cursor: grabbing;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .card-name {
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .card-role {
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-bg);
+      color: var(--primary);
+      font-weight: 600;
+      width: fit-content;
+    }
+
+    .badge-time {
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .card-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .schedule-tag {
+      font-size: 0.75rem;
+      background: #ecfdf5;
+      color: var(--success);
+      border: 1px solid #a7f3d0;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border);
+    }
+
+    .stage-select {
+      font-size: 0.75rem;
+      padding: 4px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+    }
+
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+
+    /* Calendar & Scheduling */
+    .schedule-layout {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 960px) {
+      .schedule-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .cal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .cal-title {
+      font-weight: 700;
+      font-size: 0.98rem;
+    }
+
+    .cal-weekdays, .cal-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+
+    .cal-weekdays div {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding-bottom: 6px;
+    }
+
+    .cal-day {
+      min-height: 68px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px;
+      text-align: left;
+      background: var(--surface-alt);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s ease;
+    }
+
+    .cal-day:hover {
+      border-color: var(--primary);
+    }
+
+    .cal-day.empty {
+      background: transparent;
+      border-color: transparent;
+      cursor: default;
+    }
+
+    .cal-day.selected {
+      background: var(--accent-bg);
+      border-color: var(--primary);
+      outline: 1px solid var(--primary);
+    }
+
+    .day-num {
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .event-dot {
+      font-size: 0.68rem;
+      background: var(--primary);
+      color: #fff;
+      padding: 1px 5px;
+      border-radius: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .form-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .agenda-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .agenda-item {
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.84rem;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 20px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--text);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.2s ease;
+      pointer-events: none;
+      z-index: 60;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
 </head>
 <body>
-
-<div class="container-fluid py-4">
-    <!-- HEADER -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-        <div>
-            <a href="index.html" class="btn btn-sm btn-outline-secondary mb-2">
-                <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
-            </a>
-            <h2 class="fw-bold mb-0">Pendataan & Riwayat Rekrutmen</h2>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-            <button class="btn btn-outline-success btn-sm" onclick="exportExcel()">
-                <i class="bi bi-file-earmark-excel me-1"></i> Download Excel
-            </button>
-            <button class="btn btn-outline-danger btn-sm" onclick="exportPDF()">
-                <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="clearAllData()">
-                <i class="bi bi-trash me-1"></i> Reset Data
-            </button>
-            <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#modalLoker">
-                <i class="bi bi-briefcase-plus me-1"></i> Tambah Posisi & Jobdesk
-            </button>
-            <button class="btn btn-primary btn-sm" onclick="openModalKandidat()">
-                <i class="bi bi-person-plus me-1"></i> Input Calon Kandidat
-            </button>
-        </div>
+  <header>
+    <div class="brand">
+      <h1>Recruitment Board &amp; Schedule</h1>
+      <p>Penyimpanan lokal otomatis (<code>localStorage</code>) &bull; Mode arsip aman (tanpa penghapusan data)</p>
     </div>
-
-    <!-- RINGKASAN POSISI DIBUKA & JOBDESK + JUMLAH PELAMAR -->
-    <div class="mb-4">
-        <h5 class="fw-bold mb-3"><i class="bi bi-megaphone me-2"></i>Posisi Dibuka & Jobdesk</h5>
-        <div class="row" id="jobListContainer"></div>
+    <div class="header-actions">
+      <button class="btn btn-primary" id="btnOpenAddCandidate">+ Tambah Kandidat</button>
+      <button class="btn btn-reset" id="btnClearStorage">Clear Storage</button>
     </div>
+  </header>
 
-    <!-- PENCARIAN & TABEL PENDATAAN / HISTORI KANDIDAT -->
-    <div class="card p-4">
-        <div class="row g-3 align-items-center justify-content-between mb-3">
-            <div class="col-md-5">
-                <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Data & Histori Calon Kandidat</h5>
-            </div>
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Cari nama, posisi, keahlian, status, atau alasan..." oninput="resetPageAndRender()">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <select id="filterStatus" class="form-select" onchange="resetPageAndRender()">
-                    <option value="all">Semua Status</option>
-                    <option value="Proses">Dalam Proses</option>
-                    <option value="Berhasil">Berhasil</option>
-                    <option value="Tidak Berhasil">Tidak Berhasil</option>
-                </select>
-            </div>
+  <main>
+    <!-- Penyaring Kandidat -->
+    <section aria-label="Penyaring Kandidat">
+      <div class="filter-panel">
+        <div class="field">
+          <label for="filterSearch">Cari Nama / Posisi</label>
+          <input type="text" id="filterSearch" placeholder="Contoh: Frontend, Budi..." />
+        </div>
+        <div class="field">
+          <label for="filterMaxSalary">Maks. Ekspektasi Gaji (Rp)</label>
+          <select id="filterMaxSalary">
+            <option value="">Semua Gaji</option>
+            <option value="8000000">Hingga Rp 8.000.000</option>
+            <option value="12000000">Hingga Rp 12.000.000</option>
+            <option value="18000000">Hingga Rp 18.000.000</option>
+            <option value="25000000">Hingga Rp 25.000.000</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="filterAvailability">Ketersediaan Waktu</label>
+          <select id="filterAvailability">
+            <option value="">Semua Ketersediaan</option>
+            <option value="Langsung (Immediate)">Langsung (Immediate)</option>
+            <option value="2 Minggu">2 Minggu</option>
+            <option value="1 Bulan">1 Bulan</option>
+          </select>
+        </div>
+        <div class="filter-summary" id="filterSummary">Menampilkan 0 kandidat</div>
+      </div>
+    </section>
+
+    <!-- Kanban Board -->
+    <section aria-label="Kanban Board Rekrutmen">
+      <div class="section-header">
+        <h2>Pipeline Rekrutmen (Kanban Board)</h2>
+      </div>
+      <div class="kanban-grid" id="kanbanBoard"></div>
+    </section>
+
+    <!-- Kalender dan Penjadwalan -->
+    <section aria-label="Kalender dan Penjadwalan">
+      <div class="section-header">
+        <h2>Kalender &amp; Penjadwalan Wawancara</h2>
+      </div>
+      <div class="schedule-layout">
+        <div class="panel">
+          <div class="cal-top">
+            <button class="btn btn-sm" id="prevMonth">&lsaquo; Bulan Lalu</button>
+            <div class="cal-title" id="calMonthTitle"></div>
+            <button class="btn btn-sm" id="nextMonth">Bulan Depan &rsaquo;</button>
+          </div>
+          <div class="cal-weekdays">
+            <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+          </div>
+          <div class="cal-days" id="calDays"></div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nama Kandidat</th>
-                        <th>Posisi Dilamar</th>
-                        <th>Keahlian</th>
-                        <th>Tanggal Daftar</th>
-                        <th>Status</th>
-                        <th>Alasan / Catatan</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tableKandidat"></tbody>
-            </table>
-        </div>
+        <div class="panel">
+          <h3 style="font-size: 0.95rem; margin-bottom: 12px;">Atur Jadwal Wawancara</h3>
+          <form class="form-grid" id="scheduleForm">
+            <div class="field">
+              <label for="schedCandidate">Pilih Kandidat</label>
+              <select id="schedCandidate" required></select>
+            </div>
+            <div class="field">
+              <label for="schedDate">Tanggal</label>
+              <input type="date" id="schedDate" required />
+            </div>
+            <div class="field">
+              <label for="schedTime">Jam</label>
+              <input type="time" id="schedTime" value="10:00" required />
+            </div>
+            <div class="field">
+              <label for="schedNote">Catatan / Pewawancara</label>
+              <input type="text" id="schedNote" placeholder="Contoh: User Interview dengan Tech Lead" />
+            </div>
+            <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
+          </form>
 
-        <!-- PAGINATION HISTORI -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2">
-            <small class="text-muted" id="paginationInfo">Menampilkan 0 data</small>
-            <nav>
-                <ul class="pagination pagination-sm mb-0" id="paginationControls"></ul>
-            </nav>
+          <h3 style="font-size: 0.9rem; margin-bottom: 8px; color: var(--muted);">
+            Jadwal pada Tanggal Terpilih (<span id="selectedDateLabel">-</span>)
+          </h3>
+          <div class="agenda-list" id="agendaList"></div>
         </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Tambah Kandidat (Tanpa Fitur Hapus) -->
+  <div class="modal-backdrop" id="addModal">
+    <div class="modal">
+      <h3 style="font-size: 1rem;">Tambah Kandidat Baru</h3>
+      <form class="form-grid" id="addCandidateForm" style="margin-bottom: 0;">
+        <div class="field">
+          <label for="candName">Nama Lengkap</label>
+          <input type="text" id="candName" required placeholder="Contoh: Nisa Rahmawati" />
+        </div>
+        <div class="field">
+          <label for="candRole">Posisi Dilamar</label>
+          <input type="text" id="candRole" required placeholder="Contoh: Product Designer" />
+        </div>
+        <div class="field">
+          <label for="candSalary">Ekspektasi Gaji (Rp / bulan)</label>
+          <input type="number" id="candSalary" required min="1000000" step="500000" value="11000000" />
+        </div>
+        <div class="field">
+          <label for="candAvailability">Ketersediaan Waktu</label>
+          <select id="candAvailability" required>
+            <option value="Langsung (Immediate)">Langsung (Immediate)</option>
+            <option value="2 Minggu">2 Minggu</option>
+            <option value="1 Bulan">1 Bulan</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="candStage">Tahap Awal</label>
+          <select id="candStage">
+            <option value="Applied">Applied</option>
+            <option value="Screening">Screening</option>
+            <option value="Interview">Interview</option>
+            <option value="Offering">Offering</option>
+            <option value="Hired">Hired</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="btnCancelModal">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan Kandidat</button>
+        </div>
+      </form>
     </div>
-</div>
+  </div>
 
-<!-- MODAL TAMBAH POSISI & JOBDESK -->
-<div class="modal fade" id="modalLoker" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Posisi & Jobdesk</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <label class="form-label fw-semibold">Nama Posisi</label>
-                <input type="text" id="lokerTitle" class="form-control mb-3" placeholder="Contoh: Frontend Developer">
-                <label class="form-label fw-semibold">Jobdesk & Kualifikasi</label>
-                <textarea id="lokerDesc" class="form-control" rows="4" placeholder="Tuliskan tanggung jawab pekerjaan (jobdesk) dan kualifikasi..."></textarea>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-dark w-100" onclick="saveLoker()">Simpan Posisi</button>
-            </div>
-        </div>
-    </div>
-</div>
+  <div class="toast" id="toast"></div>
 
-<!-- MODAL INPUT CALON KANDIDAT -->
-<div class="modal fade" id="modalKandidat" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Form Pendataan Calon Kandidat</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <label class="form-label fw-semibold">Posisi Dilamar</label>
-                <select id="kanJabatan" class="form-select mb-3"></select>
-                <label class="form-label fw-semibold">Nama Lengkap</label>
-                <input type="text" id="kanNama" class="form-control mb-3" placeholder="Nama lengkap kandidat">
-                <label class="form-label fw-semibold">Keahlian Utama</label>
-                <input type="text" id="kanSkill" class="form-control mb-3" placeholder="Contoh: React, SQL, Excel">
-                <label class="form-label fw-semibold">Status Awal</label>
-                <select id="kanStatus" class="form-select mb-3" onchange="toggleInitialReason()">
-                    <option value="Proses">Dalam Proses</option>
-                    <option value="Berhasil">Berhasil</option>
-                    <option value="Tidak Berhasil">Tidak Berhasil</option>
-                </select>
-                <div id="initialReasonBox" class="d-none">
-                    <label class="form-label fw-semibold text-danger">Alasan Tidak Berhasil</label>
-                    <input type="text" id="kanAlasan" class="form-control" placeholder="Contoh: Kurang sesuai kualifikasi / ekspektasi gaji">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary w-100" onclick="saveKandidat()">Simpan Kandidat</button>
-            </div>
-        </div>
-    </div>
-</div>
+  <script>
+    const STORAGE_KEY = "recruitment_hub_data_v1";
+    const STAGES = ["Applied", "Screening", "Interview", "Offering", "Hired"];
 
-<!-- MODAL UPDATE STATUS & ALASAN -->
-<div class="modal fade" id="modalStatus" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Update Hasil Seleksi: <span id="statusNamaKandidat"></span></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <label class="form-label fw-semibold">Status</label>
-                <select id="updateStatusSelect" class="form-select mb-3" onchange="toggleUpdateReason()">
-                    <option value="Proses">Dalam Proses</option>
-                    <option value="Berhasil">Berhasil</option>
-                    <option value="Tidak Berhasil">Tidak Berhasil</option>
-                </select>
-                <div id="updateReasonBox">
-                    <label class="form-label fw-semibold">Alasan / Catatan</label>
-                    <textarea id="updateAlasanInput" class="form-control" rows="3" placeholder="Wajib diisi jika Tidak Berhasil, atau isi catatan hasil seleksi..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-dark w-100" onclick="saveStatusUpdate()">Simpan Perubahan</button>
-            </div>
-        </div>
-    </div>
-</div>
+    const todayObj = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const toDateStr = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+    const dayOffsetStr = (offset) => {
+      const d = new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate() + offset);
+      return toDateStr(d);
+    };
 
-<script>
-    let dataLoker = JSON.parse(localStorage.getItem('hris_loker_v2')) || [
-        { title: "Staff Accounting", desc: "Menyusun laporan keuangan bulanan, rekonsiliasi bank, dan pajak dasar. Minimal D3/S1 Akuntansi." },
-        { title: "IT Support", desc: "Troubleshooting hardware/software, maintenance jaringan kantor, dan pengelolaan tiket IT." }
-    ];
-
-    let dataKandidat = JSON.parse(localStorage.getItem('hris_kandidat_v2')) || [];
-    let selectedIndex = null;
-    let currentPage = 1;
-    const rowsPerPage = 5;
-
-    function syncData() {
-        localStorage.setItem('hris_loker_v2', JSON.stringify(dataLoker));
-        localStorage.setItem('hris_kandidat_v2', JSON.stringify(dataKandidat));
-        renderAll();
-    }
-
-    function clearAllData() {
-        if (confirm('Hapus semua data lowongan dan kandidat?')) {
-            localStorage.removeItem('hris_loker_v2');
-            localStorage.removeItem('hris_kandidat_v2');
-            dataLoker = [];
-            dataKandidat = [];
-            currentPage = 1;
-            renderAll();
+    const DEFAULT_DATA = {
+      candidates: [
+        {
+          id: "c-1",
+          name: "Raka Pratama",
+          role: "Frontend Engineer",
+          salary: 12000000,
+          availability: "Langsung (Immediate)",
+          stage: "Applied"
+        },
+        {
+          id: "c-2",
+          name: "Dina Kusuma",
+          role: "HR Generalist",
+          salary: 8000000,
+          availability: "2 Minggu",
+          stage: "Screening"
+        },
+        {
+          id: "c-3",
+          name: "Fajar Nugroho",
+          role: "Backend Engineer",
+          salary: 17500000,
+          availability: "1 Bulan",
+          stage: "Interview"
+        },
+        {
+          id: "c-4",
+          name: "Siti Aminah",
+          role: "QA Specialist",
+          salary: 9500000,
+          availability: "2 Minggu",
+          stage: "Offering"
+        },
+        {
+          id: "c-5",
+          name: "Kevin Wijaya",
+          role: "Data Analyst",
+          salary: 14000000,
+          availability: "Langsung (Immediate)",
+          stage: "Hired"
         }
-    }
-
-    function saveLoker() {
-        const title = document.getElementById('lokerTitle').value.trim();
-        const desc = document.getElementById('lokerDesc').value.trim();
-        if (!title || !desc) return alert('Lengkapi nama posisi dan jobdesk.');
-        dataLoker.push({ title, desc });
-        document.getElementById('lokerTitle').value = '';
-        document.getElementById('lokerDesc').value = '';
-        syncData();
-        bootstrap.Modal.getInstance(document.getElementById('modalLoker')).hide();
-    }
-
-    function toggleInitialReason() {
-        const st = document.getElementById('kanStatus').value;
-        document.getElementById('initialReasonBox').classList.toggle('d-none', st !== 'Tidak Berhasil');
-    }
-
-    function openModalKandidat(preselectedJob = '') {
-        if (dataLoker.length === 0) return alert('Tambahkan posisi & jobdesk terlebih dahulu.');
-        const select = document.getElementById('kanJabatan');
-        select.innerHTML = dataLoker.map(l => `<option value="${escapeHtml(l.title)}" ${l.title === preselectedJob ? 'selected' : ''}>${escapeHtml(l.title)}</option>`).join('');
-        document.getElementById('kanNama').value = '';
-        document.getElementById('kanSkill').value = '';
-        document.getElementById('kanStatus').value = 'Proses';
-        document.getElementById('kanAlasan').value = '';
-        toggleInitialReason();
-        new bootstrap.Modal(document.getElementById('modalKandidat')).show();
-    }
-
-    function saveKandidat() {
-        const jabatan = document.getElementById('kanJabatan').value;
-        const nama = document.getElementById('kanNama').value.trim();
-        const skill = document.getElementById('kanSkill').value.trim() || '-';
-        const status = document.getElementById('kanStatus').value;
-        const alasan = document.getElementById('kanAlasan').value.trim();
-
-        if (!nama) return alert('Nama lengkap wajib diisi.');
-        if (status === 'Tidak Berhasil' && !alasan) return alert('Alasan wajib diisi untuk kandidat Tidak Berhasil.');
-
-        dataKandidat.unshift({
-            nama,
-            jabatan,
-            skill,
-            tanggal: new Date().toLocaleDateString('id-ID'),
-            status,
-            alasan: status === 'Tidak Berhasil' ? alasan : (status === 'Berhasil' ? 'Memenuhi kualifikasi & lolos seleksi' : '-')
-        });
-
-        currentPage = 1;
-        syncData();
-        bootstrap.Modal.getInstance(document.getElementById('modalKandidat')).hide();
-    }
-
-    function openStatusModal(index) {
-        selectedIndex = index;
-        const item = dataKandidat[index];
-        document.getElementById('statusNamaKandidat').innerText = item.nama;
-        document.getElementById('updateStatusSelect').value = item.status;
-        document.getElementById('updateAlasanInput').value = item.alasan === '-' ? '' : item.alasan;
-        toggleUpdateReason();
-        new bootstrap.Modal(document.getElementById('modalStatus')).show();
-    }
-
-    function toggleUpdateReason() {
-        const st = document.getElementById('updateStatusSelect').value;
-        const input = document.getElementById('updateAlasanInput');
-        input.placeholder = st === 'Tidak Berhasil'
-            ? 'Wajib isi alasan tidak berhasil...'
-            : 'Catatan hasil seleksi (opsional)...';
-    }
-
-    function saveStatusUpdate() {
-        const status = document.getElementById('updateStatusSelect').value;
-        const alasan = document.getElementById('updateAlasanInput').value.trim();
-
-        if (status === 'Tidak Berhasil' && !alasan) {
-            return alert('Mohon isi alasan mengapa kandidat tidak berhasil.');
+      ],
+      schedules: [
+        {
+          id: "s-1",
+          candidateId: "c-3",
+          date: dayOffsetStr(1),
+          time: "10:00",
+          note: "Technical Interview"
+        },
+        {
+          id: "s-2",
+          candidateId: "c-2",
+          date: dayOffsetStr(2),
+          time: "14:00",
+          note: "HR Screening Call"
         }
+      ]
+    };
 
-        dataKandidat[selectedIndex].status = status;
-        dataKandidat[selectedIndex].alasan = alasan || (status === 'Berhasil' ? 'Lolos seleksi' : '-');
-        syncData();
-        bootstrap.Modal.getInstance(document.getElementById('modalStatus')).hide();
+    let state = loadState();
+    let calYear = todayObj.getFullYear();
+    let calMonth = todayObj.getMonth();
+    let selectedDate = toDateStr(todayObj);
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(DEFAULT_DATA);
+        const parsed = JSON.parse(raw);
+        return {
+          candidates: Array.isArray(parsed.candidates) ? parsed.candidates : structuredClone(DEFAULT_DATA.candidates),
+          schedules: Array.isArray(parsed.schedules) ? parsed.schedules : structuredClone(DEFAULT_DATA.schedules)
+        };
+      } catch {
+        return structuredClone(DEFAULT_DATA);
+      }
     }
 
-    function getFilteredData() {
-        const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-        const statusFilter = document.getElementById('filterStatus').value;
-
-        return dataKandidat.map((item, realIndex) => ({ ...item, realIndex })).filter(item => {
-            const matchStatus = statusFilter === 'all' || item.status === statusFilter;
-            const matchText = !keyword ||
-                item.nama.toLowerCase().includes(keyword) ||
-                item.jabatan.toLowerCase().includes(keyword) ||
-                item.skill.toLowerCase().includes(keyword) ||
-                item.status.toLowerCase().includes(keyword) ||
-                item.alasan.toLowerCase().includes(keyword);
-            return matchStatus && matchText;
-        });
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
-    function resetPageAndRender() {
-        currentPage = 1;
-        renderTableAndPagination();
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 2200);
     }
 
-    function renderJobs() {
-        const container = document.getElementById('jobListContainer');
-        if (dataLoker.length === 0) {
-            container.innerHTML = `<div class="col-12"><div class="card p-4 text-muted">Belum ada posisi dibuka. Klik "Tambah Posisi & Jobdesk".</div></div>`;
-            return;
-        }
-
-        container.innerHTML = dataLoker.map(job => {
-            const pelamarCount = dataKandidat.filter(k => k.jabatan === job.title).length;
-            const berhasilCount = dataKandidat.filter(k => k.jabatan === job.title && k.status === 'Berhasil').length;
-            return `
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card p-3 h-100 job-card d-flex flex-column">
-                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-                        <h6 class="fw-bold mb-0">${escapeHtml(job.title)}</h6>
-                        <span class="badge bg-dark">${pelamarCount} Pelamar</span>
-                    </div>
-                    <p class="small text-muted flex-grow-1 mb-3">${escapeHtml(job.desc)}</p>
-                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                        <small class="text-success fw-semibold"><i class="bi bi-check-circle me-1"></i>Berhasil: ${berhasilCount}</small>
-                        <button class="btn btn-sm btn-outline-primary" onclick="openModalKandidat('${escapeJs(job.title)}')">
-                            <i class="bi bi-plus me-1"></i>Daftar Kandidat
-                        </button>
-                    </div>
-                </div>
-            </div>`;
-        }).join('');
+    function formatRupiah(num) {
+      return "Rp " + Number(num).toLocaleString("id-ID");
     }
 
-    function renderBadge(status) {
-        if (status === 'Berhasil') return `<span class="badge bg-success">Berhasil</span>`;
-        if (status === 'Tidak Berhasil') return `<span class="badge bg-danger">Tidak Berhasil</span>`;
-        return `<span class="badge bg-secondary">Dalam Proses</span>`;
-    }
+    function getFilteredCandidates() {
+      const q = document.getElementById("filterSearch").value.trim().toLowerCase();
+      const maxSal = Number(document.getElementById("filterMaxSalary").value || 0);
+      const avail = document.getElementById("filterAvailability").value;
 
-    function renderTableAndPagination() {
-        const filtered = getFilteredData();
-        const totalItems = filtered.length;
-        const totalPages = Math.max(1, Math.ceil(totalItems / rowsPerPage));
-        if (currentPage > totalPages) currentPage = totalPages;
-
-        const startIdx = (currentPage - 1) * rowsPerPage;
-        const paginatedItems = filtered.slice(startIdx, startIdx + rowsPerPage);
-
-        const tbody = document.getElementById('tableKandidat');
-        if (paginatedItems.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">Tidak ada data kandidat yang sesuai.</td></tr>`;
-        } else {
-            tbody.innerHTML = paginatedItems.map((k, idx) => `
-                <tr>
-                    <td>${startIdx + idx + 1}</td>
-                    <td><strong>${escapeHtml(k.nama)}</strong></td>
-                    <td>${escapeHtml(k.jabatan)}</td>
-                    <td><span class="badge bg-light text-dark border">${escapeHtml(k.skill)}</span></td>
-                    <td>${escapeHtml(k.tanggal)}</td>
-                    <td>${renderBadge(k.status)}</td>
-                    <td>${escapeHtml(k.alasan)}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-dark" onclick="openStatusModal(${k.realIndex})">
-                            <i class="bi bi-pencil-square me-1"></i>Update
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        const infoEl = document.getElementById('paginationInfo');
-        if (totalItems === 0) {
-            infoEl.innerText = 'Menampilkan 0 data';
-        } else {
-            infoEl.innerText = `Menampilkan ${startIdx + 1}–${Math.min(startIdx + rowsPerPage, totalItems)} dari ${totalItems} kandidat (Halaman ${currentPage} dari ${totalPages})`;
-        }
-
-        const pagEl = document.getElementById('paginationControls');
-        if (totalPages <= 1) {
-            pagEl.innerHTML = '';
-            return;
-        }
-
-        let html = `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-            <button class="page-link" onclick="goToPage(${currentPage - 1})">Prev</button>
-        </li>`;
-
-        for (let p = 1; p <= totalPages; p++) {
-            html += `<li class="page-item ${p === currentPage ? 'active' : ''}">
-                <button class="page-link" onclick="goToPage(${p})">${p}</button>
-            </li>`;
-        }
-
-        html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-            <button class="page-link" onclick="goToPage(${currentPage + 1})">Next</button>
-        </li>`;
-
-        pagEl.innerHTML = html;
-    }
-
-    function goToPage(page) {
-        currentPage = page;
-        renderTableAndPagination();
-    }
-
-    function exportExcel() {
-        const rows = getFilteredData();
-        if (rows.length === 0) return alert('Tidak ada data untuk diunduh.');
-
-        const headers = ['No', 'Nama Kandidat', 'Posisi Dilamar', 'Keahlian', 'Tanggal Daftar', 'Status', 'Alasan / Catatan'];
-        const csvLines = [
-            headers.map(h => `"${h}"`).join(','),
-            ...rows.map((r, i) => [
-                i + 1,
-                r.nama,
-                r.jabatan,
-                r.skill,
-                r.tanggal,
-                r.status,
-                r.alasan
-            ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
-        ];
-
-        const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `riwayat_rekrutmen_${new Date().toISOString().slice(0, 10)}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-
-    function exportPDF() {
-        const rows = getFilteredData();
-        if (rows.length === 0) return alert('Tidak ada data untuk diunduh.');
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'landscape' });
-
-        doc.setFontSize(14);
-        doc.text('Laporan Pendataan & Riwayat Rekrutmen', 14, 15);
-        doc.setFontSize(9);
-        doc.text(`Dicetak: ${new Date().toLocaleString('id-ID')}`, 14, 21);
-
-        doc.autoTable({
-            startY: 26,
-            head: [['No', 'Nama Kandidat', 'Posisi Dilamar', 'Keahlian', 'Tanggal', 'Status', 'Alasan / Catatan']],
-            body: rows.map((r, i) => [i + 1, r.nama, r.jabatan, r.skill, r.tanggal, r.status, r.alasan]),
-            styles: { fontSize: 8 }
-        });
-
-        doc.save(`riwayat_rekrutmen_${new Date().toISOString().slice(0, 10)}.pdf`);
-    }
-
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
-
-    function escapeJs(str) {
-        return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      return state.candidates.filter((c) => {
+        const matchText = !q || c.name.toLowerCase().includes(q) || c.role.toLowerCase().includes(q);
+        const matchSal = !maxSal || c.salary <= maxSal;
+        const matchAvail = !avail || c.availability === avail;
+        return matchText && matchSal && matchAvail;
+      });
     }
 
     function renderAll() {
-        renderJobs();
-        renderTableAndPagination();
+      renderKanban();
+      renderCalendar();
+      renderCandidateSelect();
+      renderAgenda();
     }
 
+    function renderKanban() {
+      const board = document.getElementById("kanbanBoard");
+      const filtered = getFilteredCandidates();
+      document.getElementById("filterSummary").textContent =
+        `Menampilkan ${filtered.length} dari ${state.candidates.length} kandidat`;
+
+      board.innerHTML = "";
+
+      STAGES.forEach((stage) => {
+        const items = filtered.filter((c) => c.stage === stage);
+        const col = document.createElement("div");
+        col.className = "kanban-col";
+        col.dataset.stage = stage;
+
+        col.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          col.classList.add("drag-over");
+        });
+
+        col.addEventListener("dragleave", () => col.classList.remove("drag-over"));
+
+        col.addEventListener("drop", (e) => {
+          e.preventDefault();
+          col.classList.remove("drag-over");
+          const id = e.dataTransfer.getData("text/plain");
+          moveCandidateStage(id, stage);
+        });
+
+        const header = document.createElement("div");
+        header.className = "col-header";
+        header.innerHTML = `<span>${stage}</span><span class="col-count">${items.length}</span>`;
+        col.appendChild(header);
+
+        items.forEach((c) => {
+          const sched = state.schedules.find((s) => s.candidateId === c.id);
+          const card = document.createElement("div");
+          card.className = "card";
+          card.draggable = true;
+          card.dataset.id = c.id;
+
+          card.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", c.id);
+          });
+
+          const stageOptions = STAGES.map(
+            (st) => `<option value="${st}" ${st === c.stage ? "selected" : ""}>${st}</option>`
+          ).join("");
+
+          card.innerHTML = `
+            <div class="card-top">
+              <div>
+                <div class="card-name">${escapeHtml(c.name)}</div>
+                <div class="card-role">${escapeHtml(c.role)}</div>
+              </div>
+            </div>
+            <div class="card-meta">
+              <span>Gaji: <strong>${formatRupiah(c.salary)}</strong></span>
+              <span class="badge badge-time">Siap: ${escapeHtml(c.availability)}</span>
+            </div>
+            ${sched ? `<div class="schedule-tag">Jadwal: ${sched.date} ${sched.time}</div>` : ""}
+            <div class="card-footer">
+              <select class="stage-select" aria-label="Pindah tahap ${escapeHtml(c.name)}">${stageOptions}</select>
+              <button type="button" class="btn btn-sm btn-schedule">Jadwalkan</button>
+            </div>
+          `;
+
+          card.querySelector(".stage-select").addEventListener("change", (e) => {
+            moveCandidateStage(c.id, e.target.value);
+          });
+
+          card.querySelector(".btn-schedule").addEventListener("click", () => {
+            document.getElementById("schedCandidate").value = c.id;
+            document.getElementById("schedDate").value = selectedDate;
+            document.getElementById("schedCandidate").scrollIntoView({ behavior: "smooth", block: "center" });
+          });
+
+          col.appendChild(card);
+        });
+
+        board.appendChild(col);
+      });
+    }
+
+    function moveCandidateStage(id, newStage) {
+      const cand = state.candidates.find((c) => c.id === id);
+      if (!cand || cand.stage === newStage) return;
+      cand.stage = newStage;
+      saveState();
+      renderKanban();
+      showToast(`${cand.name} dipindahkan ke ${newStage}`);
+    }
+
+    function renderCalendar() {
+      const titleEl = document.getElementById("calMonthTitle");
+      const daysEl = document.getElementById("calDays");
+      const monthNames = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+      ];
+
+      titleEl.textContent = `${monthNames[calMonth]} ${calYear}`;
+      daysEl.innerHTML = "";
+
+      const firstDay = new Date(calYear, calMonth, 1).getDay();
+      const totalDays = new Date(calYear, calMonth + 1, 0).getDate();
+
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement("div");
+        empty.className = "cal-day empty";
+        daysEl.appendChild(empty);
+      }
+
+      for (let day = 1; day <= totalDays; day++) {
+        const dateStr = `${calYear}-${pad(calMonth + 1)}-${pad(day)}`;
+        const daySchedules = state.schedules.filter((s) => s.date === dateStr);
+
+        const cell = document.createElement("div");
+        cell.className = "cal-day" + (dateStr === selectedDate ? " selected" : "");
+        cell.innerHTML = `<div class="day-num">${day}</div>`;
+
+        daySchedules.slice(0, 2).forEach((s) => {
+          const cand = state.candidates.find((c) => c.id === s.candidateId);
+          const dot = document.createElement("div");
+          dot.className = "event-dot";
+          dot.textContent = `${s.time} ${cand ? cand.name : "Kandidat"}`;
+          cell.appendChild(dot);
+        });
+
+        if (daySchedules.length > 2) {
+          const more = document.createElement("div");
+          more.style.fontSize = "0.68rem";
+          more.style.color = "var(--muted)";
+          more.textContent = `+${daySchedules.length - 2} lagi`;
+          cell.appendChild(more);
+        }
+
+        cell.addEventListener("click", () => {
+          selectedDate = dateStr;
+          document.getElementById("schedDate").value = dateStr;
+          renderCalendar();
+          renderAgenda();
+        });
+
+        daysEl.appendChild(cell);
+      }
+    }
+
+    function renderCandidateSelect() {
+      const sel = document.getElementById("schedCandidate");
+      const currentVal = sel.value;
+      sel.innerHTML = state.candidates
+        .map((c) => `<option value="${c.id}">${escapeHtml(c.name)} — ${escapeHtml(c.role)}</option>`)
+        .join("");
+      if (currentVal && state.candidates.some((c) => c.id === currentVal)) {
+        sel.value = currentVal;
+      }
+    }
+
+    function renderAgenda() {
+      document.getElementById("selectedDateLabel").textContent = selectedDate;
+      const list = document.getElementById("agendaList");
+      const items = state.schedules
+        .filter((s) => s.date === selectedDate)
+        .sort((a, b) => a.time.localeCompare(b.time));
+
+      if (!items.length) {
+        list.innerHTML = `<div style="font-size:0.82rem; color:var(--muted);">Belum ada jadwal wawancara pada tanggal ini.</div>`;
+        return;
+      }
+
+      list.innerHTML = items
+        .map((s) => {
+          const cand = state.candidates.find((c) => c.id === s.candidateId);
+          return `
+            <div class="agenda-item">
+              <div>
+                <strong>${s.time}</strong> &bull; <strong>${cand ? escapeHtml(cand.name) : "Kandidat"}</strong>
+                <div style="font-size:0.76rem; color:var(--muted);">
+                  ${cand ? escapeHtml(cand.role) : ""}${s.note ? " — " + escapeHtml(s.note) : ""}
+                </div>
+              </div>
+              <span class="badge">${cand ? cand.stage : ""}</span>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // Event Listeners
+    ["filterSearch", "filterMaxSalary", "filterAvailability"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", renderKanban);
+      document.getElementById(id).addEventListener("change", renderKanban);
+    });
+
+    document.getElementById("prevMonth").addEventListener("click", () => {
+      calMonth--;
+      if (calMonth < 0) {
+        calMonth = 11;
+        calYear--;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById("nextMonth").addEventListener("click", () => {
+      calMonth++;
+      if (calMonth > 11) {
+        calMonth = 0;
+        calYear++;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById("schedDate").value = selectedDate;
+
+    document.getElementById("scheduleForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const candidateId = document.getElementById("schedCandidate").value;
+      const date = document.getElementById("schedDate").value;
+      const time = document.getElementById("schedTime").value;
+      const note = document.getElementById("schedNote").value.trim();
+
+      if (!candidateId || !date || !time) return;
+
+      state.schedules.push({
+        id: "s-" + Date.now(),
+        candidateId,
+        date,
+        time,
+        note
+      });
+
+      selectedDate = date;
+      const [y, m] = date.split("-").map(Number);
+      calYear = y;
+      calMonth = m - 1;
+
+      saveState();
+      document.getElementById("schedNote").value = "";
+      renderAll();
+      showToast("Jadwal wawancara tersimpan");
+    });
+
+    const modal = document.getElementById("addModal");
+    document.getElementById("btnOpenAddCandidate").addEventListener("click", () => modal.classList.add("open"));
+    document.getElementById("btnCancelModal").addEventListener("click", () => modal.classList.remove("open"));
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.classList.remove("open");
+    });
+
+    document.getElementById("addCandidateForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("candName").value.trim();
+      const role = document.getElementById("candRole").value.trim();
+      const salary = Number(document.getElementById("candSalary").value);
+      const availability = document.getElementById("candAvailability").value;
+      const stage = document.getElementById("candStage").value;
+
+      state.candidates.push({
+        id: "c-" + Date.now(),
+        name,
+        role,
+        salary,
+        availability,
+        stage
+      });
+
+      saveState();
+      e.target.reset();
+      document.getElementById("candSalary").value = "11000000";
+      modal.classList.remove("open");
+      renderAll();
+      showToast(`Kandidat ${name} ditambahkan`);
+    });
+
+    document.getElementById("btnClearStorage").addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      state = structuredClone(DEFAULT_DATA);
+      saveState();
+      renderAll();
+      showToast("Storage dibersihkan & data awal dipulihkan");
+    });
+
     renderAll();
-</script>
+  </script>
 </body>
 </html>
