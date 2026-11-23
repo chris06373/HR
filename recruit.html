@@ -349,6 +349,7 @@
       display: flex;
       gap: 4px;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .stage-select {
@@ -649,6 +650,70 @@
       max-width: 560px;
     }
 
+    .modal-letter {
+      max-width: 680px;
+    }
+
+    .offer-letter {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 24px;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    .letter-header {
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .letter-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .letter-table {
+      width: 100%;
+      min-width: 0;
+      border-collapse: collapse;
+      margin: 4px 0;
+      font-size: 0.86rem;
+    }
+
+    .letter-table td {
+      border: none;
+      padding: 5px 8px 5px 0;
+      vertical-align: top;
+    }
+
+    .letter-table td:first-child {
+      width: 175px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .letter-sign {
+      margin-top: 10px;
+      padding-top: 12px;
+      border-top: 1px dashed #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
     .detail-box {
       background: var(--surface-alt);
       border: 1px solid var(--border);
@@ -706,6 +771,23 @@
     .toast.show {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #hiredLetterModal, #hiredLetterModal * {
+        visibility: visible;
+      }
+      #hiredLetterModal {
+        position: static;
+        background: none;
+        padding: 0;
+      }
+      .modal-actions, #btnCloseLetterModal, #btnPrintLetter {
+        display: none !important;
+      }
     }
 
     /* Mobile Breakpoints */
@@ -784,6 +866,15 @@
 
       .modal {
         padding: 16px;
+      }
+
+      .offer-letter {
+        padding: 16px;
+        font-size: 0.84rem;
+      }
+
+      .letter-table td:first-child {
+        width: 130px;
       }
     }
   </style>
@@ -865,7 +956,7 @@
               <select id="schedCandidate" required></select>
             </div>
             <div class="field">
-              <label for="schedDate">Tanggal</label>
+              <label for="schedDate">Tanggal (Mulai Hari Ini)</label>
               <input type="date" id="schedDate" required />
             </div>
             <div class="field">
@@ -999,7 +1090,7 @@
           <select id="editSchedCandidate" required></select>
         </div>
         <div class="field">
-          <label for="editSchedDate">Tanggal</label>
+          <label for="editSchedDate">Tanggal (Mulai Hari Ini)</label>
           <input type="date" id="editSchedDate" required />
         </div>
         <div class="field">
@@ -1027,8 +1118,24 @@
       </div>
       <div id="detailModalContent"></div>
       <div class="modal-actions">
+        <button type="button" class="btn btn-success" id="btnOpenLetterFromDetail" style="display: none;">Surat Diterima Bekerja</button>
         <button type="button" class="btn" id="btnEditFromDetail">Edit Kandidat</button>
         <button type="button" class="btn btn-primary" id="btnCloseDetailModal">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Surat Pemberitahuan Diterima Bekerja (Hired) -->
+  <div class="modal-backdrop" id="hiredLetterModal">
+    <div class="modal modal-letter">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <h3 style="font-size: 1rem; color: var(--success);">Surat Pemberitahuan Diterima Bekerja</h3>
+        <span class="badge badge-hired">Status: Hired</span>
+      </div>
+      <div class="offer-letter" id="hiredLetterBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="btnPrintLetter">Cetak Surat</button>
+        <button type="button" class="btn btn-primary" id="btnCloseLetterModal">Selesai</button>
       </div>
     </div>
   </div>
@@ -1036,12 +1143,13 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const STORAGE_KEY = "recruitment_hub_data_v3";
+    const STORAGE_KEY = "recruitment_hub_data_v4";
     const STAGES = ["Applied", "Screening", "Interview", "Offering", "Hired"];
 
     const todayObj = new Date();
     const pad = (n) => String(n).padStart(2, "0");
     const toDateStr = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const minInterviewDate = toDateStr(todayObj);
 
     const DEFAULT_DATA = {
       candidates: [],
@@ -1052,13 +1160,27 @@
     let state = loadState();
     let calYear = todayObj.getFullYear();
     let calMonth = todayObj.getMonth();
-    let selectedDate = toDateStr(todayObj);
+    let selectedDate = minInterviewDate;
     let historyPage = 1;
     let activeDetailCandidateId = null;
 
     function nowTimestamp() {
       const d = new Date();
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+
+    function applyDateConstraints() {
+      const schedInput = document.getElementById("schedDate");
+      const editSchedInput = document.getElementById("editSchedDate");
+      schedInput.min = minInterviewDate;
+      editSchedInput.min = minInterviewDate;
+      if (schedInput.value && schedInput.value < minInterviewDate) {
+        schedInput.value = minInterviewDate;
+      }
+    }
+
+    function isPastInterviewDate(dateStr) {
+      return !dateStr || dateStr < minInterviewDate;
     }
 
     function loadState() {
@@ -1106,11 +1228,90 @@
       const el = document.getElementById("toast");
       el.textContent = msg;
       el.classList.add("show");
-      setTimeout(() => el.classList.remove("show"), 2400);
+      setTimeout(() => el.classList.remove("show"), 2500);
     }
 
     function formatRupiah(num) {
       return "Rp " + Number(num).toLocaleString("id-ID");
+    }
+
+    function formatDateIndo(dateStr) {
+      const parts = String(dateStr).split("-");
+      if (parts.length !== 3) return dateStr;
+      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      const months = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+      ];
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function openHiredLetterModal(candId) {
+      const cand = state.candidates.find((c) => c.id === candId);
+      if (!cand || cand.stage !== "Hired") return;
+
+      const docNumber = `HR/OFFER/${todayObj.getFullYear()}/${pad(todayObj.getMonth() + 1)}/${cand.id.slice(-4).toUpperCase()}`;
+      const issuedDate = formatDateIndo(minInterviewDate);
+
+      document.getElementById("hiredLetterBody").innerHTML = `
+        <div class="letter-header">
+          <div>
+            <div class="letter-title">Surat Pemberitahuan Diterima Bekerja</div>
+            <div style="font-size:0.78rem; color:var(--muted);">No. Dokumen: ${escapeHtml(docNumber)}</div>
+          </div>
+          <div style="text-align:right; font-size:0.8rem; color:var(--muted);">
+            <div>Tanggal Terbit</div>
+            <strong style="color:var(--text);">${escapeHtml(issuedDate)}</strong>
+          </div>
+        </div>
+
+        <p>Kepada Yth.<br /><strong>${escapeHtml(cand.name)}</strong><br />di Tempat</p>
+
+        <p>Dengan hormat,</p>
+
+        <p>
+          Selamat! Berdasarkan hasil evaluasi dan proses rekrutmen yang telah dilaksanakan, kami dengan senang hati
+          menyatakan bahwa Anda <strong>DITERIMA BEKERJA</strong> dengan rincian penawaran sebagai berikut:
+        </p>
+
+        <table class="letter-table">
+          <tr>
+            <td>Nama Lengkap</td>
+            <td>: <strong>${escapeHtml(cand.name)}</strong></td>
+          </tr>
+          <tr>
+            <td>Posisi / Jabatan</td>
+            <td>: <strong>${escapeHtml(cand.role)}</strong></td>
+          </tr>
+          <tr>
+            <td>Gaji / Kompensasi</td>
+            <td>: <strong>${formatRupiah(cand.salary)} / bulan</strong></td>
+          </tr>
+          <tr>
+            <td>Ketersediaan Bergabung</td>
+            <td>: <strong>${escapeHtml(cand.availability)}</strong></td>
+          </tr>
+          <tr>
+            <td>Status Kepegawaian</td>
+            <td>: <strong>Diterima (Hired)</strong></td>
+          </tr>
+        </table>
+
+        <p>
+          Mohon konfirmasi kesiapan bergabung serta kelengkapan administrasi awal kepada tim HRD. Kami menantikan
+          kontribusi dan kolaborasi terbaik Anda bersama tim.
+        </p>
+
+        <div class="letter-sign">
+          <div>
+            <div style="font-size:0.78rem; color:var(--muted);">Ditetapkan oleh,</div>
+            <div style="font-weight:700; margin-top:4px;">Recruitment &amp; HR Team</div>
+          </div>
+          <span class="badge badge-hired">Terverifikasi Diterima</span>
+        </div>
+      `;
+
+      document.getElementById("hiredLetterModal").classList.add("open");
     }
 
     function getFilteredCandidates() {
@@ -1208,6 +1409,7 @@
             <div class="card-footer">
               <select class="stage-select" ${isHired ? "disabled" : ""} aria-label="Pindah tahap ${escapeHtml(c.name)}">${stageOptions}</select>
               <div class="card-actions">
+                ${isHired ? `<button type="button" class="btn btn-sm btn-success btn-letter">Surat</button>` : ""}
                 <button type="button" class="btn btn-sm btn-edit-cand">Edit</button>
                 <button type="button" class="btn btn-sm btn-schedule">Jadwal</button>
               </div>
@@ -1219,13 +1421,19 @@
             moveCandidateStage(c.id, e.target.value, selectEl);
           });
 
+          const letterBtn = card.querySelector(".btn-letter");
+          if (letterBtn) {
+            letterBtn.addEventListener("click", () => openHiredLetterModal(c.id));
+          }
+
           card.querySelector(".btn-edit-cand").addEventListener("click", () => {
             openEditCandidateModal(c.id);
           });
 
           card.querySelector(".btn-schedule").addEventListener("click", () => {
             document.getElementById("schedCandidate").value = c.id;
-            document.getElementById("schedDate").value = selectedDate;
+            document.getElementById("schedDate").value =
+              selectedDate >= minInterviewDate ? selectedDate : minInterviewDate;
             document.getElementById("schedCandidate").scrollIntoView({ behavior: "smooth", block: "center" });
           });
 
@@ -1255,6 +1463,10 @@
       renderKanban();
       renderHistory();
       showToast(`${cand.name} dipindahkan ke ${newStage}`);
+
+      if (newStage === "Hired") {
+        openHiredLetterModal(cand.id);
+      }
     }
 
     function renderCalendar() {
@@ -1303,7 +1515,9 @@
 
         cell.addEventListener("click", () => {
           selectedDate = dateStr;
-          document.getElementById("schedDate").value = dateStr;
+          if (dateStr >= minInterviewDate) {
+            document.getElementById("schedDate").value = dateStr;
+          }
           renderCalendar();
           renderAgenda();
         });
@@ -1413,10 +1627,12 @@
       const sched = state.schedules.find((s) => s.id === schedId);
       if (!sched) return;
 
+      applyDateConstraints();
       renderCandidateSelects();
       document.getElementById("editScheduleId").value = sched.id;
       document.getElementById("editSchedCandidate").value = sched.candidateId;
-      document.getElementById("editSchedDate").value = sched.date;
+      document.getElementById("editSchedDate").value =
+        sched.date >= minInterviewDate ? sched.date : minInterviewDate;
       document.getElementById("editSchedTime").value = sched.time;
       document.getElementById("editSchedNote").value = sched.note || "";
       editScheduleModal.classList.add("open");
@@ -1549,6 +1765,9 @@
       const candSchedules = state.schedules.filter((s) => s.candidateId === item.candidateId);
       const candLogs = state.histories.filter((h) => h.candidateId === item.candidateId);
       const currentStage = cand ? cand.stage : item.stage;
+
+      document.getElementById("btnOpenLetterFromDetail").style.display =
+        cand && currentStage === "Hired" ? "inline-flex" : "none";
 
       const badgeEl = document.getElementById("detailCurrentStageBadge");
       badgeEl.textContent = currentStage;
@@ -1713,6 +1932,7 @@
     });
 
     document.getElementById("schedDate").value = selectedDate;
+    applyDateConstraints();
 
     document.getElementById("scheduleForm").addEventListener("submit", (e) => {
       e.preventDefault();
@@ -1722,6 +1942,12 @@
       const note = document.getElementById("schedNote").value.trim();
 
       if (!candidateId || !date || !time) return;
+
+      if (isPastInterviewDate(date)) {
+        showToast("Tanggal interview tidak boleh mundur dari hari ini");
+        document.getElementById("schedDate").value = minInterviewDate;
+        return;
+      }
 
       const cand = state.candidates.find((c) => c.id === candidateId);
 
@@ -1768,6 +1994,12 @@
       const time = document.getElementById("editSchedTime").value;
       const note = document.getElementById("editSchedNote").value.trim();
 
+      if (isPastInterviewDate(date)) {
+        showToast("Tanggal interview tidak boleh mundur dari hari ini");
+        document.getElementById("editSchedDate").value = minInterviewDate;
+        return;
+      }
+
       sched.candidateId = candidateId;
       sched.date = date;
       sched.time = time;
@@ -1807,6 +2039,18 @@
       detailModal.classList.remove("open");
       openEditCandidateModal(activeDetailCandidateId);
     });
+    document.getElementById("btnOpenLetterFromDetail").addEventListener("click", () => {
+      if (!activeDetailCandidateId) return;
+      detailModal.classList.remove("open");
+      openHiredLetterModal(activeDetailCandidateId);
+    });
+
+    const hiredLetterModal = document.getElementById("hiredLetterModal");
+    document.getElementById("btnCloseLetterModal").addEventListener("click", () => hiredLetterModal.classList.remove("open"));
+    hiredLetterModal.addEventListener("click", (e) => {
+      if (e.target === hiredLetterModal) hiredLetterModal.classList.remove("open");
+    });
+    document.getElementById("btnPrintLetter").addEventListener("click", () => window.print());
 
     document.getElementById("candidateForm").addEventListener("submit", (e) => {
       e.preventDefault();
@@ -1842,6 +2086,10 @@
         candidateModal.classList.remove("open");
         renderAll();
         showToast(`Data ${name} diperbarui`);
+
+        if (stageChanged && newStage === "Hired") {
+          openHiredLetterModal(cand.id);
+        }
       } else {
         const newCand = {
           id: "c-" + Date.now(),
@@ -1862,6 +2110,10 @@
         historyPage = 1;
         renderAll();
         showToast(`Kandidat ${name} ditambahkan`);
+
+        if (requestedStage === "Hired") {
+          openHiredLetterModal(newCand.id);
+        }
       }
     });
 
