@@ -1046,7 +1046,7 @@
         </div>
 
         <div class="panel">
-          <h3 style="font-size: 0.95rem; margin-bottom: 12px;">Atur Jadwal Wawancara (1x per Kandidat)</h3>
+          <h3 style="font-size: 0.95rem; margin-bottom: 12px;">Atur Jadwal Wawancara (maksimal 1 jadwal HR dan 1 jadwal User per kandidat)</h3>
           <form class="form-grid" id="scheduleForm">
             <div class="schedule-mode-banner" id="scheduleModeBanner">
               Pilih kandidat untuk mengatur jadwal wawancara.
@@ -1383,7 +1383,14 @@ function loadState() {
 }
 
     function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        return true;
+      } catch (error) {
+        console.error("Gagal menyimpan data:", error);
+        showToast("Penyimpanan gagal. Periksa kapasitas browser atau ukuran data.");
+        return false;
+      }
     }
 
     /**
@@ -1528,7 +1535,7 @@ function loadState() {
       const avail = document.getElementById("filterAvailability").value;
 
       return state.candidates.filter((c) => {
-        const matchText = !q || c.name.toLowerCase().includes(q) || c.role.toLowerCase().includes(q);
+        const matchText = !q || String(c.name || "").toLowerCase().includes(q) || String(c.role || "").toLowerCase().includes(q);
         const matchSal = !maxSal || c.salary <= maxSal;
         const matchAvail = !avail || c.availability === avail;
         return matchText && matchSal && matchAvail;
@@ -1586,7 +1593,8 @@ function loadState() {
 
         items.forEach((c) => {
           const isHired = c.stage === "Hired";
-          const sched = state.schedules.find((s) => s.candidateId === c.id);
+          const candidateSchedules = state.schedules.filter((s) => s.candidateId === c.id).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+          const sched = candidateSchedules[0];
           const card = document.createElement("div");
           card.className = "card" + (isHired ? " is-hired" : "");
           card.draggable = !isHired;
@@ -1614,13 +1622,13 @@ function loadState() {
               <span>Gaji: <strong>${formatRupiah(c.salary)}</strong></span>
               <span class="badge badge-time">Siap: ${escapeHtml(c.availability)}</span>
             </div>
-            ${sched ? `<div class="schedule-tag">Jadwal: ${sched.date} ${sched.time}</div>` : ""}
+            ${candidateSchedules.length ? `<div class="schedule-tag">${candidateSchedules.map(x => `${x.type}: ${escapeHtml(x.date)} ${escapeHtml(x.time)}`).join("<br>")}</div>` : ""}
             <div class="card-footer">
               <select class="stage-select" ${isHired ? "disabled" : ""} aria-label="Pindah tahap ${escapeHtml(c.name)}">${stageOptions}</select>
               <div class="card-actions">
                 ${isHired ? `<button type="button" class="btn btn-sm btn-success btn-letter">Surat</button>` : ""}
                 <button type="button" class="btn btn-sm btn-edit-cand" ${isHired ? "disabled title='Data kandidat Hired tidak dapat diedit'" : ""}>Edit</button>
-                <button type="button" class="btn btn-sm btn-schedule" ${isHired ? "disabled title='Data kandidat sudah tidak bisa di edit jadwal'" : ""}></button>
+                <button type="button" class="btn btn-sm btn-schedule" ${isHired ? "disabled title='Kandidat Hired tidak dapat mengubah jadwal'" : ""}>Jadwalkan</button>
               </div>
             </div>
           `;
@@ -1660,6 +1668,8 @@ function loadState() {
       const cand = state.candidates.find((c) => c.id === id);
       if (!cand) return;
 
+      if (!STAGES.includes(newStage)) return;
+
       if (cand.stage === "Hired") {
         if (selectEl) selectEl.value = "Hired";
         showToast(`${cand.name} sudah Hired dan tidak bisa dipindahkan lagi`);
@@ -1685,8 +1695,7 @@ function loadState() {
       );
 
       saveState();
-      renderKanban();
-      renderHistory();
+      renderAll();
       showToast(`${cand.name} dipindahkan ke ${newStage}`);
 
       if (newStage === "Hired") {
@@ -1752,8 +1761,10 @@ function loadState() {
         if (!isPast) {
           cell.addEventListener("click", () => {
             selectedDate = dateStr;
+            const selectedCandidateId = document.getElementById("schedCandidate").value;
+            const selectedType = document.getElementById("schedType").value;
             const existing = state.schedules.find(
-              (s) => s.candidateId === document.getElementById("schedCandidate").value
+              (s) => s.candidateId === selectedCandidateId && s.type === selectedType
             );
             if (!existing) {
               document.getElementById("schedDate").value = dateStr;
@@ -1773,18 +1784,12 @@ function loadState() {
       const submitBtn = document.getElementById("btnSubmitSchedule");
       const bannerEl = document.getElementById("scheduleModeBanner");
       const currentVal = sel.value;
-
-      const optionsHtml = state.candidates
-        .map((c) => {
-          const hasSched = state.schedules.some((s) => s.candidateId === c.id);
-          return `<option value="${c.id}">${escapeHtml(c.name)} — ${escapeHtml(c.role)}${hasSched ? " [Sudah Terjadwal]" : ""}</option>`;
-        })
-        .join("");
-
-      editSel.innerHTML = state.candidates
-        .map((c) => `<option value="${c.id}">${escapeHtml(c.name)} — ${escapeHtml(c.role)}</option>`)
-        .join("");
-
+      const optionsHtml = state.candidates.map((c) => {
+        const hasHR = state.schedules.some((s) => s.candidateId === c.id && s.type === "HR");
+        const hasUser = state.schedules.some((s) => s.candidateId === c.id && s.type === "User");
+        return `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)} — ${escapeHtml(c.role)}${hasHR || hasUser ? ` [${[hasHR ? "HR" : "", hasUser ? "User" : ""].filter(Boolean).join(" & ")}]` : ""}</option>`;
+      }).join("");
+      editSel.innerHTML = state.candidates.map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)} — ${escapeHtml(c.role)}</option>`).join("");
       if (!state.candidates.length) {
         sel.innerHTML = `<option value="">-- Belum ada kandidat --</option>`;
         sel.disabled = true;
@@ -1793,97 +1798,72 @@ function loadState() {
         bannerEl.textContent = "Tambahkan kandidat terlebih dahulu untuk mengatur jadwal wawancara.";
         return;
       }
-
       sel.disabled = false;
-      submitBtn.disabled = false;
       sel.innerHTML = optionsHtml;
+      if (currentVal && state.candidates.some((c) => c.id === currentVal)) sel.value = currentVal;
+      else sel.selectedIndex = 0;
+    }
 
-      if (currentVal && state.candidates.some((c) => c.id === currentVal)) {
-        sel.value = currentVal;
+    function syncScheduleFormWithSelectedCandidate() {
+      const candidateId = document.getElementById("schedCandidate").value;
+      const type = document.getElementById("schedType").value;
+      const bannerEl = document.getElementById("scheduleModeBanner");
+      const submitBtn = document.getElementById("btnSubmitSchedule");
+      const dateInput = document.getElementById("schedDate");
+      const timeInput = document.getElementById("schedTime");
+      const noteInput = document.getElementById("schedNote");
+      const candidate = state.candidates.find((c) => c.id === candidateId);
+      const inputs = [dateInput, timeInput, noteInput];
+      if (!candidate) {
+        inputs.forEach((el) => el.disabled = true);
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Simpan Jadwal";
+        return;
+      }
+      const locked = candidate.stage === "Hired";
+      const existing = state.schedules.find((s) => s.candidateId === candidateId && s.type === type);
+      inputs.forEach((el) => el.disabled = locked);
+      submitBtn.disabled = locked;
+      if (locked) {
+        bannerEl.className = "schedule-mode-banner";
+        bannerEl.textContent = "Kandidat sudah Hired. Jadwal tidak dapat diubah.";
+        return;
+      }
+      if (existing) {
+        bannerEl.className = "schedule-mode-banner is-update";
+        bannerEl.textContent = `Jadwal Interview ${type} sudah tersedia. Menyimpan akan memperbarui jadwal ini.`;
+        submitBtn.textContent = "Perbarui Jadwal";
+        dateInput.value = existing.date;
+        timeInput.value = existing.time;
+        noteInput.value = existing.note || "";
+      } else {
+        bannerEl.className = "schedule-mode-banner";
+        bannerEl.textContent = `Buat jadwal Interview ${type} untuk kandidat ini.`;
+        submitBtn.textContent = "Simpan Jadwal";
+        dateInput.value = selectedDate >= minInterviewDate ? selectedDate : minInterviewDate;
+        timeInput.value = "10:00";
+        noteInput.value = "";
       }
     }
 
- function syncScheduleFormWithSelectedCandidate() {
-  const candidateId =
-    document.getElementById("schedCandidate").value;
-
-  const type = document.getElementById("schedType").value;
-
-  const bannerEl =
-    document.getElementById("scheduleModeBanner");
-
-  const submitBtn =
-    document.getElementById("btnSubmitSchedule");
-
-  const dateInput =
-    document.getElementById("schedDate");
-
-  const timeInput =
-    document.getElementById("schedTime");
-
-  const noteInput =
-    document.getElementById("schedNote");
-
-  const candidate = state.candidates.find(
-    c => c.id === candidateId
-  );
-
-  if (!candidateId || !candidate) return;
-
-  const locked = candidate.stage === "Hired";
-
-  const existing = state.schedules.find(
-    s => s.candidateId === candidateId &&
-         s.type === type
-  );
-
-  if (locked) {
-    bannerEl.className = "schedule-mode-banner";
-    bannerEl.textContent =
-      "Kandidat sudah Hired. Jadwal tidak dapat diubah.";
-
-    submitBtn.disabled = true;
-    dateInput.disabled = true;
-    timeInput.disabled = true;
-    noteInput.disabled = true;
-    return;
-  }
-
-  submitBtn.disabled = false;
-  dateInput.disabled = false;
-  timeInput.disabled = false;
-  noteInput.disabled = false;
-
-  if (existing) {
-    bannerEl.className =
-      "schedule-mode-banner is-update";
-
-    bannerEl.textContent =
-      `Jadwal Interview ${type} sudah tersedia. ` +
-      "Menyimpan akan memperbarui jadwal ini.";
-
-    submitBtn.textContent = "Perbarui Jadwal";
-
-    dateInput.value = existing.date;
-    timeInput.value = existing.time;
-    noteInput.value = existing.note || "";
-  } else {
-    bannerEl.className = "schedule-mode-banner";
-
-    bannerEl.textContent =
-      `Buat jadwal Interview ${type} untuk kandidat ini.`;
-
-    submitBtn.textContent = "Simpan Jadwal";
-
-    dateInput.value =
-      selectedDate >= minInterviewDate
-        ? selectedDate
-        : minInterviewDate;
-
-    timeInput.value = "10:00";
-    noteInput.value = "";
-  }
-}
+    function markInterviewDone(scheduleId) {
+      const sched = state.schedules.find((item) => item.id === scheduleId);
+      if (!sched || sched.done) return;
+      const candidate = state.candidates.find((item) => item.id === sched.candidateId);
+      if (!candidate) {
+        showToast("Data kandidat untuk jadwal ini tidak ditemukan.");
+        return;
+      }
+      if (candidate.stage === "Hired") {
+        showToast("Kandidat sudah Hired; status jadwal tidak dapat diubah.");
+        return;
+      }
+      sched.done = true;
+      recordHistory(candidate.id, `Interview ${sched.type} selesai pada ${sched.date} ${sched.time}`, candidate.stage);
+      saveState();
+      renderAll();
+      showToast(`Interview ${sched.type} ${candidate.name} ditandai selesai.`);
+    }
 
     function renderAgenda() {
   document.getElementById("selectedDateLabel").textContent =
@@ -2017,6 +1997,7 @@ function loadState() {
       renderCandidateSelects();
       document.getElementById("editScheduleId").value = sched.id;
       document.getElementById("editSchedCandidate").value = sched.candidateId;
+      document.getElementById("editSchedType").value = sched.type || "HR";
       document.getElementById("editSchedDate").value =
         sched.date >= minInterviewDate ? sched.date : minInterviewDate;
       document.getElementById("editSchedTime").value = sched.time;
@@ -2275,8 +2256,8 @@ function loadState() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      showToast("File Excel histori berhasil diunduh");
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast("File histori berhasil diunduh");
     }
 
     function escapeHtml(str) {
@@ -2331,8 +2312,17 @@ function loadState() {
     document.getElementById("schedDate").value = selectedDate;
     applyDateConstraints();
 
-    document.getElementById("schedCandidate").addEventListener("change", () => {
-      syncScheduleFormWithSelectedCandidate();
+    document.getElementById("schedCandidate").addEventListener("change", syncScheduleFormWithSelectedCandidate);
+    document.getElementById("schedType").addEventListener("change", syncScheduleFormWithSelectedCandidate);
+    document.getElementById("schedDate").addEventListener("change", (e) => {
+      if (isPastInterviewDate(e.target.value)) {
+        e.target.value = minInterviewDate;
+        showToast("Tanggal wawancara tidak boleh sebelum hari ini.");
+      }
+      selectedDate = e.target.value || minInterviewDate;
+      const [year, month] = selectedDate.split("-").map(Number);
+      calYear = year; calMonth = month - 1;
+      renderCalendar(); renderAgenda();
     });
 
     document.getElementById("scheduleForm")
@@ -2358,7 +2348,10 @@ function loadState() {
     c => c.id === candidateId
   );
 
-  if (!cand || !date || !time) return;
+  if (!cand || !date || !time) {
+    showToast("Pilih kandidat, tanggal, dan jam wawancara.");
+    return;
+  }
 
   if (cand.stage === "Hired") {
     showToast("Kandidat Hired tidak dapat mengubah jadwal.");
@@ -2374,6 +2367,11 @@ function loadState() {
     s => s.candidateId === candidateId &&
          s.type === type
   );
+
+  if (existing && existing.done) {
+    showToast("Wawancara yang sudah selesai tidak dapat dijadwalkan ulang dari formulir ini.");
+    return;
+  }
 
   if (existing) {
     existing.date = date;
@@ -2426,6 +2424,21 @@ function loadState() {
       const date = document.getElementById("editSchedDate").value;
       const time = document.getElementById("editSchedTime").value;
       const note = document.getElementById("editSchedNote").value.trim();
+      const type = document.getElementById("editSchedType").value;
+      const cand = state.candidates.find((c) => c.id === candidateId);
+      if (!cand || cand.stage === "Hired") {
+        showToast("Kandidat tidak ditemukan atau sudah Hired.");
+        return;
+      }
+      const duplicate = state.schedules.find((item) => item.id !== schedId && item.candidateId === candidateId && item.type === type);
+      if (duplicate) {
+        showToast(`Jadwal Interview ${type} untuk kandidat ini sudah ada.`);
+        return;
+      }
+      if (!date || !time) {
+        showToast("Tanggal dan jam wajib diisi.");
+        return;
+      }
 
       if (isPastInterviewDate(date)) {
         showToast("Tanggal interview tidak boleh mundur dari hari ini");
@@ -2436,8 +2449,8 @@ function loadState() {
       sched.date = date;
       sched.time = time;
       sched.note = note;
+      sched.type = type;
 
-      const cand = state.candidates.find((c) => c.id === candidateId);
       recordHistory(
         candidateId,
         `Jadwal wawancara diperbarui menjadi ${date} ${time}${note ? " (" + note + ")" : ""}`,
@@ -2584,6 +2597,7 @@ function loadState() {
     });
 
     document.getElementById("btnClearStorage").addEventListener("click", () => {
+      if (!confirm("Hapus seluruh data kandidat, jadwal, histori, dan nomor surat dari browser ini? Tindakan ini tidak dapat dibatalkan.")) return;
       localStorage.removeItem(STORAGE_KEY);
       state = structuredClone(DEFAULT_DATA);
       historyPage = 1;
