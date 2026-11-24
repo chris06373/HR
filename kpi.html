@@ -20,6 +20,7 @@
       --danger: #dc2626;
       --danger-bg: #fef2f2;
       --success: #16a34a;
+      --success-bg: #f0fdf4;
       --radius: 12px;
       --shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
     }
@@ -35,30 +36,47 @@
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
-      padding: 16px;
+      padding: 12px;
+    }
+
+    @media (min-width: 640px) {
+      body {
+        padding: 20px;
+      }
     }
 
     .container {
-      max-width: 960px;
+      max-width: 1060px;
       margin: 0 auto;
     }
 
     header {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+    }
+
+    @media (min-width: 700px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
     }
 
     header h1 {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 700;
     }
 
     header p {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--muted);
     }
 
@@ -66,17 +84,25 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      align-items: center;
     }
 
+    .btn-link,
     button {
       font-family: inherit;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 600;
       border: none;
       border-radius: 8px;
-      padding: 9px 14px;
+      padding: 8px 13px;
       cursor: pointer;
       transition: all 0.15s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 38px;
     }
 
     .btn-primary {
@@ -86,6 +112,15 @@
 
     .btn-primary:hover {
       background: var(--primary-hover);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      filter: brightness(0.95);
     }
 
     .btn-outline {
@@ -110,22 +145,30 @@
 
     .btn-sm {
       padding: 6px 10px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
+      min-height: 32px;
     }
 
-    /* Info Kategori di Halaman Awal */
+    /* Info Kategori */
     .info-banner {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    @media (min-width: 680px) {
+      .info-banner {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
     }
 
     .info-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px;
+      padding: 15px;
       box-shadow: var(--shadow);
     }
 
@@ -139,11 +182,11 @@
 
     .badge {
       display: inline-block;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       padding: 3px 9px;
       border-radius: 999px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .badge-office {
@@ -157,18 +200,18 @@
     }
 
     .info-card h2 {
-      font-size: 1.05rem;
-      margin-bottom: 6px;
+      font-size: 1.02rem;
+      margin-bottom: 5px;
     }
 
     .info-card p {
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .info-card ul {
-      font-size: 0.83rem;
+      font-size: 0.82rem;
       padding-left: 18px;
       color: var(--text);
     }
@@ -178,7 +221,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .tab-btn {
@@ -187,11 +230,8 @@
       border: 1px solid var(--border);
       padding: 12px;
       border-radius: var(--radius);
-      font-size: 0.95rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
+      font-size: 0.92rem;
+      min-height: 46px;
     }
 
     .tab-btn.active[data-cat="kantoran"] {
@@ -207,22 +247,22 @@
     }
 
     .count-pill {
-      background: rgba(0, 0, 0, 0.07);
+      background: rgba(0, 0, 0, 0.08);
       padding: 2px 8px;
       border-radius: 999px;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
     }
 
-    /* Ringkasan & Form */
+    /* Layout Utama */
     .grid-main {
       display: grid;
       grid-template-columns: 1fr;
       gap: 16px;
     }
 
-    @media (min-width: 768px) {
+    @media (min-width: 860px) {
       .grid-main {
-        grid-template-columns: 340px 1fr;
+        grid-template-columns: 360px 1fr;
         align-items: start;
       }
     }
@@ -233,6 +273,11 @@
       border-radius: var(--radius);
       padding: 16px;
       box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .panel:last-child {
+      margin-bottom: 0;
     }
 
     .panel h3 {
@@ -241,42 +286,53 @@
     }
 
     .form-group {
-      margin-bottom: 12px;
+      margin-bottom: 11px;
     }
 
     label {
       display: block;
-      font-size: 0.83rem;
+      font-size: 0.82rem;
       font-weight: 600;
       margin-bottom: 4px;
       color: var(--text);
     }
 
-    input, select {
+    input,
+    select,
+    textarea {
       width: 100%;
       padding: 9px 11px;
       border: 1px solid var(--border);
       border-radius: 8px;
       font-family: inherit;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       background: #fff;
+      color: var(--text);
     }
 
-    input:focus, select:focus {
-      outline: 2px solid rgba(37, 99, 235, 0.25);
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 2px solid rgba(37, 99, 235, 0.22);
       border-color: var(--primary);
     }
 
     .row-2 {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 10px;
+    }
+
+    @media (min-width: 480px) {
+      .row-2 {
+        grid-template-columns: 1fr 1fr;
+      }
     }
 
     .summary-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 8px;
       margin-bottom: 14px;
     }
 
@@ -284,19 +340,59 @@
       background: #f8fafc;
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px;
+      padding: 10px 8px;
       text-align: center;
     }
 
     .stat-box .label {
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       color: var(--muted);
     }
 
     .stat-box .val {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 700;
       margin-top: 2px;
+    }
+
+    /* Toolbar Pencarian & Pagination */
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    @media (min-width: 580px) {
+      .toolbar {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-wrap input {
+      padding-right: 34px;
+    }
+
+    .per-page-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .per-page-wrap select {
+      width: auto;
+      padding: 6px 10px;
+      min-height: 36px;
     }
 
     /* Daftar KPI */
@@ -315,15 +411,27 @@
 
     .kpi-top {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: flex-start;
       gap: 8px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .kpi-title {
       font-weight: 700;
       font-size: 0.95rem;
+    }
+
+    .role-tag {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: #334155;
+      margin-left: 6px;
     }
 
     .kpi-meta {
@@ -352,58 +460,158 @@
 
     .kpi-footer {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.8rem;
+      gap: 8px;
+      font-size: 0.82rem;
+    }
+
+    .kpi-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* Pagination Controls */
+    .pagination {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .page-buttons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* Histori Penilaian */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.82rem;
+    }
+
+    .history-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .history-note {
+      color: var(--muted);
+      font-size: 0.79rem;
+      margin-top: 3px;
     }
 
     .empty-state {
       text-align: center;
-      padding: 32px 16px;
+      padding: 28px 14px;
       color: var(--muted);
       border: 1px dashed var(--border);
       border-radius: 10px;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
+    }
+
+    /* Modal Penilaian / Update Realisasi */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 440px;
+      padding: 18px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.2);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .modal-header h3 {
+      font-size: 1rem;
+      margin: 0;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Header & Tombol Clear Storage -->
+    <!-- Header -->
     <header>
       <div>
         <h1>Monitoring KPI</h1>
-        <p>Pencatatan performa kategori Kantoran & Usaha (tersimpan otomatis di browser)</p>
+        <p>Pencatatan performa, jabatan & histori penilaian Kantoran & Usaha</p>
       </div>
       <div class="header-actions">
-        <a href="index.html" class="text-decoration-none">
-        <button type="button" class="btn-outline btn-sm" id="btnExport">Export</button>
+        <a href="index.html" class="btn-link btn-outline btn-sm">Home</a>
+        <button type="button" class="btn-success btn-sm" id="btnExportExcel">Download Excel (.csv)</button>
+        <button type="button" class="btn-outline btn-sm" id="btnExportJson">Export JSON</button>
         <button type="button" class="btn-danger btn-sm" id="btnClearStorage">Clear Storage</button>
       </div>
     </header>
 
-    <!-- Halaman Awal: Informasi Kategori Kantoran & Usaha -->
+    <!-- Informasi Kategori -->
     <section class="info-banner" aria-label="Informasi Kategori">
       <div class="info-card office">
         <span class="badge badge-office">KATEGORI 1</span>
         <h2>Kantoran</h2>
-        <p>Fokus pada produktivitas kerja tim/staf, ketepatan waktu penyelesaian tugas, kualitas administrasi, dan kepatuhan SOP.</p>
+        <p>Fokus pada produktivitas staf/tim, ketepatan waktu tugas, SLA, dan kepatuhan SOP.</p>
         <ul>
-          <li>Contoh KPI: Ketepatan deadline laporan, SLA respon tiket/email, akurasi dokumen.</li>
+          <li>Contoh Jabatan: Staf Admin, Supervisor, HR, Finance, Project Lead.</li>
         </ul>
       </div>
 
       <div class="info-card business">
         <span class="badge badge-business">KATEGORI 2</span>
         <h2>Usaha</h2>
-        <p>Fokus pada pergerakan penjualan, arus kas, efisiensi operasional/stok, serta kepuasan dan retensi pelanggan.</p>
+        <p>Fokus pada omzet, transaksi, margin/stok, layanan pelanggan, dan pertumbuhan usaha.</p>
         <ul>
-          <li>Contoh KPI: Omzet harian/bulanan, jumlah transaksi, repeat order, efisiensi stok.</li>
+          <li>Contoh Jabatan: Owner, Kasir, Barista/Operasional, Sales/Marketing, Kurir.</li>
         </ul>
       </div>
     </section>
 
-    <!-- Navigasi 2 Sub-Kategori -->
+    <!-- Tabs Sub-Kategori -->
     <div class="tabs" role="tablist">
       <button type="button" class="tab-btn active" data-cat="kantoran" role="tab" aria-selected="true">
         Kantoran <span class="count-pill" id="countKantoran">0</span>
@@ -413,19 +621,26 @@
       </button>
     </div>
 
-    <!-- Area Input & Daftar KPI -->
+    <!-- Grid Utama -->
     <div class="grid-main">
+      <!-- Form Tambah KPI -->
       <form class="panel" id="kpiForm">
         <h3 id="formTitle">Tambah KPI — Kantoran</h3>
 
         <div class="form-group">
           <label for="kpiName">Nama Indikator KPI</label>
-          <input type="text" id="kpiName" placeholder="Contoh: Penyelesaian Laporan Mingguan" required />
+          <input type="text" id="kpiName" placeholder="Contoh: Ketepatan Laporan Bulanan" required />
         </div>
 
-        <div class="form-group">
-          <label for="kpiOwner">Penanggung Jawab / PIC</label>
-          <input type="text" id="kpiOwner" placeholder="Contoh: Budi / Tim Admin" required />
+        <div class="row-2">
+          <div class="form-group">
+            <label for="kpiOwner">Nama / PIC</label>
+            <input type="text" id="kpiOwner" placeholder="Contoh: Budi" required />
+          </div>
+          <div class="form-group">
+            <label for="kpiRole">Jabatan (<span id="roleCategoryLabel">Kantoran</span>)</label>
+            <select id="kpiRole" required></select>
+          </div>
         </div>
 
         <div class="row-2">
@@ -434,7 +649,7 @@
             <input type="number" id="kpiTarget" step="any" min="0.01" placeholder="100" required />
           </div>
           <div class="form-group">
-            <label for="kpiActual">Realisasi</label>
+            <label for="kpiActual">Realisasi Awal</label>
             <input type="number" id="kpiActual" step="any" min="0" placeholder="0" required />
           </div>
         </div>
@@ -442,7 +657,7 @@
         <div class="row-2">
           <div class="form-group">
             <label for="kpiUnit">Satuan</label>
-            <input type="text" id="kpiUnit" placeholder="%, Rp, unit, hari" required />
+            <input type="text" id="kpiUnit" placeholder="%, Rp, unit, transaksi" required />
           </div>
           <div class="form-group">
             <label for="kpiPeriod">Periode</label>
@@ -455,37 +670,144 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label for="kpiNote">Catatan Awal (Opsional)</label>
+          <input type="text" id="kpiNote" placeholder="Catatan penilaian awal..." />
+        </div>
+
         <button type="submit" class="btn-primary" style="width: 100%;">Simpan KPI</button>
       </form>
 
-      <div class="panel">
-        <div class="summary-bar">
-          <div class="stat-box">
-            <div class="label">Total KPI</div>
-            <div class="val" id="statTotal">0</div>
+      <!-- Kolom Kanan: Ringkasan, Pencarian, Daftar KPI, Pagination & Histori -->
+      <div>
+        <div class="panel">
+          <div class="summary-bar">
+            <div class="stat-box">
+              <div class="label">Total KPI</div>
+              <div class="val" id="statTotal">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="label">Rata-rata Capaian</div>
+              <div class="val" id="statAvg">0%</div>
+            </div>
+            <div class="stat-box">
+              <div class="label">Tercapai (&ge;100%)</div>
+              <div class="val" id="statAchieved">0</div>
+            </div>
           </div>
-          <div class="stat-box">
-            <div class="label">Rata-rata Capaian</div>
-            <div class="val" id="statAvg">0%</div>
+
+          <!-- Pencarian & Per Halaman -->
+          <div class="toolbar">
+            <div class="search-wrap">
+              <input
+                type="search"
+                id="searchInput"
+                placeholder="Cari indikator KPI, nama PIC, jabatan, atau periode..."
+                aria-label="Cari KPI"
+              />
+            </div>
+            <div class="per-page-wrap">
+              <label for="perPageSelect" style="margin: 0; font-weight: 500;">Tampil:</label>
+              <select id="perPageSelect">
+                <option value="5" selected>5 / hal</option>
+                <option value="10">10 / hal</option>
+                <option value="20">20 / hal</option>
+              </select>
+            </div>
           </div>
-          <div class="stat-box">
-            <div class="label">Tercapai (&ge;100%)</div>
-            <div class="val" id="statAchieved">0</div>
+
+          <div class="kpi-list" id="kpiList"></div>
+
+          <!-- Pagination -->
+          <div class="pagination" id="paginationBar">
+            <span id="paginationInfo">Menampilkan 0 data</span>
+            <div class="page-buttons">
+              <button type="button" class="btn-outline btn-sm" id="btnPrevPage">&laquo; Prev</button>
+              <span id="pageIndicator" style="padding: 0 6px; font-weight: 600;">Hal 1 / 1</span>
+              <button type="button" class="btn-outline btn-sm" id="btnNextPage">Next &raquo;</button>
+            </div>
           </div>
         </div>
 
-        <div class="kpi-list" id="kpiList"></div>
+        <!-- Histori Penilaian -->
+        <div class="panel">
+          <h3>Histori Penilaian (<span id="historyCatLabel">Kantoran</span>)</h3>
+          <div class="history-list" id="historyList"></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = "kpi_tracker_kantoran_usaha_v1";
+  <!-- Modal Input Penilaian / Update Realisasi -->
+  <div class="modal-backdrop" id="evalModal" role="dialog" aria-modal="true" aria-labelledby="evalModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="evalModalTitle">Input Penilaian KPI</h3>
+        <button type="button" class="btn-outline btn-sm" id="btnCloseModal">Tutup</button>
+      </div>
+      <form id="evalForm">
+        <input type="hidden" id="evalItemId" />
+        <p id="evalItemSummary" style="font-size: 0.84rem; color: var(--muted); margin-bottom: 12px;"></p>
 
-    // Inisialisasi kosong tanpa data dummy
+        <div class="form-group">
+          <label for="evalActual">Realisasi Baru</label>
+          <input type="number" id="evalActual" step="any" min="0" required />
+        </div>
+
+        <div class="form-group">
+          <label for="evalDate">Tanggal Penilaian</label>
+          <input type="date" id="evalDate" required />
+        </div>
+
+        <div class="form-group">
+          <label for="evalNote">Catatan Evaluasi / Penilaian</label>
+          <textarea id="evalNote" rows="2" placeholder="Contoh: Pencapaian sesuai target minggu ini"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+          <button type="button" class="btn-outline" id="btnCancelEval">Batal</button>
+          <button type="submit" class="btn-primary">Simpan Penilaian</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "kpi_tracker_kantoran_usaha_v2";
+
+    // Daftar jabatan berbeda untuk Kantoran dan Usaha
+    const ROLES_BY_CATEGORY = {
+      kantoran: [
+        "Staf / Admin",
+        "Supervisor / Team Lead",
+        "HR & General Affair",
+        "Finance & Accounting",
+        "Project / Operational Staff",
+        "Manager"
+      ],
+      usaha: [
+        "Owner / Pengelola",
+        "Kasir / Admin Toko",
+        "Operasional / Produksi / Barista",
+        "Sales / Marketing",
+        "Gudang & Stok",
+        "Kurir / Layanan Pelanggan"
+      ]
+    };
+
     let state = {
       activeCategory: "kantoran",
+      searchQuery: "",
+      currentPage: {
+        kantoran: 1,
+        usaha: 1
+      },
+      perPage: 5,
       items: {
+        kantoran: [],
+        usaha: []
+      },
+      history: {
         kantoran: [],
         usaha: []
       }
@@ -494,16 +816,21 @@
     function loadStorage() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          state.items.kantoran = Array.isArray(parsed?.items?.kantoran) ? parsed.items.kantoran : [];
-          state.items.usaha = Array.isArray(parsed?.items?.usaha) ? parsed.items.usaha : [];
-          if (parsed?.activeCategory === "kantoran" || parsed?.activeCategory === "usaha") {
-            state.activeCategory = parsed.activeCategory;
-          }
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+
+        if (parsed.activeCategory === "kantoran" || parsed.activeCategory === "usaha") {
+          state.activeCategory = parsed.activeCategory;
         }
-      } catch (e) {
-        console.error("Gagal memuat storage:", e);
+        state.perPage = [5, 10, 20].includes(Number(parsed.perPage)) ? Number(parsed.perPage) : 5;
+        state.items.kantoran = Array.isArray(parsed?.items?.kantoran) ? parsed.items.kantoran : [];
+        state.items.usaha = Array.isArray(parsed?.items?.usaha) ? parsed.items.usaha : [];
+        state.history.kantoran = Array.isArray(parsed?.history?.kantoran) ? parsed.history.kantoran : [];
+        state.history.usaha = Array.isArray(parsed?.history?.usaha) ? parsed.history.usaha : [];
+        state.currentPage.kantoran = Number(parsed?.currentPage?.kantoran) || 1;
+        state.currentPage.usaha = Number(parsed?.currentPage?.usaha) || 1;
+      } catch (err) {
+        console.error("Gagal memuat storage:", err);
       }
     }
 
@@ -517,32 +844,73 @@
 
     function escapeHTML(str) {
       const div = document.createElement("div");
-      div.textContent = str;
+      div.textContent = String(str ?? "");
       return div.innerHTML;
+    }
+
+    function renderRoleOptions(category) {
+      const select = document.getElementById("kpiRole");
+      const roles = ROLES_BY_CATEGORY[category] || [];
+      select.innerHTML = roles
+        .map((role) => `<option value="${escapeHTML(role)}">${escapeHTML(role)}</option>`)
+        .join("");
+      document.getElementById("roleCategoryLabel").textContent =
+        category === "kantoran" ? "Kantoran" : "Usaha";
+    }
+
+    function addHistoryLog(category, entry) {
+      state.history[category].unshift({
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        timestamp: new Date().toLocaleString("id-ID", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        }),
+        ...entry
+      });
+    }
+
+    function getFilteredItems(category) {
+      const q = state.searchQuery.trim().toLowerCase();
+      const list = state.items[category];
+      if (!q) return list;
+
+      return list.filter((it) => {
+        return (
+          it.name.toLowerCase().includes(q) ||
+          it.owner.toLowerCase().includes(q) ||
+          (it.role || "").toLowerCase().includes(q) ||
+          it.period.toLowerCase().includes(q)
+        );
+      });
     }
 
     function render() {
       const cat = state.activeCategory;
-      const items = state.items[cat];
+      const allCatItems = state.items[cat];
+      const filtered = getFilteredItems(cat);
 
-      // Update badge jumlah di tab
+      // Update badge tab
       document.getElementById("countKantoran").textContent = state.items.kantoran.length;
       document.getElementById("countUsaha").textContent = state.items.usaha.length;
 
-      // Update status tab aktif
+      // Update tab aktif
       document.querySelectorAll(".tab-btn").forEach((btn) => {
-        const isActive = btn.dataset.cat === cat;
-        btn.classList.toggle("active", isActive);
-        btn.setAttribute("aria-selected", isActive);
+        const active = btn.dataset.cat === cat;
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-selected", active);
       });
 
-      // Update judul form
+      // Judul form & opsi jabatan
       document.getElementById("formTitle").textContent =
         cat === "kantoran" ? "Tambah KPI — Kantoran" : "Tambah KPI — Usaha";
+      renderRoleOptions(cat);
 
-      // Hitung ringkasan
-      const total = items.length;
-      const pcts = items.map((it) => (it.target > 0 ? (it.actual / it.target) * 100 : 0));
+      // Ringkasan kategori
+      const total = allCatItems.length;
+      const pcts = allCatItems.map((it) => (it.target > 0 ? (it.actual / it.target) * 100 : 0));
       const avg = total > 0 ? pcts.reduce((a, b) => a + b, 0) / total : 0;
       const achieved = pcts.filter((p) => p >= 100).length;
 
@@ -550,40 +918,151 @@
       document.getElementById("statAvg").textContent = `${avg.toFixed(1)}%`;
       document.getElementById("statAchieved").textContent = achieved;
 
-      // Render daftar KPI
+      // Pagination
+      const perPage = state.perPage;
+      const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+      if (state.currentPage[cat] > totalPages) {
+        state.currentPage[cat] = totalPages;
+      }
+      const page = state.currentPage[cat];
+      const startIdx = (page - 1) * perPage;
+      const pageItems = filtered.slice(startIdx, startIdx + perPage);
+
       const listEl = document.getElementById("kpiList");
-      if (total === 0) {
-        listEl.innerHTML = `<div class="empty-state">Belum ada data KPI untuk kategori <strong>${cat === "kantoran" ? "Kantoran" : "Usaha"}</strong>.<br/>Silakan tambahkan KPI baru pada form di samping.</div>`;
-        return;
+      if (pageItems.length === 0) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            ${
+              state.searchQuery.trim()
+                ? `Tidak ada data KPI yang cocok dengan pencarian "<strong>${escapeHTML(state.searchQuery)}</strong>".`
+                : `Belum ada data KPI untuk kategori <strong>${cat === "kantoran" ? "Kantoran" : "Usaha"}</strong>.`
+            }
+          </div>
+        `;
+      } else {
+        listEl.innerHTML = pageItems
+          .map((item) => {
+            const pct = item.target > 0 ? (item.actual / item.target) * 100 : 0;
+            const barWidth = Math.min(Math.max(pct, 0), 100);
+            const isGood = pct >= 100;
+
+            return `
+              <div class="kpi-item">
+                <div class="kpi-top">
+                  <div>
+                    <span class="kpi-title">${escapeHTML(item.name)}</span>
+                    <span class="role-tag">${escapeHTML(item.role || "-")}</span>
+                  </div>
+                  <div class="kpi-actions">
+                    <button type="button" class="btn-outline btn-sm" onclick="openEvalModal('${item.id}')">Nilai / Update</button>
+                    <button type="button" class="btn-danger btn-sm" onclick="deleteItem('${item.id}')">Hapus</button>
+                  </div>
+                </div>
+                <div class="kpi-meta">
+                  PIC: <strong>${escapeHTML(item.owner)}</strong> &bull; Periode: ${escapeHTML(item.period)}
+                </div>
+                <div class="progress-wrap">
+                  <div class="progress-bar ${isGood ? "good" : ""}" style="width: ${barWidth}%"></div>
+                </div>
+                <div class="kpi-footer">
+                  <span>Realisasi: <strong>${formatNumber(item.actual)}</strong> / ${formatNumber(item.target)} ${escapeHTML(item.unit)}</span>
+                  <strong>${pct.toFixed(1)}%</strong>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
       }
 
-      listEl.innerHTML = items
-        .map((item) => {
-          const pct = item.target > 0 ? (item.actual / item.target) * 100 : 0;
-          const barWidth = Math.min(Math.max(pct, 0), 100);
-          const isGood = pct >= 100;
+      // Info & kontrol pagination
+      const startDisp = filtered.length === 0 ? 0 : startIdx + 1;
+      const endDisp = Math.min(startIdx + perPage, filtered.length);
+      document.getElementById("paginationInfo").textContent =
+        `Menampilkan ${startDisp}–${endDisp} dari ${filtered.length} data`;
+      document.getElementById("pageIndicator").textContent = `Hal ${page} / ${totalPages}`;
+      document.getElementById("btnPrevPage").disabled = page <= 1;
+      document.getElementById("btnNextPage").disabled = page >= totalPages;
 
-          return `
-            <div class="kpi-item">
-              <div class="kpi-top">
-                <div class="kpi-title">${escapeHTML(item.name)}</div>
-                <button type="button" class="btn-danger btn-sm" onclick="deleteItem('${item.id}')">Hapus</button>
+      // Render histori penilaian
+      document.getElementById("historyCatLabel").textContent =
+        cat === "kantoran" ? "Kantoran" : "Usaha";
+      const histList = document.getElementById("historyList");
+      const logs = state.history[cat];
+
+      if (logs.length === 0) {
+        histList.innerHTML = `<div class="empty-state">Belum ada histori penilaian pada kategori ini.</div>`;
+      } else {
+        histList.innerHTML = logs
+          .map(
+            (log) => `
+            <div class="history-item">
+              <div class="history-head">
+                <span>${escapeHTML(log.kpiName)} (${escapeHTML(log.owner)} • ${escapeHTML(log.role)})</span>
+                <span>${escapeHTML(log.scorePct)}%</span>
               </div>
-              <div class="kpi-meta">
-                PIC: <strong>${escapeHTML(item.owner)}</strong> &bull; Periode: ${escapeHTML(item.period)}
+              <div>
+                Tanggal: <strong>${escapeHTML(log.evalDate)}</strong> &bull; Realisasi: <strong>${escapeHTML(log.changeText)}</strong>
               </div>
-              <div class="progress-wrap">
-                <div class="progress-bar ${isGood ? "good" : ""}" style="width: ${barWidth}%"></div>
-              </div>
-              <div class="kpi-footer">
-                <span>Realisasi: <strong>${formatNumber(item.actual)}</strong> / ${formatNumber(item.target)} ${escapeHTML(item.unit)}</span>
-                <strong>${pct.toFixed(1)}%</strong>
-              </div>
+              ${log.note ? `<div class="history-note">Catatan: ${escapeHTML(log.note)}</div>` : ""}
+              <div class="history-note">Dicatat: ${escapeHTML(log.timestamp)}</div>
             </div>
-          `;
-        })
-        .join("");
+          `
+          )
+          .join("");
+      }
     }
+
+    // Modal Penilaian
+    function openEvalModal(id) {
+      const cat = state.activeCategory;
+      const item = state.items[cat].find((x) => x.id === id);
+      if (!item) return;
+
+      document.getElementById("evalItemId").value = item.id;
+      document.getElementById("evalItemSummary").textContent =
+        `${item.name} — ${item.owner} (${item.role || "-"}) | Target: ${formatNumber(item.target)} ${item.unit}`;
+      document.getElementById("evalActual").value = item.actual;
+      document.getElementById("evalDate").value = new Date().toISOString().slice(0, 10);
+      document.getElementById("evalNote").value = "";
+      document.getElementById("evalModal").classList.add("open");
+    }
+
+    function closeEvalModal() {
+      document.getElementById("evalModal").classList.remove("open");
+    }
+
+    document.getElementById("btnCloseModal").addEventListener("click", closeEvalModal);
+    document.getElementById("btnCancelEval").addEventListener("click", closeEvalModal);
+
+    document.getElementById("evalForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const cat = state.activeCategory;
+      const id = document.getElementById("evalItemId").value;
+      const newActual = parseFloat(document.getElementById("evalActual").value);
+      const evalDate = document.getElementById("evalDate").value;
+      const note = document.getElementById("evalNote").value.trim();
+
+      const item = state.items[cat].find((x) => x.id === id);
+      if (!item || isNaN(newActual) || newActual < 0) return;
+
+      const oldActual = item.actual;
+      item.actual = newActual;
+      const pct = item.target > 0 ? ((newActual / item.target) * 100).toFixed(1) : "0.0";
+
+      addHistoryLog(cat, {
+        kpiName: item.name,
+        owner: item.owner,
+        role: item.role || "-",
+        evalDate: evalDate || new Date().toISOString().slice(0, 10),
+        changeText: `${formatNumber(oldActual)} → ${formatNumber(newActual)} ${item.unit}`,
+        scorePct: pct,
+        note: note || "Update penilaian KPI"
+      });
+
+      saveStorage();
+      closeEvalModal();
+      render();
+    });
 
     function deleteItem(id) {
       const cat = state.activeCategory;
@@ -592,7 +1071,7 @@
       render();
     }
 
-    // Event switching sub-kategori
+    // Ganti kategori
     document.querySelectorAll(".tab-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.activeCategory = btn.dataset.cat;
@@ -601,17 +1080,20 @@
       });
     });
 
-    // Event tambah KPI
+    // Tambah KPI baru + catat histori awal
     document.getElementById("kpiForm").addEventListener("submit", (e) => {
       e.preventDefault();
+      const cat = state.activeCategory;
       const name = document.getElementById("kpiName").value.trim();
       const owner = document.getElementById("kpiOwner").value.trim();
+      const role = document.getElementById("kpiRole").value;
       const target = parseFloat(document.getElementById("kpiTarget").value);
       const actual = parseFloat(document.getElementById("kpiActual").value);
       const unit = document.getElementById("kpiUnit").value.trim();
       const period = document.getElementById("kpiPeriod").value;
+      const note = document.getElementById("kpiNote").value.trim();
 
-      if (!name || !owner || isNaN(target) || target <= 0 || isNaN(actual) || actual < 0 || !unit) {
+      if (!name || !owner || !role || isNaN(target) || target <= 0 || isNaN(actual) || actual < 0 || !unit) {
         return;
       }
 
@@ -619,32 +1101,123 @@
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         name,
         owner,
+        role,
         target,
         actual,
         unit,
         period
       };
 
-      state.items[state.activeCategory].unshift(newItem);
+      state.items[cat].unshift(newItem);
+      state.currentPage[cat] = 1;
+
+      const pct = ((actual / target) * 100).toFixed(1);
+      addHistoryLog(cat, {
+        kpiName: name,
+        owner,
+        role,
+        evalDate: new Date().toISOString().slice(0, 10),
+        changeText: `Awal: ${formatNumber(actual)} / ${formatNumber(target)} ${unit}`,
+        scorePct: pct,
+        note: note || "Penilaian awal KPI dibuat"
+      });
+
       saveStorage();
       render();
       e.target.reset();
+      renderRoleOptions(cat);
       document.getElementById("kpiPeriod").value = "Bulanan";
     });
 
-    // Tombol Clear Storage
-    document.getElementById("btnClearStorage").addEventListener("click", () => {
-      const yakin = confirm("Hapus seluruh data KPI (Kantoran & Usaha) dan bersihkan storage?");
-      if (!yakin) return;
-
-      localStorage.removeItem(STORAGE_KEY);
-      state.items = { kantoran: [], usaha: [] };
+    // Pencarian & Pagination
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      state.searchQuery = e.target.value;
+      state.currentPage.kantoran = 1;
+      state.currentPage.usaha = 1;
       render();
     });
 
-    // Tombol Export JSON
-    document.getElementById("btnExport").addEventListener("click", () => {
-      const dataStr = JSON.stringify(state.items, null, 2);
+    document.getElementById("perPageSelect").addEventListener("change", (e) => {
+      state.perPage = Number(e.target.value) || 5;
+      state.currentPage.kantoran = 1;
+      state.currentPage.usaha = 1;
+      saveStorage();
+      render();
+    });
+
+    document.getElementById("btnPrevPage").addEventListener("click", () => {
+      const cat = state.activeCategory;
+      if (state.currentPage[cat] > 1) {
+        state.currentPage[cat]--;
+        render();
+      }
+    });
+
+    document.getElementById("btnNextPage").addEventListener("click", () => {
+      const cat = state.activeCategory;
+      const totalPages = Math.max(1, Math.ceil(getFilteredItems(cat).length / state.perPage));
+      if (state.currentPage[cat] < totalPages) {
+        state.currentPage[cat]++;
+        render();
+      }
+    });
+
+    // Download Excel (.csv dengan BOM UTF-8)
+    function csvEscape(val) {
+      const s = String(val ?? "").replace(/"/g, '""');
+      return `"${s}"`;
+    }
+
+    document.getElementById("btnExportExcel").addEventListener("click", () => {
+      const rows = [
+        [
+          "Kategori",
+          "Nama KPI",
+          "PIC",
+          "Jabatan",
+          "Periode",
+          "Realisasi",
+          "Target",
+          "Satuan",
+          "Capaian (%)"
+        ]
+      ];
+
+      ["kantoran", "usaha"].forEach((cat) => {
+        const catLabel = cat === "kantoran" ? "Kantoran" : "Usaha";
+        state.items[cat].forEach((it) => {
+          const pct = it.target > 0 ? ((it.actual / it.target) * 100).toFixed(1) : "0.0";
+          rows.push([
+            catLabel,
+            it.name,
+            it.owner,
+            it.role || "-",
+            it.period,
+            it.actual,
+            it.target,
+            it.unit,
+            pct
+          ]);
+        });
+      });
+
+      const csvContent = "\uFEFF" + rows.map((r) => r.map(csvEscape).join(";")).join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `rekap-kpi-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Export JSON
+    document.getElementById("btnExportJson").addEventListener("click", () => {
+      const dataStr = JSON.stringify(
+        { items: state.items, history: state.history },
+        null,
+        2
+      );
       const blob = new Blob([dataStr], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -654,6 +1227,20 @@
       URL.revokeObjectURL(url);
     });
 
+    // Clear Storage
+    document.getElementById("btnClearStorage").addEventListener("click", () => {
+      const yakin = confirm("Hapus seluruh data KPI, histori penilaian, dan bersihkan storage?");
+      if (!yakin) return;
+
+      localStorage.removeItem(STORAGE_KEY);
+      state.items = { kantoran: [], usaha: [] };
+      state.history = { kantoran: [], usaha: [] };
+      state.currentPage = { kantoran: 1, usaha: 1 };
+      render();
+    });
+
+    // Init
+    document.getElementById("perPageSelect").value = String(state.perPage);
     loadStorage();
     render();
   </script>
