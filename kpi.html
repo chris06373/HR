@@ -48,7 +48,7 @@
     }
 
     .container {
-      max-width: 1060px;
+      max-width: 1080px;
       margin: 0 auto;
     }
 
@@ -64,7 +64,7 @@
       box-shadow: var(--shadow);
     }
 
-    @media (min-width: 700px) {
+    @media (min-width: 720px) {
       header {
         flex-direction: row;
         justify-content: space-between;
@@ -92,7 +92,7 @@
     .btn-link,
     button {
       font-family: inherit;
-      font-size: 0.86rem;
+      font-size: 0.85rem;
       font-weight: 600;
       border: none;
       border-radius: 8px;
@@ -161,7 +161,6 @@
       min-height: 32px;
     }
 
-    /* Info Kategori */
     .info-banner {
       display: grid;
       grid-template-columns: 1fr;
@@ -228,7 +227,6 @@
       color: var(--text);
     }
 
-    /* Tabs Sub-Kategori */
     .tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -265,16 +263,15 @@
       font-size: 0.76rem;
     }
 
-    /* Layout Utama */
     .grid-main {
       display: grid;
       grid-template-columns: 1fr;
       gap: 16px;
     }
 
-    @media (min-width: 860px) {
+    @media (min-width: 880px) {
       .grid-main {
-        grid-template-columns: 360px 1fr;
+        grid-template-columns: 365px 1fr;
         align-items: start;
       }
     }
@@ -329,6 +326,22 @@
       border-color: var(--primary);
     }
 
+    .form-error {
+      display: none;
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: var(--danger-bg);
+      border: 1px solid #fecaca;
+      color: var(--danger);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .form-error.show {
+      display: block;
+    }
+
     .row-2 {
       display: grid;
       grid-template-columns: 1fr;
@@ -367,15 +380,14 @@
       margin-top: 2px;
     }
 
-    /* Toolbar Pencarian & Pagination */
     .toolbar {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
-    @media (min-width: 580px) {
+    @media (min-width: 640px) {
       .toolbar {
         flex-direction: row;
         justify-content: space-between;
@@ -383,27 +395,26 @@
       }
     }
 
-    .search-wrap {
-      position: relative;
-      flex: 1;
-    }
-
-    .per-page-wrap {
-      display: flex;
-      align-items: center;
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
       gap: 8px;
-      font-size: 0.82rem;
-      color: var(--muted);
-      white-space: nowrap;
+      margin-bottom: 14px;
+      align-items: center;
     }
 
-    .per-page-wrap select {
-      width: auto;
-      padding: 6px 10px;
+    @media (max-width: 560px) {
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .filter-row select {
+      padding: 7px 10px;
       min-height: 36px;
+      font-size: 0.82rem;
     }
 
-    /* Daftar KPI */
     .kpi-list {
       display: flex;
       flex-direction: column;
@@ -442,6 +453,25 @@
       margin-left: 6px;
     }
 
+    .status-pill {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-left: 6px;
+    }
+
+    .status-pill.done {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .status-pill.progress {
+      background: #eff6ff;
+      color: var(--primary);
+    }
+
     .kpi-meta {
       font-size: 0.8rem;
       color: var(--muted);
@@ -475,13 +505,6 @@
       font-size: 0.82rem;
     }
 
-    .kpi-actions {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    /* Pagination Controls */
     .pagination {
       display: flex;
       flex-wrap: wrap;
@@ -502,7 +525,6 @@
       flex-wrap: wrap;
     }
 
-    /* Histori Penilaian */
     .history-list {
       display: flex;
       flex-direction: column;
@@ -544,7 +566,6 @@
       font-size: 0.86rem;
     }
 
-    /* Modal */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -555,6 +576,7 @@
       justify-content: center;
       padding: 14px;
       z-index: 60;
+      overflow-y: auto;
     }
 
     .modal-backdrop.open {
@@ -566,14 +588,16 @@
       border-radius: var(--radius);
       border: 1px solid var(--border);
       width: 100%;
-      max-width: 440px;
+      max-width: 460px;
       padding: 18px;
       box-shadow: 0 16px 36px rgba(15, 23, 42, 0.22);
       animation: popIn 0.16s ease-out;
+      max-height: 92vh;
+      overflow-y: auto;
     }
 
     .modal-card.cert-modal {
-      max-width: 680px;
+      max-width: 720px;
     }
 
     @keyframes popIn {
@@ -593,12 +617,12 @@
       margin: 0;
     }
 
-    /* Sertifikat Preview */
+    /* Sertifikat Preview + Tanda Tangan */
     .certificate-box {
       border: 3px double #1e293b;
       background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
       border-radius: 10px;
-      padding: 24px 20px;
+      padding: 22px 20px;
       text-align: center;
       margin-bottom: 14px;
     }
@@ -616,7 +640,7 @@
     }
 
     .cert-title {
-      font-size: 1.35rem;
+      font-size: 1.32rem;
       font-weight: 800;
       letter-spacing: 0.5px;
       color: #0f172a;
@@ -626,11 +650,11 @@
     .cert-subtitle {
       font-size: 0.84rem;
       color: var(--muted);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .cert-recipient {
-      font-size: 1.25rem;
+      font-size: 1.22rem;
       font-weight: 700;
       color: var(--primary);
       border-bottom: 1px solid var(--border);
@@ -640,10 +664,10 @@
     }
 
     .cert-details {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       color: var(--text);
-      max-width: 520px;
-      margin: 0 auto 16px;
+      max-width: 540px;
+      margin: 0 auto 14px;
     }
 
     .cert-meta-grid {
@@ -654,10 +678,54 @@
       border-radius: 8px;
       padding: 10px;
       font-size: 0.8rem;
+      margin-bottom: 16px;
+    }
+
+    .sign-inputs {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      text-align: left;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
       margin-bottom: 14px;
     }
 
-    /* Toast Notification Modern */
+    @media (min-width: 560px) {
+      .sign-inputs {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .signatures-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+      padding-top: 10px;
+    }
+
+    .sign-box {
+      text-align: center;
+      font-size: 0.82rem;
+    }
+
+    .sign-line {
+      margin-top: 44px;
+      border-top: 1px solid #334155;
+      padding-top: 6px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .sign-role {
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+
+    /* Toast Notification */
     .toast-container {
       position: fixed;
       top: 16px;
@@ -692,7 +760,6 @@
       to { opacity: 1; transform: translateX(0); }
     }
 
-    /* Print Styling untuk Sertifikat */
     @media print {
       body {
         background: #fff !important;
@@ -712,25 +779,25 @@
         border: none !important;
         max-width: 100% !important;
         padding: 0 !important;
+        max-height: none !important;
       }
       .modal-header,
+      .sign-inputs,
       .cert-actions {
         display: none !important;
       }
       .certificate-box {
         border: 4px double #0f172a !important;
         margin: 0 !important;
-        padding: 36px 28px !important;
+        padding: 32px 24px !important;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Toast Container -->
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <div class="container">
-    <!-- Header -->
     <header>
       <div>
         <h1>Monitoring KPI</h1>
@@ -738,13 +805,12 @@
       </div>
       <div class="header-actions">
         <a href="index.html" class="btn-link btn-outline btn-sm">Home</a>
-        <button type="button" class="btn-success btn-sm" id="btnExportCsv">Download CSV</button>
-        <button type="button" class="btn-primary btn-sm" id="btnExportExcel">Download Excel </button>
+        <button type="button" class="btn-success btn-sm" id="btnExportCsv">Download CSV (Tab Aktif)</button>
+        <button type="button" class="btn-primary btn-sm" id="btnExportExcel">Download Excel (Tab Aktif)</button>
         <button type="button" class="btn-danger btn-sm" id="btnClearStorage">Clear Storage</button>
       </div>
     </header>
 
-    <!-- Informasi Kategori -->
     <section class="info-banner" aria-label="Informasi Kategori">
       <div class="info-card office">
         <span class="badge badge-office">KATEGORI 1</span>
@@ -765,7 +831,6 @@
       </div>
     </section>
 
-    <!-- Tabs Sub-Kategori -->
     <div class="tabs" role="tablist">
       <button type="button" class="tab-btn active" data-cat="kantoran" role="tab" aria-selected="true">
         Kantoran <span class="count-pill" id="countKantoran">0</span>
@@ -775,11 +840,12 @@
       </button>
     </div>
 
-    <!-- Grid Utama -->
     <div class="grid-main">
       <!-- Form Tambah KPI -->
-      <form class="panel" id="kpiForm">
+      <form class="panel" id="kpiForm" novalidate>
         <h3 id="formTitle">Tambah KPI — Kantoran</h3>
+
+        <div class="form-error" id="formError" role="alert"></div>
 
         <div class="form-group">
           <label for="kpiName">Nama Indikator KPI</label>
@@ -788,7 +854,7 @@
 
         <div class="row-2">
           <div class="form-group">
-            <label for="kpiOwner">Nama / PIC</label>
+            <label for="kpiOwner">Nama / PIC (Yang Dinilai)</label>
             <input type="text" id="kpiOwner" placeholder="Contoh: Budi" required />
           </div>
           <div class="form-group">
@@ -869,6 +935,25 @@
             </div>
           </div>
 
+          <!-- Filter Periode & Status -->
+          <div class="filter-row">
+            <select id="filterPeriod" aria-label="Filter Periode">
+              <option value="ALL">Semua Periode</option>
+              <option value="Harian">Harian</option>
+              <option value="Mingguan">Mingguan</option>
+              <option value="Bulanan">Bulanan</option>
+              <option value="Triwulan">Triwulan</option>
+            </select>
+
+            <select id="filterStatus" aria-label="Filter Status Capaian">
+              <option value="ALL">Semua Status</option>
+              <option value="ACHIEVED">Tercapai (&ge;100%)</option>
+              <option value="UNACHIEVED">Belum Tercapai (kurang dari 100%)</option>
+            </select>
+
+            <button type="button" class="btn-outline btn-sm" id="btnResetFilter">Reset Filter</button>
+          </div>
+
           <div class="kpi-list" id="kpiList"></div>
 
           <div class="pagination" id="paginationBar">
@@ -881,7 +966,6 @@
           </div>
         </div>
 
-        <!-- Histori Penilaian -->
         <div class="panel">
           <h3>Histori Penilaian (<span id="historyCatLabel">Kantoran</span>)</h3>
           <div class="history-list" id="historyList"></div>
@@ -890,11 +974,11 @@
     </div>
   </div>
 
-  <!-- Modal Input Penilaian / Update Realisasi -->
+  <!-- Modal Update Realisasi -->
   <div class="modal-backdrop" id="evalModal" role="dialog" aria-modal="true" aria-labelledby="evalModalTitle">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="evalModalTitle">Input Penilaian KPI</h3>
+        <h3 id="evalModalTitle">Update Realisasi KPI</h3>
         <button type="button" class="btn-outline btn-sm" id="btnCloseModal">Tutup</button>
       </div>
       <form id="evalForm">
@@ -912,19 +996,24 @@
         </div>
 
         <div class="form-group">
+          <label for="evalEvaluator">Nama Penilai</label>
+          <input type="text" id="evalEvaluator" placeholder="Contoh: HR / Supervisor / Owner" />
+        </div>
+
+        <div class="form-group">
           <label for="evalNote">Catatan Evaluasi / Penilaian</label>
-          <textarea id="evalNote" rows="2" placeholder="Contoh: Pencapaian sesuai target minggu ini"></textarea>
+          <textarea id="evalNote" rows="2" placeholder="Contoh: Pencapaian sesuai target periode ini"></textarea>
         </div>
 
         <div style="display: flex; gap: 8px; justify-content: flex-end;">
           <button type="button" class="btn-outline" id="btnCancelEval">Batal</button>
-          <button type="submit" class="btn-primary">Simpan Penilaian</button>
+          <button type="submit" class="btn-primary">Simpan Update</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal Konfirmasi Clear Storage Modern -->
+  <!-- Modal Konfirmasi Clear Storage -->
   <div class="modal-backdrop" id="clearModal" role="dialog" aria-modal="true" aria-labelledby="clearModalTitle">
     <div class="modal-card">
       <div class="modal-header">
@@ -935,7 +1024,7 @@
         Tindakan ini akan menghapus <strong>seluruh data KPI</strong> dan <strong>histori penilaian</strong> (Kantoran & Usaha) dari penyimpanan lokal browser.
       </p>
       <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 16px;">
-        Sebaiknya unduh CSV atau Excel terlebih dahulu bila data masih dibutuhkan.
+        Unduh CSV atau Excel terlebih dahulu bila data masih dibutuhkan.
       </p>
       <div style="display: flex; gap: 8px; justify-content: flex-end;">
         <button type="button" class="btn-outline" id="btnCancelClear">Batal</button>
@@ -944,12 +1033,24 @@
     </div>
   </div>
 
-  <!-- Modal Sertifikat Histori -->
+  <!-- Modal Sertifikat -->
   <div class="modal-backdrop" id="certModal" role="dialog" aria-modal="true" aria-labelledby="certModalTitle">
     <div class="modal-card cert-modal">
       <div class="modal-header">
         <h3 id="certModalTitle">Sertifikat Penilaian KPI</h3>
         <button type="button" class="btn-outline btn-sm" id="btnCloseCertModal">Tutup</button>
+      </div>
+
+      <!-- Input Tanda Tangan Penilai & Yang Dinilai -->
+      <div class="sign-inputs">
+        <div>
+          <label for="signEvaluatorName">Nama Penilai</label>
+          <input type="text" id="signEvaluatorName" placeholder="Nama Penilai (HR / Manager / Owner)" />
+        </div>
+        <div>
+          <label for="signEvaluatedName">Nama Yang Dinilai</label>
+          <input type="text" id="signEvaluatedName" placeholder="Nama Yang Dinilai" />
+        </div>
       </div>
 
       <div class="certificate-box" id="certificateContent">
@@ -982,17 +1083,30 @@
         <div style="font-size: 0.78rem; color: var(--muted);">
           Tanggal Penilaian: <strong id="certDate">-</strong> &bull; Perubahan: <strong id="certChange">-</strong>
         </div>
+
+        <div class="signatures-grid">
+          <div class="sign-box">
+            <div style="font-size: 0.74rem; color: var(--muted);">Penilai</div>
+            <div class="sign-line" id="certSignEvaluatorDisplay">Penilai</div>
+            <div class="sign-role">Tanda Tangan Penilai</div>
+          </div>
+          <div class="sign-box">
+            <div style="font-size: 0.74rem; color: var(--muted);">Yang Dinilai</div>
+            <div class="sign-line" id="certSignEvaluatedDisplay">-</div>
+            <div class="sign-role" id="certSignEvaluatedRole">Tanda Tangan Yang Dinilai</div>
+          </div>
+        </div>
       </div>
 
       <div class="cert-actions" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end;">
-        <button type="button" class="btn-indigo" id="btnShareCert">Bagikan Sertifikat</button>
-        <button type="button" class="btn-primary" id="btnPrintCert">Cetak / Simpan PDF</button>
+        <button type="button" class="btn-indigo" id="btnDownloadCertPng">Unduh Gambar (.PNG)</button>
+        <button type="button" class="btn-primary" id="btnDownloadCertPdf">Unduh / Cetak PDF</button>
       </div>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = "kpi_tracker_kantoran_usaha_v2";
+    const STORAGE_KEY = "kpi_tracker_kantoran_usaha_v3";
 
     const ROLES_BY_CATEGORY = {
       kantoran: [
@@ -1016,6 +1130,8 @@
     let state = {
       activeCategory: "kantoran",
       searchQuery: "",
+      filterPeriod: "ALL",
+      filterStatus: "ALL",
       currentPage: {
         kantoran: 1,
         usaha: 1
@@ -1033,7 +1149,6 @@
 
     let activeCertData = null;
 
-    // Notifikasi Toast Modern
     function showToast(message, type = "info", title = "") {
       const container = document.getElementById("toastContainer");
       const toast = document.createElement("div");
@@ -1089,13 +1204,24 @@
       return div.innerHTML;
     }
 
-    // Format nomor sertifikat: KPI/HR/BULAN/TAHUN (contoh: KPI/HR/11/2026)
     function formatCertNumber(dateStr) {
       const d = dateStr ? new Date(dateStr) : new Date();
       const validDate = isNaN(d.getTime()) ? new Date() : d;
       const month = String(validDate.getMonth() + 1).padStart(2, "0");
       const year = validDate.getFullYear();
       return `KPI/HR/${month}/${year}`;
+    }
+
+    function showFormError(msg) {
+      const el = document.getElementById("formError");
+      el.textContent = msg;
+      el.classList.add("show");
+    }
+
+    function hideFormError() {
+      const el = document.getElementById("formError");
+      el.textContent = "";
+      el.classList.remove("show");
     }
 
     function renderRoleOptions(category) {
@@ -1114,6 +1240,7 @@
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         certNumber: formatCertNumber(evalDate),
         category,
+        evaluatorName: entry.evaluatorName || (category === "kantoran" ? "HR / Manager" : "Owner / Pengelola"),
         timestamp: new Date().toLocaleString("id-ID", {
           day: "2-digit",
           month: "short",
@@ -1128,10 +1255,27 @@
 
     function getFilteredItems(category) {
       const q = state.searchQuery.trim().toLowerCase();
+      const periodFilter = state.filterPeriod;
+      const statusFilter = state.filterStatus;
       const list = state.items[category];
-      if (!q) return list;
 
       return list.filter((it) => {
+        const pct = it.target > 0 ? (it.actual / it.target) * 100 : 0;
+
+        if (periodFilter !== "ALL" && it.period !== periodFilter) {
+          return false;
+        }
+
+        if (statusFilter === "ACHIEVED" && pct < 100) {
+          return false;
+        }
+
+        if (statusFilter === "UNACHIEVED" && pct >= 100) {
+          return false;
+        }
+
+        if (!q) return true;
+
         return (
           it.name.toLowerCase().includes(q) ||
           it.owner.toLowerCase().includes(q) ||
@@ -1159,8 +1303,12 @@
         cat === "kantoran" ? "Tambah KPI — Kantoran" : "Tambah KPI — Usaha";
       renderRoleOptions(cat);
 
-      const total = allCatItems.length;
-      const pcts = allCatItems.map((it) => (it.target > 0 ? (it.actual / it.target) * 100 : 0));
+      // Ringkasan dari data terfilter (atau seluruh kategori jika tidak ada filter aktif)
+      const summarySource = filtered.length > 0 || state.searchQuery.trim() || state.filterPeriod !== "ALL" || state.filterStatus !== "ALL"
+        ? filtered
+        : allCatItems;
+      const total = summarySource.length;
+      const pcts = summarySource.map((it) => (it.target > 0 ? (it.actual / it.target) * 100 : 0));
       const avg = total > 0 ? pcts.reduce((a, b) => a + b, 0) / total : 0;
       const achieved = pcts.filter((p) => p >= 100).length;
 
@@ -1182,9 +1330,9 @@
         listEl.innerHTML = `
           <div class="empty-state">
             ${
-              state.searchQuery.trim()
-                ? `Tidak ada data KPI yang cocok dengan pencarian "<strong>${escapeHTML(state.searchQuery)}</strong>".`
-                : `Belum ada data KPI untuk kategori <strong>${cat === "kantoran" ? "Kantoran" : "Usaha"}</strong>.`
+              allCatItems.length === 0
+                ? `Belum ada data KPI untuk kategori <strong>${cat === "kantoran" ? "Kantoran" : "Usaha"}</strong>.`
+                : `Tidak ada data KPI yang sesuai dengan filter atau pencarian saat ini.`
             }
           </div>
         `;
@@ -1201,10 +1349,10 @@
                   <div>
                     <span class="kpi-title">${escapeHTML(item.name)}</span>
                     <span class="role-tag">${escapeHTML(item.role || "-")}</span>
+                    <span class="status-pill ${isGood ? "done" : "progress"}">${isGood ? "Tercapai" : "Berjalan"}</span>
                   </div>
-                  <div class="kpi-actions">
-                    <button type="button" class="btn-outline btn-sm" onclick="openEvalModal('${item.id}')">Nilai / Update</button>
-                    <button type="button" class="btn-danger btn-sm" onclick="deleteItem('${item.id}')">Hapus</button>
+                  <div>
+                    <button type="button" class="btn-outline btn-sm" onclick="openEvalModal('${item.id}')">Update</button>
                   </div>
                 </div>
                 <div class="kpi-meta">
@@ -1231,7 +1379,6 @@
       document.getElementById("btnPrevPage").disabled = page <= 1;
       document.getElementById("btnNextPage").disabled = page >= totalPages;
 
-      // Render Histori Penilaian + Tombol Cetak Sertifikat
       document.getElementById("historyCatLabel").textContent =
         cat === "kantoran" ? "Kantoran" : "Usaha";
       const histList = document.getElementById("historyList");
@@ -1257,7 +1404,7 @@
                 <div>
                   No: <strong>${escapeHTML(certNo)}</strong> &bull; Tanggal: <strong>${escapeHTML(log.evalDate)}</strong> &bull; Realisasi: <strong>${escapeHTML(log.changeText)}</strong>
                 </div>
-                ${log.note ? `<div class="history-note">Catatan: ${escapeHTML(log.note)}</div>` : ""}
+                <div class="history-note">Penilai: ${escapeHTML(log.evaluatorName || "-")}${log.note ? ` &bull; Catatan: ${escapeHTML(log.note)}` : ""}</div>
                 <div class="history-note">Dicatat: ${escapeHTML(log.timestamp)}</div>
               </div>
             `;
@@ -1266,7 +1413,18 @@
       }
     }
 
-    // Modal Sertifikat
+    // Sinkronisasi tampilan tanda tangan pada sertifikat
+    function syncSignatureDisplay() {
+      const evName = document.getElementById("signEvaluatorName").value.trim() || "Penilai";
+      const edName = document.getElementById("signEvaluatedName").value.trim() || (activeCertData ? activeCertData.owner : "-");
+      document.getElementById("certSignEvaluatorDisplay").textContent = evName;
+      document.getElementById("certSignEvaluatedDisplay").textContent = edName;
+      document.getElementById("certOwner").textContent = edName;
+    }
+
+    document.getElementById("signEvaluatorName").addEventListener("input", syncSignatureDisplay);
+    document.getElementById("signEvaluatedName").addEventListener("input", syncSignatureDisplay);
+
     function openCertificateModal(logId) {
       const cat = state.activeCategory;
       const log = state.history[cat].find((h) => h.id === logId);
@@ -1278,7 +1436,6 @@
 
       document.getElementById("certCode").textContent = certNo;
       document.getElementById("certCategorySubtitle").textContent = `Kategori: ${catLabel}`;
-      document.getElementById("certOwner").textContent = log.owner;
       document.getElementById("certRole").textContent = log.role || "-";
       document.getElementById("certKpiName").textContent = log.kpiName;
       document.getElementById("certScore").textContent = `${log.scorePct}%`;
@@ -1288,6 +1445,12 @@
         log.note && log.note !== "Penilaian awal KPI dibuat"
           ? `Catatan Evaluasi: "${log.note}".`
           : `Telah menyelesaikan pencatatan dan evaluasi indikator "${log.kpiName}" pada kategori ${catLabel}.`;
+
+      document.getElementById("signEvaluatorName").value =
+        log.evaluatorName || (cat === "kantoran" ? "HR & Manager" : "Owner / Pengelola");
+      document.getElementById("signEvaluatedName").value = log.owner || "";
+      document.getElementById("certSignEvaluatedRole").textContent = log.role || "Yang Dinilai";
+      syncSignatureDisplay();
 
       document.getElementById("certModal").classList.add("open");
     }
@@ -1299,44 +1462,103 @@
 
     document.getElementById("btnCloseCertModal").addEventListener("click", closeCertificateModal);
 
-    document.getElementById("btnPrintCert").addEventListener("click", () => {
-      window.print();
-    });
-
-    document.getElementById("btnShareCert").addEventListener("click", async () => {
+    // Unduh Gambar (.PNG) langsung via Canvas
+    document.getElementById("btnDownloadCertPng").addEventListener("click", () => {
       if (!activeCertData) return;
+
       const certNo = activeCertData.certNumber || formatCertNumber(activeCertData.evalDate);
-      const shareText = [
-        `SERTIFIKAT KPI (${certNo})`,
-        `Nama / PIC: ${activeCertData.owner}`,
-        `Jabatan: ${activeCertData.role || "-"}`,
-        `Indikator: ${activeCertData.kpiName}`,
-        `Capaian: ${activeCertData.scorePct}% (${activeCertData.changeText})`,
-        `Tanggal: ${activeCertData.evalDate}`
-      ].join("\n");
+      const catLabel = activeCertData.category === "kantoran" ? "Kantoran" : "Usaha";
+      const evaluator = document.getElementById("signEvaluatorName").value.trim() || "Penilai";
+      const evaluated = document.getElementById("signEvaluatedName").value.trim() || activeCertData.owner;
 
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: `Sertifikat KPI ${certNo}`,
-            text: shareText
-          });
-          showToast("Sertifikat berhasil dibagikan.", "success", "Berhasil");
-          return;
-        } catch (err) {
-          if (err && err.name === "AbortError") return;
-        }
-      }
+      const canvas = document.createElement("canvas");
+      canvas.width = 1200;
+      canvas.height = 820;
+      const ctx = canvas.getContext("2d");
 
-      try {
-        await navigator.clipboard.writeText(shareText);
-        showToast("Ringkasan sertifikat disalin ke clipboard agar mudah dibagikan.", "info", "Tersalin");
-      } catch {
-        showToast("Gunakan tombol Cetak / Simpan PDF untuk menyimpan & membagikan sertifikat.", "info", "Info");
-      }
+      // Latar & bingkai
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = "#0f172a";
+      ctx.lineWidth = 6;
+      ctx.strokeRect(32, 32, canvas.width - 64, canvas.height - 64);
+
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(46, 46, canvas.width - 92, canvas.height - 92);
+
+      ctx.textAlign = "center";
+
+      // Nomor sertifikat
+      ctx.fillStyle = "#4f46e5";
+      ctx.font = "bold 22px monospace";
+      ctx.fillText(certNo, canvas.width / 2, 115);
+
+      // Judul
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 42px sans-serif";
+      ctx.fillText("SERTIFIKAT CAPAIAN KPI", canvas.width / 2, 175);
+
+      ctx.fillStyle = "#64748b";
+      ctx.font = "22px sans-serif";
+      ctx.fillText(`Kategori: ${catLabel}`, canvas.width / 2, 215);
+
+      ctx.fillStyle = "#64748b";
+      ctx.font = "20px sans-serif";
+      ctx.fillText("Diberikan kepada:", canvas.width / 2, 275);
+
+      ctx.fillStyle = "#2563eb";
+      ctx.font = "bold 38px sans-serif";
+      ctx.fillText(evaluated, canvas.width / 2, 325);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "22px sans-serif";
+      ctx.fillText(`Indikator: ${activeCertData.kpiName} (${activeCertData.role || "-"})`, canvas.width / 2, 385);
+      ctx.fillText(`Capaian: ${activeCertData.scorePct}%  •  ${activeCertData.changeText}`, canvas.width / 2, 425);
+      ctx.fillText(`Tanggal Penilaian: ${activeCertData.evalDate}`, canvas.width / 2, 465);
+
+      // Area tanda tangan
+      const leftX = 330;
+      const rightX = 870;
+      const lineY = 665;
+
+      ctx.fillStyle = "#64748b";
+      ctx.font = "19px sans-serif";
+      ctx.fillText("Penilai", leftX, 545);
+      ctx.fillText("Yang Dinilai", rightX, 545);
+
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(leftX - 150, lineY);
+      ctx.lineTo(leftX + 150, lineY);
+      ctx.moveTo(rightX - 150, lineY);
+      ctx.lineTo(rightX + 150, lineY);
+      ctx.stroke();
+
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 22px sans-serif";
+      ctx.fillText(evaluator, leftX, lineY + 34);
+      ctx.fillText(evaluated, rightX, lineY + 34);
+
+      const safeNo = certNo.replace(/\//g, "-");
+      const link = document.createElement("a");
+      link.download = `sertifikat-${safeNo}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+
+      showToast("Sertifikat berhasil diunduh dalam format .PNG.", "success", "Unduh PNG");
     });
 
-    // Modal Penilaian
+    // Unduh / Cetak PDF langsung
+    document.getElementById("btnDownloadCertPdf").addEventListener("click", () => {
+      syncSignatureDisplay();
+      showToast("Membuka dialog cetak — pilih 'Save as PDF' untuk mengunduh file PDF.", "info", "Ekspor PDF");
+      setTimeout(() => window.print(), 150);
+    });
+
+    // Modal Update Realisasi
     function openEvalModal(id) {
       const cat = state.activeCategory;
       const item = state.items[cat].find((x) => x.id === id);
@@ -1347,6 +1569,7 @@
         `${item.name} — ${item.owner} (${item.role || "-"}) | Target: ${formatNumber(item.target)} ${item.unit}`;
       document.getElementById("evalActual").value = item.actual;
       document.getElementById("evalDate").value = new Date().toISOString().slice(0, 10);
+      document.getElementById("evalEvaluator").value = cat === "kantoran" ? "HR & Manager" : "Owner / Pengelola";
       document.getElementById("evalNote").value = "";
       document.getElementById("evalModal").classList.add("open");
     }
@@ -1364,6 +1587,7 @@
       const id = document.getElementById("evalItemId").value;
       const newActual = parseFloat(document.getElementById("evalActual").value);
       const evalDate = document.getElementById("evalDate").value;
+      const evaluatorName = document.getElementById("evalEvaluator").value.trim();
       const note = document.getElementById("evalNote").value.trim();
 
       const item = state.items[cat].find((x) => x.id === id);
@@ -1378,6 +1602,7 @@
         owner: item.owner,
         role: item.role || "-",
         evalDate: evalDate || new Date().toISOString().slice(0, 10),
+        evaluatorName: evaluatorName || (cat === "kantoran" ? "HR & Manager" : "Owner / Pengelola"),
         changeText: `${formatNumber(oldActual)} → ${formatNumber(newActual)} ${item.unit}`,
         scorePct: pct,
         note: note || "Update penilaian KPI"
@@ -1386,29 +1611,24 @@
       saveStorage();
       closeEvalModal();
       render();
-      showToast("Penilaian tersimpan & sertifikat histori siap dicetak.", "success", "Tersimpan");
+      showToast("Realisasi diupdate & masuk ke histori sertifikat.", "success", "Update Berhasil");
     });
 
-    function deleteItem(id) {
-      const cat = state.activeCategory;
-      state.items[cat] = state.items[cat].filter((item) => item.id !== id);
-      saveStorage();
-      render();
-      showToast("Item KPI dihapus dari daftar aktif.", "info", "Dihapus");
-    }
-
-    // Ganti kategori
+    // Ganti tab kategori
     document.querySelectorAll(".tab-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.activeCategory = btn.dataset.cat;
+        hideFormError();
         saveStorage();
         render();
       });
     });
 
-    // Tambah KPI baru
+    // Validasi & Pencegahan Duplikasi saat Tambah KPI
     document.getElementById("kpiForm").addEventListener("submit", (e) => {
       e.preventDefault();
+      hideFormError();
+
       const cat = state.activeCategory;
       const name = document.getElementById("kpiName").value.trim();
       const owner = document.getElementById("kpiOwner").value.trim();
@@ -1419,7 +1639,39 @@
       const period = document.getElementById("kpiPeriod").value;
       const note = document.getElementById("kpiNote").value.trim();
 
-      if (!name || !owner || !role || isNaN(target) || target <= 0 || isNaN(actual) || actual < 0 || !unit) {
+      if (!name) {
+        showFormError("Nama indikator KPI wajib diisi.");
+        return;
+      }
+      if (!owner) {
+        showFormError("Nama / PIC wajib diisi.");
+        return;
+      }
+      if (isNaN(target) || target <= 0) {
+        showFormError("Target harus berupa angka lebih besar dari 0.");
+        return;
+      }
+      if (isNaN(actual) || actual < 0) {
+        showFormError("Realisasi awal tidak boleh kurang dari 0.");
+        return;
+      }
+      if (!unit) {
+        showFormError("Satuan wajib diisi (contoh: %, Rp, unit).");
+        return;
+      }
+
+      // Cek duplikasi: Nama KPI + PIC + Periode pada kategori yang sama
+      const isDuplicate = state.items[cat].some(
+        (existing) =>
+          existing.name.trim().toLowerCase() === name.toLowerCase() &&
+          existing.owner.trim().toLowerCase() === owner.toLowerCase() &&
+          existing.period === period
+      );
+
+      if (isDuplicate) {
+        const msg = `Data duplikat: KPI "${name}" untuk PIC "${owner}" pada periode "${period}" sudah terdaftar.`;
+        showFormError(msg);
+        showToast(msg, "danger", "Duplikasi Ditolak");
         return;
       }
 
@@ -1453,14 +1705,36 @@
       e.target.reset();
       renderRoleOptions(cat);
       document.getElementById("kpiPeriod").value = "Bulanan";
-      showToast("KPI disimpan dan masuk ke histori penilaian.", "success", "Berhasil");
+      showToast("KPI baru tersimpan dan tercatat di histori.", "success", "Berhasil");
     });
 
-    // Pencarian & Pagination
+    // Pencarian, Filter & Pagination
     document.getElementById("searchInput").addEventListener("input", (e) => {
       state.searchQuery = e.target.value;
       state.currentPage.kantoran = 1;
       state.currentPage.usaha = 1;
+      render();
+    });
+
+    document.getElementById("filterPeriod").addEventListener("change", (e) => {
+      state.filterPeriod = e.target.value;
+      state.currentPage[state.activeCategory] = 1;
+      render();
+    });
+
+    document.getElementById("filterStatus").addEventListener("change", (e) => {
+      state.filterStatus = e.target.value;
+      state.currentPage[state.activeCategory] = 1;
+      render();
+    });
+
+    document.getElementById("btnResetFilter").addEventListener("click", () => {
+      state.searchQuery = "";
+      state.filterPeriod = "ALL";
+      state.filterStatus = "ALL";
+      document.getElementById("searchInput").value = "";
+      document.getElementById("filterPeriod").value = "ALL";
+      document.getElementById("filterStatus").value = "ALL";
       render();
     });
 
@@ -1489,7 +1763,7 @@
       }
     });
 
-    // Helper data sesuai tab aktif
+    // Export CSV & Excel sesuai tab aktif
     function buildActiveTabRows() {
       const cat = state.activeCategory;
       const catLabel = cat === "kantoran" ? "Kantoran" : "Usaha";
@@ -1537,17 +1811,14 @@
       URL.revokeObjectURL(url);
     }
 
-    // Download CSV sesuai tab aktif
     document.getElementById("btnExportCsv").addEventListener("click", () => {
       const { cat, catLabel, headers, bodyRows } = buildActiveTabRows();
-      const allRows = [headers, ...bodyRows];
-      const csvContent = "\uFEFF" + allRows.map((r) => r.map(csvEscape).join(";")).join("\n");
+      const csvContent = "\uFEFF" + [headers, ...bodyRows].map((r) => r.map(csvEscape).join(";")).join("\n");
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       triggerDownload(blob, `rekap-kpi-${cat}-${new Date().toISOString().slice(0, 10)}.csv`);
       showToast(`File CSV kategori ${catLabel} berhasil diunduh.`, "success", "Export CSV");
     });
 
-    // Download Excel (.xls spreadsheet XML/HTML agar langsung terbaca Excel & kolom terpisah rapi) sesuai tab aktif
     document.getElementById("btnExportExcel").addEventListener("click", () => {
       const { cat, catLabel, headers, bodyRows } = buildActiveTabRows();
       const tableHtml = `
@@ -1578,7 +1849,7 @@
       showToast(`File Excel kategori ${catLabel} berhasil diunduh.`, "success", "Export Excel");
     });
 
-    // Clear Storage dengan Modal & Toast Modern
+    // Clear Storage Modal & Toast
     const clearModal = document.getElementById("clearModal");
     document.getElementById("btnClearStorage").addEventListener("click", () => {
       clearModal.classList.add("open");
@@ -1604,7 +1875,6 @@
       );
     });
 
-    // Tutup modal jika klik backdrop
     document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
       backdrop.addEventListener("click", (e) => {
         if (e.target === backdrop) {
