@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KPI Tracker — Kantoran & Usaha</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --office: #0f766e;
+      --office-bg: #f0fdfa;
+      --business: #b45309;
+      --business-bg: #fffbeb;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --success: #16a34a;
+      --radius: 12px;
+      --shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 16px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    header p {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 14px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-outline {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      background: #f8fafc;
+    }
+
+    .btn-danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .btn-danger:hover {
+      background: #fee2e2;
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+
+    /* Info Kategori di Halaman Awal */
+    .info-banner {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .info-card.office {
+      border-top: 4px solid var(--office);
+    }
+
+    .info-card.business {
+      border-top: 4px solid var(--business);
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+
+    .badge-office {
+      background: var(--office-bg);
+      color: var(--office);
+    }
+
+    .badge-business {
+      background: var(--business-bg);
+      color: var(--business);
+    }
+
+    .info-card h2 {
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+
+    .info-card p {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .info-card ul {
+      font-size: 0.83rem;
+      padding-left: 18px;
+      color: var(--text);
+    }
+
+    /* Tabs Sub-Kategori */
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .tab-btn {
+      background: var(--card);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn.active[data-cat="kantoran"] {
+      background: var(--office-bg);
+      color: var(--office);
+      border-color: var(--office);
+    }
+
+    .tab-btn.active[data-cat="usaha"] {
+      background: var(--business-bg);
+      color: var(--business);
+      border-color: var(--business);
+    }
+
+    .count-pill {
+      background: rgba(0, 0, 0, 0.07);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+    }
+
+    /* Ringkasan & Form */
+    .grid-main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 768px) {
+      .grid-main {
+        grid-template-columns: 340px 1fr;
+        align-items: start;
+      }
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h3 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.83rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      background: #fff;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid rgba(37, 99, 235, 0.25);
+      border-color: var(--primary);
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .summary-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat-box .label {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .stat-box .val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* Daftar KPI */
+    .kpi-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .kpi-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .kpi-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .kpi-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-wrap {
+      background: #e2e8f0;
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.25s ease;
+    }
+
+    .progress-bar.good {
+      background: var(--success);
+    }
+
+    .kpi-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header & Tombol Clear Storage -->
+    <header>
+      <div>
+        <h1>Monitoring KPI</h1>
+        <p>Pencatatan performa kategori Kantoran & Usaha (tersimpan otomatis di browser)</p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn-outline btn-sm" id="btnExport">Export JSON</button>
+        <button type="button" class="btn-danger btn-sm" id="btnClearStorage">Clear Storage</button>
+      </div>
+    </header>
+
+    <!-- Halaman Awal: Informasi Kategori Kantoran & Usaha -->
+    <section class="info-banner" aria-label="Informasi Kategori">
+      <div class="info-card office">
+        <span class="badge badge-office">KATEGORI 1</span>
+        <h2>Kantoran</h2>
+        <p>Fokus pada produktivitas kerja tim/staf, ketepatan waktu penyelesaian tugas, kualitas administrasi, dan kepatuhan SOP.</p>
+        <ul>
+          <li>Contoh KPI: Ketepatan deadline laporan, SLA respon tiket/email, akurasi dokumen.</li>
+        </ul>
+      </div>
+
+      <div class="info-card business">
+        <span class="badge badge-business">KATEGORI 2</span>
+        <h2>Usaha</h2>
+        <p>Fokus pada pergerakan penjualan, arus kas, efisiensi operasional/stok, serta kepuasan dan retensi pelanggan.</p>
+        <ul>
+          <li>Contoh KPI: Omzet harian/bulanan, jumlah transaksi, repeat order, efisiensi stok.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Navigasi 2 Sub-Kategori -->
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab-btn active" data-cat="kantoran" role="tab" aria-selected="true">
+        Kantoran <span class="count-pill" id="countKantoran">0</span>
+      </button>
+      <button type="button" class="tab-btn" data-cat="usaha" role="tab" aria-selected="false">
+        Usaha <span class="count-pill" id="countUsaha">0</span>
+      </button>
+    </div>
+
+    <!-- Area Input & Daftar KPI -->
+    <div class="grid-main">
+      <form class="panel" id="kpiForm">
+        <h3 id="formTitle">Tambah KPI — Kantoran</h3>
+
+        <div class="form-group">
+          <label for="kpiName">Nama Indikator KPI</label>
+          <input type="text" id="kpiName" placeholder="Contoh: Penyelesaian Laporan Mingguan" required />
+        </div>
+
+        <div class="form-group">
+          <label for="kpiOwner">Penanggung Jawab / PIC</label>
+          <input type="text" id="kpiOwner" placeholder="Contoh: Budi / Tim Admin" required />
+        </div>
+
+        <div class="row-2">
+          <div class="form-group">
+            <label for="kpiTarget">Target</label>
+            <input type="number" id="kpiTarget" step="any" min="0.01" placeholder="100" required />
+          </div>
+          <div class="form-group">
+            <label for="kpiActual">Realisasi</label>
+            <input type="number" id="kpiActual" step="any" min="0" placeholder="0" required />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="form-group">
+            <label for="kpiUnit">Satuan</label>
+            <input type="text" id="kpiUnit" placeholder="%, Rp, unit, hari" required />
+          </div>
+          <div class="form-group">
+            <label for="kpiPeriod">Periode</label>
+            <select id="kpiPeriod">
+              <option value="Harian">Harian</option>
+              <option value="Mingguan">Mingguan</option>
+              <option value="Bulanan" selected>Bulanan</option>
+              <option value="Triwulan">Triwulan</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%;">Simpan KPI</button>
+      </form>
+
+      <div class="panel">
+        <div class="summary-bar">
+          <div class="stat-box">
+            <div class="label">Total KPI</div>
+            <div class="val" id="statTotal">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">Rata-rata Capaian</div>
+            <div class="val" id="statAvg">0%</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">Tercapai (&ge;100%)</div>
+            <div class="val" id="statAchieved">0</div>
+          </div>
+        </div>
+
+        <div class="kpi-list" id="kpiList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "kpi_tracker_kantoran_usaha_v1";
+
+    // Inisialisasi kosong tanpa data dummy
+    let state = {
+      activeCategory: "kantoran",
+      items: {
+        kantoran: [],
+        usaha: []
+      }
+    };
+
+    function loadStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state.items.kantoran = Array.isArray(parsed?.items?.kantoran) ? parsed.items.kantoran : [];
+          state.items.usaha = Array.isArray(parsed?.items?.usaha) ? parsed.items.usaha : [];
+          if (parsed?.activeCategory === "kantoran" || parsed?.activeCategory === "usaha") {
+            state.activeCategory = parsed.activeCategory;
+          }
+        }
+      } catch (e) {
+        console.error("Gagal memuat storage:", e);
+      }
+    }
+
+    function saveStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function formatNumber(num) {
+      return Number(num).toLocaleString("id-ID", { maximumFractionDigits: 2 });
+    }
+
+    function escapeHTML(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function render() {
+      const cat = state.activeCategory;
+      const items = state.items[cat];
+
+      // Update badge jumlah di tab
+      document.getElementById("countKantoran").textContent = state.items.kantoran.length;
+      document.getElementById("countUsaha").textContent = state.items.usaha.length;
+
+      // Update status tab aktif
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        const isActive = btn.dataset.cat === cat;
+        btn.classList.toggle("active", isActive);
+        btn.setAttribute("aria-selected", isActive);
+      });
+
+      // Update judul form
+      document.getElementById("formTitle").textContent =
+        cat === "kantoran" ? "Tambah KPI — Kantoran" : "Tambah KPI — Usaha";
+
+      // Hitung ringkasan
+      const total = items.length;
+      const pcts = items.map((it) => (it.target > 0 ? (it.actual / it.target) * 100 : 0));
+      const avg = total > 0 ? pcts.reduce((a, b) => a + b, 0) / total : 0;
+      const achieved = pcts.filter((p) => p >= 100).length;
+
+      document.getElementById("statTotal").textContent = total;
+      document.getElementById("statAvg").textContent = `${avg.toFixed(1)}%`;
+      document.getElementById("statAchieved").textContent = achieved;
+
+      // Render daftar KPI
+      const listEl = document.getElementById("kpiList");
+      if (total === 0) {
+        listEl.innerHTML = `<div class="empty-state">Belum ada data KPI untuk kategori <strong>${cat === "kantoran" ? "Kantoran" : "Usaha"}</strong>.<br/>Silakan tambahkan KPI baru pada form di samping.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = items
+        .map((item) => {
+          const pct = item.target > 0 ? (item.actual / item.target) * 100 : 0;
+          const barWidth = Math.min(Math.max(pct, 0), 100);
+          const isGood = pct >= 100;
+
+          return `
+            <div class="kpi-item">
+              <div class="kpi-top">
+                <div class="kpi-title">${escapeHTML(item.name)}</div>
+                <button type="button" class="btn-danger btn-sm" onclick="deleteItem('${item.id}')">Hapus</button>
+              </div>
+              <div class="kpi-meta">
+                PIC: <strong>${escapeHTML(item.owner)}</strong> &bull; Periode: ${escapeHTML(item.period)}
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar ${isGood ? "good" : ""}" style="width: ${barWidth}%"></div>
+              </div>
+              <div class="kpi-footer">
+                <span>Realisasi: <strong>${formatNumber(item.actual)}</strong> / ${formatNumber(item.target)} ${escapeHTML(item.unit)}</span>
+                <strong>${pct.toFixed(1)}%</strong>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function deleteItem(id) {
+      const cat = state.activeCategory;
+      state.items[cat] = state.items[cat].filter((item) => item.id !== id);
+      saveStorage();
+      render();
+    }
+
+    // Event switching sub-kategori
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.activeCategory = btn.dataset.cat;
+        saveStorage();
+        render();
+      });
+    });
+
+    // Event tambah KPI
+    document.getElementById("kpiForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("kpiName").value.trim();
+      const owner = document.getElementById("kpiOwner").value.trim();
+      const target = parseFloat(document.getElementById("kpiTarget").value);
+      const actual = parseFloat(document.getElementById("kpiActual").value);
+      const unit = document.getElementById("kpiUnit").value.trim();
+      const period = document.getElementById("kpiPeriod").value;
+
+      if (!name || !owner || isNaN(target) || target <= 0 || isNaN(actual) || actual < 0 || !unit) {
+        return;
+      }
+
+      const newItem = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        name,
+        owner,
+        target,
+        actual,
+        unit,
+        period
+      };
+
+      state.items[state.activeCategory].unshift(newItem);
+      saveStorage();
+      render();
+      e.target.reset();
+      document.getElementById("kpiPeriod").value = "Bulanan";
+    });
+
+    // Tombol Clear Storage
+    document.getElementById("btnClearStorage").addEventListener("click", () => {
+      const yakin = confirm("Hapus seluruh data KPI (Kantoran & Usaha) dan bersihkan storage?");
+      if (!yakin) return;
+
+      localStorage.removeItem(STORAGE_KEY);
+      state.items = { kantoran: [], usaha: [] };
+      render();
+    });
+
+    // Tombol Export JSON
+    document.getElementById("btnExport").addEventListener("click", () => {
+      const dataStr = JSON.stringify(state.items, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `kpi-kantoran-usaha-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    loadStorage();
+    render();
+  </script>
+</body>
+</html>
