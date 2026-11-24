@@ -670,6 +670,12 @@ function showModule(moduleName) {
         window.location.href = "sp.html";
         return;
     }
+
+    // Redirect ke halaman kpi.html
+    if (moduleName === "kpi") {
+        window.location.href = "kpi.html";
+        return;
+    }
     
     const module = modules[moduleName];
 
