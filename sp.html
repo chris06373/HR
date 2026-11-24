@@ -432,11 +432,39 @@
       color: var(--text);
       padding: 0 6px;
     }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+    
+    .home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background-color: var(--primary);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.home-btn:hover {
+  background-color: var(--primary-hover);
+}
   </style>
 </head>
 <body>
 
-   <a href="index.html" class="btn-link" a href = "index.html">Home </a>
+   <div class="container">
+    <div class="page-header">
+      <a href="index.html" class="home-btn">Home</a>
+    </div>
 
   <main class="container">
     <div class="top-grid">
