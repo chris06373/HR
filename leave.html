@@ -26,8 +26,8 @@
         .search-input {
             border-radius: 10px;
             border: 1px solid #e2e8f0;
-            padding: 10px 15px;
-            transition: all 0.3s ease;
+            padding: 9px 14px;
+            transition: all 0.25s ease;
             min-width: 0;
         }
 
@@ -40,8 +40,8 @@
         .table thead th {
             background: #f1f5f9;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
             border: none;
             white-space: nowrap;
         }
@@ -53,8 +53,15 @@
 
         .badge-type {
             font-size: 0.72rem;
-            padding: 5px 9px;
+            padding: 5px 8px;
             white-space: nowrap;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
         }
 
         @media (min-width: 992px) {
@@ -67,29 +74,20 @@
 
         @media (max-width: 576px) {
             .card-body {
-                padding: 1.15rem !important;
-            }
-
-            .navbar .container {
-                gap: 0.5rem;
+                padding: 1.1rem !important;
             }
 
             .navbar-brand {
                 font-size: 1.05rem;
             }
 
-            .lang-switcher .btn {
-                padding: 0.25rem 0.55rem;
-                font-size: 0.75rem;
-            }
-
-            .history-actions {
+            .history-toolbar {
                 width: 100%;
                 flex-direction: column;
             }
 
-            .history-actions .search-input,
-            .history-actions .btn-clear {
+            .history-toolbar .search-input,
+            .history-toolbar button {
                 width: 100%;
             }
         }
@@ -98,10 +96,8 @@
 <body>
 
 <nav class="navbar navbar-light bg-white border-bottom mb-3 mb-md-4">
-    <div class="container d-flex flex-wrap justify-content-between align-items-center">
-        <a href="index.html" id="clearStorageHome" class="navbar-brand fw-bold text-primary m-0">
-            Home
-        </a>
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <a href="index.html" class="navbar-brand fw-bold text-primary m-0">HRIS.Global</a>
         <div class="lang-switcher d-flex gap-1" role="group" aria-label="Language switcher">
             <button type="button" data-lang="id" class="btn btn-primary">ID</button>
             <button type="button" data-lang="en" class="btn btn-light">EN</button>
@@ -110,18 +106,25 @@
     </div>
 </nav>
 
-<div class="container-fluid px-3 px-md-4 px-lg-5 pb-4">
+<div class="container-fluid px-3 px-md-4 px-lg-5 pb-5">
     <div class="row g-3 g-md-4">
-        <!-- Form Pengajuan -->
+        <!-- Form Pengajuan & Edit -->
         <div class="col-12 col-lg-4">
             <div class="card sticky-lg-top">
                 <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4" id="txtTitle"></h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0" id="txtTitle"></h5>
+                        <span class="badge bg-warning-subtle text-warning-emphasis d-none" id="editBadge">EDIT MODE</span>
+                    </div>
+
                     <form id="hrisForm">
+                        <input type="hidden" id="edit_id">
+
                         <div class="mb-3">
                             <label for="nama_karyawan" class="form-label small fw-semibold" id="txtNameLabel"></label>
                             <input type="text" id="nama_karyawan" class="form-control" required>
                         </div>
+
                         <div class="mb-3">
                             <label for="tipe_absen" class="form-label small fw-semibold" id="txtTypeLabel"></label>
                             <select id="tipe_absen" class="form-select">
@@ -129,12 +132,34 @@
                                 <option value="Cuti">Cuti / Leave</option>
                                 <option value="Sakit">Sakit / Sick</option>
                             </select>
+                            <div class="form-text small" id="ruleHint"></div>
                         </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-12 col-sm-6">
+                                <label for="tgl_pengajuan" class="form-label small fw-semibold" id="txtReqDateLabel"></label>
+                                <input type="date" id="tgl_pengajuan" class="form-control" required>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label for="tgl_selesai" class="form-label small fw-semibold" id="txtEndDateLabel"></label>
+                                <input type="date" id="tgl_selesai" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 d-none" id="approvalDateGroup">
+                            <label for="tgl_persetujuan" class="form-label small fw-semibold" id="txtAppDateLabel"></label>
+                            <input type="date" id="tgl_persetujuan" class="form-control">
+                        </div>
+
                         <div class="mb-4">
                             <label for="keterangan" class="form-label small fw-semibold" id="txtDescLabel"></label>
-                            <textarea id="keterangan" class="form-control" rows="4" required></textarea>
+                            <textarea id="keterangan" class="form-control" rows="3" required></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="txtSendBtn"></button>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary py-2 fw-bold" id="txtSendBtn"></button>
+                            <button type="button" class="btn btn-light border d-none" id="cancelEditBtn" onclick="cancelEdit()"></button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -144,11 +169,12 @@
         <div class="col-12 col-lg-8">
             <div class="card h-100">
                 <div class="card-body p-4">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                    <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center mb-4 gap-3">
                         <h5 class="fw-bold mb-0" id="txtHistoryTitle"></h5>
-                        <div class="d-flex gap-2 history-actions">
+                        <div class="d-flex flex-wrap gap-2 history-toolbar">
                             <input type="text" id="searchInput" class="search-input">
-                            <button type="button" onclick="clearHistory()" class="btn btn-outline-danger btn-sm px-3 btn-clear" id="txtClearBtn"></button>
+                            <button type="button" onclick="downloadExcel()" class="btn btn-success btn-sm px-3" id="txtExcelBtn"></button>
+                            <button type="button" onclick="clearHistory()" class="btn btn-outline-danger btn-sm px-3" id="txtClearBtn"></button>
                         </div>
                     </div>
 
@@ -158,12 +184,23 @@
                                 <tr>
                                     <th id="thName"></th>
                                     <th id="thType"></th>
+                                    <th id="thReqDate"></th>
+                                    <th id="thAppDate"></th>
                                     <th id="thDesc"></th>
-                                    <th class="text-end" id="thDate"></th>
+                                    <th id="thStatus"></th>
+                                    <th class="text-end" id="thAction"></th>
                                 </tr>
                             </thead>
                             <tbody id="riwayatTable"></tbody>
                         </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mt-4 gap-2">
+                        <div class="small text-muted" id="pageInfo"></div>
+                        <nav aria-label="History pagination">
+                            <ul class="pagination pagination-sm mb-0" id="paginationList"></ul>
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -174,54 +211,123 @@
 <script>
     const DATA_KEY = "hris_global_v2";
     const LANG_KEY = "hris_global_lang";
+    const PAGE_SIZE = 5;
+
+    let currentPage = 1;
 
     const dictionary = {
         id: {
             title: "Pengajuan Izin & Cuti",
             name: "Nama Lengkap",
             type: "Jenis Pengajuan",
+            reqDate: "Tgl Pengajuan",
+            endDate: "Tgl Selesai",
+            appDate: "Tgl Persetujuan",
             desc: "Alasan / Keterangan",
-            date: "Tanggal",
+            status: "Status",
+            action: "Aksi",
             send: "Kirim Pengajuan",
+            update: "Simpan Perubahan",
+            cancel: "Batal Edit",
             history: "Riwayat Pengajuan",
             search: "Cari riwayat...",
             placeholder_desc: "Jelaskan detail pengajuan...",
+            rule_hint: "Izin & Cuti: Tgl pengajuan minimal hari ini. Sakit: minimal 3 hari.",
+            err_past_date: "Untuk Izin & Cuti, tanggal pengajuan tidak boleh kurang dari hari ini.",
+            err_end_before_start: "Tanggal selesai tidak boleh lebih awal dari tanggal pengajuan.",
+            err_sick_min_days: "Untuk Sakit, durasi pengajuan minimal 3 hari.",
             success_msg: "Data berhasil disimpan!",
+            update_msg: "Data berhasil diperbarui!",
+            approve_msg: "Pengajuan telah di-approve!",
             confirm_clear: "Yakin hapus semua riwayat?",
             clear: "HAPUS SEMUA",
+            excel: "Download Excel",
+            approve: "Approve",
+            edit: "Edit",
+            pending: "Menunggu",
+            approved: "Disetujui",
             no_data: "Data tidak ditemukan"
         },
         en: {
             title: "Leave & Permit Request",
             name: "Full Name",
             type: "Request Type",
+            reqDate: "Submission Date",
+            endDate: "End Date",
+            appDate: "Approval Date",
             desc: "Reason / Description",
-            date: "Date",
+            status: "Status",
+            action: "Action",
             send: "Submit Request",
+            update: "Save Changes",
+            cancel: "Cancel Edit",
             history: "Submission History",
             search: "Search history...",
             placeholder_desc: "Explain your request details...",
+            rule_hint: "Permit & Leave: submission date cannot be before today. Sick: minimum 3 days.",
+            err_past_date: "For Permit & Leave, submission date cannot be earlier than today.",
+            err_end_before_start: "End date cannot be earlier than submission date.",
+            err_sick_min_days: "For Sick leave, duration must be at least 3 days.",
             success_msg: "Data saved successfully!",
+            update_msg: "Data updated successfully!",
+            approve_msg: "Request approved!",
             confirm_clear: "Confirm clear all?",
             clear: "CLEAR ALL",
+            excel: "Download Excel",
+            approve: "Approve",
+            edit: "Edit",
+            pending: "Pending",
+            approved: "Approved",
             no_data: "No data found"
         },
         zh: {
             title: "请假与许可申请",
             name: "全名",
             type: "申请类型",
+            reqDate: "申请日期",
+            endDate: "结束日期",
+            appDate: "批准日期",
             desc: "原因 / 描述",
-            date: "日期",
+            status: "状态",
+            action: "操作",
             send: "提交申请",
+            update: "保存修改",
+            cancel: "取消编辑",
             history: "申请历史",
             search: "搜索历史...",
             placeholder_desc: "详细说明您的申请...",
+            rule_hint: "事假/年假：申请日期不得早于今天；病假：至少 3 天。",
+            err_past_date: "事假与年假的申请日期不能早于今天。",
+            err_end_before_start: "结束日期不能早于申请日期。",
+            err_sick_min_days: "病假至少需要 3 天。",
             success_msg: "数据保存成功！",
+            update_msg: "数据更新成功！",
+            approve_msg: "申请已批准！",
             confirm_clear: "确认清除全部记录？",
             clear: "全部清除",
+            excel: "导出 Excel",
+            approve: "批准",
+            edit: "编辑",
+            pending: "待处理",
+            approved: "已批准",
             no_data: "未找到数据"
         }
     };
+
+    function getTodayISO() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    }
+
+    function getDaysInclusive(startStr, endStr) {
+        const start = new Date(startStr + "T00:00:00");
+        const end = new Date(endStr + "T00:00:00");
+        const diffMs = end.getTime() - start.getTime();
+        return Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+    }
 
     function getCurrentLang() {
         const params = new URLSearchParams(window.location.search);
@@ -236,108 +342,357 @@
 
     let currentLang = getCurrentLang();
 
+    function getRecords() {
+        try {
+            return JSON.parse(localStorage.getItem(DATA_KEY)) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveRecords(records) {
+        localStorage.setItem(DATA_KEY, JSON.stringify(records));
+    }
+
     function escapeHtml(text) {
         const div = document.createElement("div");
-        div.textContent = text;
+        div.textContent = text == null ? "" : String(text);
         return div.innerHTML;
     }
 
     function applyLanguage(lang) {
         currentLang = dictionary[lang] ? lang : "id";
         const txt = dictionary[currentLang];
+        const isEditing = Boolean(document.getElementById("edit_id").value);
 
         document.documentElement.lang = currentLang;
         document.getElementById("txtTitle").textContent = txt.title;
         document.getElementById("txtNameLabel").textContent = txt.name;
         document.getElementById("txtTypeLabel").textContent = txt.type;
+        document.getElementById("ruleHint").textContent = txt.rule_hint;
+        document.getElementById("txtReqDateLabel").textContent = txt.reqDate;
+        document.getElementById("txtEndDateLabel").textContent = txt.endDate;
+        document.getElementById("txtAppDateLabel").textContent = txt.appDate;
         document.getElementById("txtDescLabel").textContent = txt.desc;
         document.getElementById("keterangan").placeholder = txt.placeholder_desc;
-        document.getElementById("txtSendBtn").textContent = txt.send;
+        document.getElementById("txtSendBtn").textContent = isEditing ? txt.update : txt.send;
+        document.getElementById("cancelEditBtn").textContent = txt.cancel;
         document.getElementById("txtHistoryTitle").textContent = txt.history;
         document.getElementById("searchInput").placeholder = txt.search;
+        document.getElementById("txtExcelBtn").textContent = txt.excel;
         document.getElementById("txtClearBtn").textContent = txt.clear;
 
         document.getElementById("thName").textContent = txt.name;
         document.getElementById("thType").textContent = txt.type;
+        document.getElementById("thReqDate").textContent = txt.reqDate;
+        document.getElementById("thAppDate").textContent = txt.appDate;
         document.getElementById("thDesc").textContent = txt.desc;
-        document.getElementById("thDate").textContent = txt.date;
+        document.getElementById("thStatus").textContent = txt.status;
+        document.getElementById("thAction").textContent = txt.action;
 
         document.querySelectorAll(".lang-switcher button").forEach(btn => {
-            const isActive = btn.dataset.lang === currentLang;
-            btn.classList.toggle("btn-primary", isActive);
-            btn.classList.toggle("btn-light", !isActive);
+            const active = btn.dataset.lang === currentLang;
+            btn.classList.toggle("btn-primary", active);
+            btn.classList.toggle("btn-light", !active);
         });
 
         renderHistory(document.getElementById("searchInput").value);
+    }
+
+    function getFilteredData(filter = "") {
+        const data = getRecords();
+        const q = filter.trim().toLowerCase();
+        if (!q) return data;
+        return data.filter(item => {
+            const hay = `${item.nama} ${item.tipe} ${item.ket} ${item.tgl_pengajuan || ""} ${item.tgl_persetujuan || ""} ${item.status || ""}`.toLowerCase();
+            return hay.includes(q);
+        });
     }
 
     function renderHistory(filter = "") {
         const tbody = document.getElementById("riwayatTable");
         const txt = dictionary[currentLang];
-        const data = JSON.parse(localStorage.getItem(DATA_KEY)) || [];
+        const filtered = getFilteredData(filter);
 
-        const filteredData = data.filter(item => {
-            const searchStr = `${item.nama} ${item.tipe} ${item.ket}`.toLowerCase();
-            return searchStr.includes(filter.toLowerCase());
-        });
+        const totalItems = filtered.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+        if (currentPage > totalPages) currentPage = totalPages;
 
-        if (filteredData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-muted">${escapeHtml(txt.no_data)}</td></tr>`;
+        const startIdx = (currentPage - 1) * PAGE_SIZE;
+        const pageItems = filtered.slice(startIdx, startIdx + PAGE_SIZE);
+
+        if (pageItems.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-muted">${escapeHtml(txt.no_data)}</td></tr>`;
+        } else {
+            tbody.innerHTML = pageItems.map(item => {
+                const isApproved = item.status === "Approved";
+                const statusBadge = isApproved
+                    ? `<span class="badge bg-success-subtle text-success border border-success-subtle">${escapeHtml(txt.approved)}</span>`
+                    : `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">${escapeHtml(txt.pending)}</span>`;
+
+                const periodText = item.tgl_selesai && item.tgl_selesai !== item.tgl_pengajuan
+                    ? `${escapeHtml(item.tgl_pengajuan)} s/d ${escapeHtml(item.tgl_selesai)}`
+                    : escapeHtml(item.tgl_pengajuan || "-");
+
+                return `
+                    <tr>
+                        <td><span class="fw-semibold text-dark">${escapeHtml(item.nama)}</span></td>
+                        <td><span class="badge bg-light text-primary border badge-type">${escapeHtml(item.tipe)}</span></td>
+                        <td class="small text-nowrap">${periodText}</td>
+                        <td class="small text-nowrap">${escapeHtml(item.tgl_persetujuan || "-")}</td>
+                        <td class="text-muted small">${escapeHtml(item.ket)}</td>
+                        <td>${statusBadge}</td>
+                        <td class="text-end">
+                            <div class="action-btns">
+                                <button type="button" class="btn btn-success btn-sm" onclick="approveItem(${item.id})" ${isApproved ? "disabled" : ""}>
+                                    ${escapeHtml(txt.approve)}
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="startEdit(${item.id})">
+                                    ${escapeHtml(txt.edit)}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        const pageInfo = document.getElementById("pageInfo");
+        if (totalItems === 0) {
+            pageInfo.textContent = "0 data";
+        } else {
+            pageInfo.textContent = `${startIdx + 1}-${Math.min(startIdx + PAGE_SIZE, totalItems)} / ${totalItems} (${currentPage}/${totalPages})`;
+        }
+
+        renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+        const list = document.getElementById("paginationList");
+        if (totalPages <= 1) {
+            list.innerHTML = "";
             return;
         }
 
-        const locale = currentLang === "zh" ? "zh-CN" : (currentLang === "en" ? "en-GB" : "id-ID");
+        let html = `
+            <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+                <button type="button" class="page-link" onclick="goToPage(${currentPage - 1})">&laquo;</button>
+            </li>
+        `;
 
-        tbody.innerHTML = filteredData.map(item => `
-            <tr>
-                <td><span class="fw-semibold text-dark">${escapeHtml(item.nama)}</span></td>
-                <td><span class="badge bg-light text-primary border badge-type">${escapeHtml(item.tipe)}</span></td>
-                <td class="text-muted small">${escapeHtml(item.ket)}</td>
-                <td class="text-end text-muted" style="font-size: 0.75rem; white-space: nowrap;">
-                    ${escapeHtml(item.tanggal || new Date(item.id).toLocaleDateString(locale, { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }))}
-                </td>
-            </tr>
-        `).join("");
+        for (let p = 1; p <= totalPages; p++) {
+            html += `
+                <li class="page-item ${p === currentPage ? "active" : ""}">
+                    <button type="button" class="page-link" onclick="goToPage(${p})">${p}</button>
+                </li>
+            `;
+        }
+
+        html += `
+            <li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
+                <button type="button" class="page-link" onclick="goToPage(${currentPage + 1})">&raquo;</button>
+            </li>
+        `;
+
+        list.innerHTML = html;
     }
 
-    document.querySelectorAll(".lang-switcher button").forEach(btn => {
-        btn.addEventListener("click", function () {
-            const lang = this.dataset.lang;
-            localStorage.setItem(LANG_KEY, lang);
-            applyLanguage(lang);
-        });
-    });
+    function goToPage(page) {
+        currentPage = page;
+        renderHistory(document.getElementById("searchInput").value);
+    }
+
+    function validateEntry(tipe, tglPengajuan, tglSelesai) {
+        const txt = dictionary[currentLang];
+        const today = getTodayISO();
+
+        if (!tglPengajuan || !tglSelesai) return false;
+
+        if (tglSelesai < tglPengajuan) {
+            alert(txt.err_end_before_start);
+            return false;
+        }
+
+        if ((tipe === "Izin" || tipe === "Cuti") && tglPengajuan < today) {
+            alert(txt.err_past_date);
+            return false;
+        }
+
+        if (tipe === "Sakit") {
+            const days = getDaysInclusive(tglPengajuan, tglSelesai);
+            if (days < 3) {
+                alert(txt.err_sick_min_days);
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     document.getElementById("hrisForm").addEventListener("submit", function (e) {
         e.preventDefault();
         const txt = dictionary[currentLang];
-        const locale = currentLang === "zh" ? "zh-CN" : (currentLang === "en" ? "en-GB" : "id-ID");
+        const editId = document.getElementById("edit_id").value;
+        const nama = document.getElementById("nama_karyawan").value.trim();
+        const tipe = document.getElementById("tipe_absen").value;
+        const tglPengajuan = document.getElementById("tgl_pengajuan").value;
+        const tglSelesai = document.getElementById("tgl_selesai").value;
+        const tglPersetujuan = document.getElementById("tgl_persetujuan").value || "";
+        const ket = document.getElementById("keterangan").value.trim();
 
-        const entry = {
-            id: Date.now(),
-            nama: document.getElementById("nama_karyawan").value.trim(),
-            tipe: document.getElementById("tipe_absen").value,
-            ket: document.getElementById("keterangan").value.trim(),
-            tanggal: new Date().toLocaleDateString(locale, {
-                day: "2-digit",
-                month: "short",
-                hour: "2-digit",
-                minute: "2-digit"
-            })
-        };
+        if (!nama || !ket) return;
+        if (!validateEntry(tipe, tglPengajuan, tglSelesai)) return;
 
-        if (!entry.nama || !entry.ket) return;
+        const records = getRecords();
 
-        const history = JSON.parse(localStorage.getItem(DATA_KEY)) || [];
-        history.unshift(entry);
-        localStorage.setItem(DATA_KEY, JSON.stringify(history));
+        if (editId) {
+            const idx = records.findIndex(r => String(r.id) === String(editId));
+            if (idx !== -1) {
+                records[idx] = {
+                    ...records[idx],
+                    nama,
+                    tipe,
+                    tgl_pengajuan: tglPengajuan,
+                    tgl_selesai: tglSelesai,
+                    tgl_persetujuan: tglPersetujuan,
+                    status: tglPersetujuan ? "Approved" : (records[idx].status || "Pending"),
+                    ket
+                };
+                saveRecords(records);
+                alert(txt.update_msg);
+            }
+            cancelEdit();
+        } else {
+            records.unshift({
+                id: Date.now(),
+                nama,
+                tipe,
+                tgl_pengajuan: tglPengajuan,
+                tgl_selesai: tglSelesai,
+                tgl_persetujuan: "",
+                status: "Pending",
+                ket
+            });
+            saveRecords(records);
+            alert(txt.success_msg);
+            resetFormDefaults();
+        }
 
-        this.reset();
-        alert(txt.success_msg);
         renderHistory(document.getElementById("searchInput").value);
     });
 
+    function approveItem(id) {
+        const txt = dictionary[currentLang];
+        const records = getRecords();
+        const idx = records.findIndex(r => r.id === id);
+        if (idx === -1) return;
+
+        records[idx].status = "Approved";
+        records[idx].tgl_persetujuan = getTodayISO();
+        saveRecords(records);
+
+        if (String(document.getElementById("edit_id").value) === String(id)) {
+            document.getElementById("tgl_persetujuan").value = records[idx].tgl_persetujuan;
+        }
+
+        alert(txt.approve_msg);
+        renderHistory(document.getElementById("searchInput").value);
+    }
+
+    function startEdit(id) {
+        const txt = dictionary[currentLang];
+        const records = getRecords();
+        const item = records.find(r => r.id === id);
+        if (!item) return;
+
+        document.getElementById("edit_id").value = item.id;
+        document.getElementById("nama_karyawan").value = item.nama;
+        document.getElementById("tipe_absen").value = item.tipe;
+        document.getElementById("tgl_pengajuan").value = item.tgl_pengajuan || getTodayISO();
+        document.getElementById("tgl_selesai").value = item.tgl_selesai || item.tgl_pengajuan || getTodayISO();
+        document.getElementById("tgl_persetujuan").value = item.tgl_persetujuan || "";
+        document.getElementById("keterangan").value = item.ket;
+
+        document.getElementById("editBadge").classList.remove("d-none");
+        document.getElementById("approvalDateGroup").classList.remove("d-none");
+        document.getElementById("cancelEditBtn").classList.remove("d-none");
+        document.getElementById("txtSendBtn").textContent = txt.update;
+
+        document.getElementById("nama_karyawan").scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function cancelEdit() {
+        const txt = dictionary[currentLang];
+        document.getElementById("edit_id").value = "";
+        document.getElementById("editBadge").classList.add("d-none");
+        document.getElementById("approvalDateGroup").classList.add("d-none");
+        document.getElementById("cancelEditBtn").classList.add("d-none");
+        document.getElementById("txtSendBtn").textContent = txt.send;
+        resetFormDefaults();
+    }
+
+    function resetFormDefaults() {
+        document.getElementById("hrisForm").reset();
+        const today = getTodayISO();
+        document.getElementById("tgl_pengajuan").value = today;
+        document.getElementById("tgl_selesai").value = today;
+        document.getElementById("tgl_persetujuan").value = "";
+    }
+
+    function downloadExcel() {
+        const txt = dictionary[currentLang];
+        const rows = getFilteredData(document.getElementById("searchInput").value);
+
+        const tableHtml = `
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>${escapeHtml(txt.name)}</th>
+                        <th>${escapeHtml(txt.type)}</th>
+                        <th>${escapeHtml(txt.reqDate)}</th>
+                        <th>${escapeHtml(txt.endDate)}</th>
+                        <th>${escapeHtml(txt.appDate)}</th>
+                        <th>${escapeHtml(txt.desc)}</th>
+                        <th>${escapeHtml(txt.status)}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows.map(item => `
+                        <tr>
+                            <td>${escapeHtml(item.nama)}</td>
+                            <td>${escapeHtml(item.tipe)}</td>
+                            <td>${escapeHtml(item.tgl_pengajuan || "")}</td>
+                            <td>${escapeHtml(item.tgl_selesai || "")}</td>
+                            <td>${escapeHtml(item.tgl_persetujuan || "")}</td>
+                            <td>${escapeHtml(item.ket)}</td>
+                            <td>${escapeHtml(item.status === "Approved" ? txt.approved : txt.pending)}</td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+        `;
+
+        const blob = new Blob(["\ufeff" + tableHtml], {
+            type: "application/vnd.ms-excel;charset=utf-8;"
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `riwayat_izin_cuti_${getTodayISO()}.xls`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    document.querySelectorAll(".lang-switcher button").forEach(btn => {
+        btn.addEventListener("click", function () {
+            applyLanguage(this.dataset.lang);
+        });
+    });
+
     document.getElementById("searchInput").addEventListener("input", function (e) {
+        currentPage = 1;
         renderHistory(e.target.value);
     });
 
@@ -345,16 +700,14 @@
         const txt = dictionary[currentLang];
         if (confirm(txt.confirm_clear)) {
             localStorage.removeItem(DATA_KEY);
+            currentPage = 1;
+            cancelEdit();
             renderHistory(document.getElementById("searchInput").value);
         }
     }
 
-    document.getElementById("clearStorageHome").addEventListener("click", function () {
-        localStorage.clear();
-        sessionStorage.clear();
-    });
-
     window.addEventListener("DOMContentLoaded", () => {
+        resetFormDefaults();
         applyLanguage(currentLang);
     });
 </script>
