@@ -126,6 +126,11 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="nama_pengganti" class="form-label small fw-semibold" id="txtBackupLabel"></label>
+                            <input type="text" id="nama_pengganti" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="tipe_absen" class="form-label small fw-semibold" id="txtTypeLabel"></label>
                             <select id="tipe_absen" class="form-select">
                                 <option value="Izin">Izin / Permit</option>
@@ -144,11 +149,6 @@
                                 <label for="tgl_selesai" class="form-label small fw-semibold" id="txtEndDateLabel"></label>
                                 <input type="date" id="tgl_selesai" class="form-control" required>
                             </div>
-                        </div>
-
-                        <div class="mb-3 d-none" id="approvalDateGroup">
-                            <label for="tgl_persetujuan" class="form-label small fw-semibold" id="txtAppDateLabel"></label>
-                            <input type="date" id="tgl_persetujuan" class="form-control">
                         </div>
 
                         <div class="mb-4">
@@ -183,9 +183,9 @@
                             <thead>
                                 <tr>
                                     <th id="thName"></th>
+                                    <th id="thBackup"></th>
                                     <th id="thType"></th>
                                     <th id="thReqDate"></th>
-                                    <th id="thAppDate"></th>
                                     <th id="thDesc"></th>
                                     <th id="thStatus"></th>
                                     <th class="text-end" id="thAction"></th>
@@ -219,10 +219,12 @@
         id: {
             title: "Pengajuan Izin & Cuti",
             name: "Nama Lengkap",
+            backup: "Nama Pengganti / Petugas Sementara",
+            backupPlaceholder: "Masukkan nama pengganti / petugas...",
             type: "Jenis Pengajuan",
             reqDate: "Tgl Pengajuan",
             endDate: "Tgl Selesai",
-            appDate: "Tgl Persetujuan",
+            appInfo: "Waktu Persetujuan",
             desc: "Alasan / Keterangan",
             status: "Status",
             action: "Aksi",
@@ -232,13 +234,16 @@
             history: "Riwayat Pengajuan",
             search: "Cari riwayat...",
             placeholder_desc: "Jelaskan detail pengajuan...",
-            rule_hint: "Izin & Cuti: Tgl pengajuan minimal hari ini. Sakit: minimal 3 hari.",
+            rule_hint: "Izin: maks 3 hari & tgl mulai min hari ini. Cuti: tgl mulai min hari ini. Sakit: bisa diajukan s/d 3 hari sebelumnya.",
             err_past_date: "Untuk Izin & Cuti, tanggal pengajuan tidak boleh kurang dari hari ini.",
             err_end_before_start: "Tanggal selesai tidak boleh lebih awal dari tanggal pengajuan.",
-            err_sick_min_days: "Untuk Sakit, durasi pengajuan minimal 3 hari.",
+            err_izin_max_days: "Untuk Izin, maksimal hanya boleh 3 hari.",
+            err_sick_min_date: "Untuk Sakit, pengajuan paling awal adalah 3 hari sebelumnya.",
+            err_sick_max_date: "Untuk Sakit, tanggal pengajuan tidak boleh melebihi hari ini.",
             success_msg: "Data berhasil disimpan!",
             update_msg: "Data berhasil diperbarui!",
             approve_msg: "Pengajuan telah di-approve!",
+            approved_at_prefix: "Di-approve pada",
             confirm_clear: "Yakin hapus semua riwayat?",
             clear: "HAPUS SEMUA",
             excel: "Download Excel",
@@ -251,10 +256,12 @@
         en: {
             title: "Leave & Permit Request",
             name: "Full Name",
+            backup: "Replacement / Temporary Officer",
+            backupPlaceholder: "Enter replacement / temporary officer...",
             type: "Request Type",
-            reqDate: "Submission Date",
+            reqDate: "Start Date",
             endDate: "End Date",
-            appDate: "Approval Date",
+            appInfo: "Approval Time",
             desc: "Reason / Description",
             status: "Status",
             action: "Action",
@@ -264,13 +271,16 @@
             history: "Submission History",
             search: "Search history...",
             placeholder_desc: "Explain your request details...",
-            rule_hint: "Permit & Leave: submission date cannot be before today. Sick: minimum 3 days.",
-            err_past_date: "For Permit & Leave, submission date cannot be earlier than today.",
-            err_end_before_start: "End date cannot be earlier than submission date.",
-            err_sick_min_days: "For Sick leave, duration must be at least 3 days.",
+            rule_hint: "Permit: max 3 days & start date min today. Leave: start date min today. Sick: can be filed up to 3 days earlier.",
+            err_past_date: "For Permit & Leave, start date cannot be earlier than today.",
+            err_end_before_start: "End date cannot be earlier than start date.",
+            err_izin_max_days: "For Permit, maximum duration is 3 days.",
+            err_sick_min_date: "For Sick leave, earliest submission date is 3 days ago.",
+            err_sick_max_date: "For Sick leave, submission date cannot be after today.",
             success_msg: "Data saved successfully!",
             update_msg: "Data updated successfully!",
             approve_msg: "Request approved!",
+            approved_at_prefix: "Approved at",
             confirm_clear: "Confirm clear all?",
             clear: "CLEAR ALL",
             excel: "Download Excel",
@@ -283,10 +293,12 @@
         zh: {
             title: "请假与许可申请",
             name: "全名",
+            backup: "代理人 / 临时负责人",
+            backupPlaceholder: "输入代理人或临时负责人姓名...",
             type: "申请类型",
-            reqDate: "申请日期",
+            reqDate: "开始日期",
             endDate: "结束日期",
-            appDate: "批准日期",
+            appInfo: "批准时间",
             desc: "原因 / 描述",
             status: "状态",
             action: "操作",
@@ -296,13 +308,16 @@
             history: "申请历史",
             search: "搜索历史...",
             placeholder_desc: "详细说明您的申请...",
-            rule_hint: "事假/年假：申请日期不得早于今天；病假：至少 3 天。",
-            err_past_date: "事假与年假的申请日期不能早于今天。",
-            err_end_before_start: "结束日期不能早于申请日期。",
-            err_sick_min_days: "病假至少需要 3 天。",
+            rule_hint: "事假：最多3天且开始日期不早于今天；年假：开始日期不早于今天；病假：最早可提前3天申请。",
+            err_past_date: "事假与年假的开始日期不能早于今天。",
+            err_end_before_start: "结束日期不能早于开始日期。",
+            err_izin_max_days: "事假最长只能申请 3 天。",
+            err_sick_min_date: "病假最早可提前 3 天申请。",
+            err_sick_max_date: "病假申请日期不能晚于今天。",
             success_msg: "数据保存成功！",
             update_msg: "数据更新成功！",
             approve_msg: "申请已批准！",
+            approved_at_prefix: "批准时间",
             confirm_clear: "确认清除全部记录？",
             clear: "全部清除",
             excel: "导出 Excel",
@@ -314,12 +329,21 @@
         }
     };
 
-    function getTodayISO() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, "0");
-        const day = String(now.getDate()).padStart(2, "0");
+    function formatDateISO(dateObj) {
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const day = String(dateObj.getDate()).padStart(2, "0");
         return `${year}-${month}-${day}`;
+    }
+
+    function getTodayISO() {
+        return formatDateISO(new Date());
+    }
+
+    function getDaysOffsetISO(offsetDays) {
+        const d = new Date();
+        d.setDate(d.getDate() + offsetDays);
+        return formatDateISO(d);
     }
 
     function getDaysInclusive(startStr, endStr) {
@@ -327,6 +351,22 @@
         const end = new Date(endStr + "T00:00:00");
         const diffMs = end.getTime() - start.getTime();
         return Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+    }
+
+    function getNowDateTimeFormatted() {
+        const locale = currentLang === "zh" ? "zh-CN" : (currentLang === "en" ? "en-GB" : "id-ID");
+        const now = new Date();
+        const datePart = now.toLocaleDateString(locale, {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        });
+        const timePart = now.toLocaleTimeString(locale, {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+        return `${datePart} ${timePart}`;
     }
 
     function getCurrentLang() {
@@ -368,11 +408,12 @@
         document.documentElement.lang = currentLang;
         document.getElementById("txtTitle").textContent = txt.title;
         document.getElementById("txtNameLabel").textContent = txt.name;
+        document.getElementById("txtBackupLabel").textContent = txt.backup;
+        document.getElementById("nama_pengganti").placeholder = txt.backupPlaceholder;
         document.getElementById("txtTypeLabel").textContent = txt.type;
         document.getElementById("ruleHint").textContent = txt.rule_hint;
         document.getElementById("txtReqDateLabel").textContent = txt.reqDate;
         document.getElementById("txtEndDateLabel").textContent = txt.endDate;
-        document.getElementById("txtAppDateLabel").textContent = txt.appDate;
         document.getElementById("txtDescLabel").textContent = txt.desc;
         document.getElementById("keterangan").placeholder = txt.placeholder_desc;
         document.getElementById("txtSendBtn").textContent = isEditing ? txt.update : txt.send;
@@ -383,9 +424,9 @@
         document.getElementById("txtClearBtn").textContent = txt.clear;
 
         document.getElementById("thName").textContent = txt.name;
+        document.getElementById("thBackup").textContent = txt.backup;
         document.getElementById("thType").textContent = txt.type;
         document.getElementById("thReqDate").textContent = txt.reqDate;
-        document.getElementById("thAppDate").textContent = txt.appDate;
         document.getElementById("thDesc").textContent = txt.desc;
         document.getElementById("thStatus").textContent = txt.status;
         document.getElementById("thAction").textContent = txt.action;
@@ -404,7 +445,7 @@
         const q = filter.trim().toLowerCase();
         if (!q) return data;
         return data.filter(item => {
-            const hay = `${item.nama} ${item.tipe} ${item.ket} ${item.tgl_pengajuan || ""} ${item.tgl_persetujuan || ""} ${item.status || ""}`.toLowerCase();
+            const hay = `${item.nama} ${item.pengganti || ""} ${item.tipe} ${item.ket} ${item.tgl_pengajuan || ""} ${item.tgl_selesai || ""} ${item.approved_at || ""} ${item.status || ""}`.toLowerCase();
             return hay.includes(q);
         });
     }
@@ -426,32 +467,45 @@
         } else {
             tbody.innerHTML = pageItems.map(item => {
                 const isApproved = item.status === "Approved";
-                const statusBadge = isApproved
-                    ? `<span class="badge bg-success-subtle text-success border border-success-subtle">${escapeHtml(txt.approved)}</span>`
-                    : `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">${escapeHtml(txt.pending)}</span>`;
+                const daysCount = item.tgl_pengajuan && item.tgl_selesai
+                    ? getDaysInclusive(item.tgl_pengajuan, item.tgl_selesai)
+                    : 1;
 
                 const periodText = item.tgl_selesai && item.tgl_selesai !== item.tgl_pengajuan
-                    ? `${escapeHtml(item.tgl_pengajuan)} s/d ${escapeHtml(item.tgl_selesai)}`
-                    : escapeHtml(item.tgl_pengajuan || "-");
+                    ? `${escapeHtml(item.tgl_pengajuan)} s/d ${escapeHtml(item.tgl_selesai)} <span class="text-muted">(${daysCount}h)</span>`
+                    : `${escapeHtml(item.tgl_pengajuan || "-")} <span class="text-muted">(1h)</span>`;
+
+                const statusCell = isApproved
+                    ? `
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">${escapeHtml(txt.approved)}</span>
+                        <div class="text-muted mt-1" style="font-size: 0.72rem; line-height: 1.25;">
+                            ${escapeHtml(txt.approved_at_prefix)}: <strong>${escapeHtml(item.approved_at || "-")}</strong>
+                        </div>
+                    `
+                    : `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">${escapeHtml(txt.pending)}</span>`;
+
+                const actionCell = isApproved
+                    ? `<span class="text-muted small">-</span>`
+                    : `
+                        <div class="action-btns">
+                            <button type="button" class="btn btn-success btn-sm" onclick="approveItem(${item.id})">
+                                ${escapeHtml(txt.approve)}
+                            </button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="startEdit(${item.id})">
+                                ${escapeHtml(txt.edit)}
+                            </button>
+                        </div>
+                    `;
 
                 return `
                     <tr>
                         <td><span class="fw-semibold text-dark">${escapeHtml(item.nama)}</span></td>
+                        <td class="small">${escapeHtml(item.pengganti || "-")}</td>
                         <td><span class="badge bg-light text-primary border badge-type">${escapeHtml(item.tipe)}</span></td>
                         <td class="small text-nowrap">${periodText}</td>
-                        <td class="small text-nowrap">${escapeHtml(item.tgl_persetujuan || "-")}</td>
                         <td class="text-muted small">${escapeHtml(item.ket)}</td>
-                        <td>${statusBadge}</td>
-                        <td class="text-end">
-                            <div class="action-btns">
-                                <button type="button" class="btn btn-success btn-sm" onclick="approveItem(${item.id})" ${isApproved ? "disabled" : ""}>
-                                    ${escapeHtml(txt.approve)}
-                                </button>
-                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="startEdit(${item.id})">
-                                    ${escapeHtml(txt.edit)}
-                                </button>
-                            </div>
-                        </td>
+                        <td>${statusCell}</td>
+                        <td class="text-end">${actionCell}</td>
                     </tr>
                 `;
             }).join("");
@@ -505,6 +559,7 @@
     function validateEntry(tipe, tglPengajuan, tglSelesai) {
         const txt = dictionary[currentLang];
         const today = getTodayISO();
+        const minSickDate = getDaysOffsetISO(-3);
 
         if (!tglPengajuan || !tglSelesai) return false;
 
@@ -513,15 +568,27 @@
             return false;
         }
 
-        if ((tipe === "Izin" || tipe === "Cuti") && tglPengajuan < today) {
-            alert(txt.err_past_date);
-            return false;
-        }
-
-        if (tipe === "Sakit") {
-            const days = getDaysInclusive(tglPengajuan, tglSelesai);
-            if (days < 3) {
-                alert(txt.err_sick_min_days);
+        if (tipe === "Izin") {
+            if (tglPengajuan < today) {
+                alert(txt.err_past_date);
+                return false;
+            }
+            if (getDaysInclusive(tglPengajuan, tglSelesai) > 3) {
+                alert(txt.err_izin_max_days);
+                return false;
+            }
+        } else if (tipe === "Cuti") {
+            if (tglPengajuan < today) {
+                alert(txt.err_past_date);
+                return false;
+            }
+        } else if (tipe === "Sakit") {
+            if (tglPengajuan < minSickDate) {
+                alert(txt.err_sick_min_date);
+                return false;
+            }
+            if (tglPengajuan > today) {
+                alert(txt.err_sick_max_date);
                 return false;
             }
         }
@@ -534,13 +601,13 @@
         const txt = dictionary[currentLang];
         const editId = document.getElementById("edit_id").value;
         const nama = document.getElementById("nama_karyawan").value.trim();
+        const pengganti = document.getElementById("nama_pengganti").value.trim();
         const tipe = document.getElementById("tipe_absen").value;
         const tglPengajuan = document.getElementById("tgl_pengajuan").value;
         const tglSelesai = document.getElementById("tgl_selesai").value;
-        const tglPersetujuan = document.getElementById("tgl_persetujuan").value || "";
         const ket = document.getElementById("keterangan").value.trim();
 
-        if (!nama || !ket) return;
+        if (!nama || !pengganti || !ket) return;
         if (!validateEntry(tipe, tglPengajuan, tglSelesai)) return;
 
         const records = getRecords();
@@ -548,14 +615,18 @@
         if (editId) {
             const idx = records.findIndex(r => String(r.id) === String(editId));
             if (idx !== -1) {
+                if (records[idx].status === "Approved") {
+                    cancelEdit();
+                    renderHistory(document.getElementById("searchInput").value);
+                    return;
+                }
                 records[idx] = {
                     ...records[idx],
                     nama,
+                    pengganti,
                     tipe,
                     tgl_pengajuan: tglPengajuan,
                     tgl_selesai: tglSelesai,
-                    tgl_persetujuan: tglPersetujuan,
-                    status: tglPersetujuan ? "Approved" : (records[idx].status || "Pending"),
                     ket
                 };
                 saveRecords(records);
@@ -566,11 +637,12 @@
             records.unshift({
                 id: Date.now(),
                 nama,
+                pengganti,
                 tipe,
                 tgl_pengajuan: tglPengajuan,
                 tgl_selesai: tglSelesai,
-                tgl_persetujuan: "",
                 status: "Pending",
+                approved_at: "",
                 ket
             });
             saveRecords(records);
@@ -588,11 +660,11 @@
         if (idx === -1) return;
 
         records[idx].status = "Approved";
-        records[idx].tgl_persetujuan = getTodayISO();
+        records[idx].approved_at = getNowDateTimeFormatted();
         saveRecords(records);
 
         if (String(document.getElementById("edit_id").value) === String(id)) {
-            document.getElementById("tgl_persetujuan").value = records[idx].tgl_persetujuan;
+            cancelEdit();
         }
 
         alert(txt.approve_msg);
@@ -603,18 +675,17 @@
         const txt = dictionary[currentLang];
         const records = getRecords();
         const item = records.find(r => r.id === id);
-        if (!item) return;
+        if (!item || item.status === "Approved") return;
 
         document.getElementById("edit_id").value = item.id;
         document.getElementById("nama_karyawan").value = item.nama;
+        document.getElementById("nama_pengganti").value = item.pengganti || "";
         document.getElementById("tipe_absen").value = item.tipe;
         document.getElementById("tgl_pengajuan").value = item.tgl_pengajuan || getTodayISO();
         document.getElementById("tgl_selesai").value = item.tgl_selesai || item.tgl_pengajuan || getTodayISO();
-        document.getElementById("tgl_persetujuan").value = item.tgl_persetujuan || "";
         document.getElementById("keterangan").value = item.ket;
 
         document.getElementById("editBadge").classList.remove("d-none");
-        document.getElementById("approvalDateGroup").classList.remove("d-none");
         document.getElementById("cancelEditBtn").classList.remove("d-none");
         document.getElementById("txtSendBtn").textContent = txt.update;
 
@@ -625,7 +696,6 @@
         const txt = dictionary[currentLang];
         document.getElementById("edit_id").value = "";
         document.getElementById("editBadge").classList.add("d-none");
-        document.getElementById("approvalDateGroup").classList.add("d-none");
         document.getElementById("cancelEditBtn").classList.add("d-none");
         document.getElementById("txtSendBtn").textContent = txt.send;
         resetFormDefaults();
@@ -636,7 +706,6 @@
         const today = getTodayISO();
         document.getElementById("tgl_pengajuan").value = today;
         document.getElementById("tgl_selesai").value = today;
-        document.getElementById("tgl_persetujuan").value = "";
     }
 
     function downloadExcel() {
@@ -648,24 +717,26 @@
                 <thead>
                     <tr>
                         <th>${escapeHtml(txt.name)}</th>
+                        <th>${escapeHtml(txt.backup)}</th>
                         <th>${escapeHtml(txt.type)}</th>
                         <th>${escapeHtml(txt.reqDate)}</th>
                         <th>${escapeHtml(txt.endDate)}</th>
-                        <th>${escapeHtml(txt.appDate)}</th>
                         <th>${escapeHtml(txt.desc)}</th>
                         <th>${escapeHtml(txt.status)}</th>
+                        <th>${escapeHtml(txt.appInfo)}</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${rows.map(item => `
                         <tr>
                             <td>${escapeHtml(item.nama)}</td>
+                            <td>${escapeHtml(item.pengganti || "")}</td>
                             <td>${escapeHtml(item.tipe)}</td>
                             <td>${escapeHtml(item.tgl_pengajuan || "")}</td>
                             <td>${escapeHtml(item.tgl_selesai || "")}</td>
-                            <td>${escapeHtml(item.tgl_persetujuan || "")}</td>
                             <td>${escapeHtml(item.ket)}</td>
                             <td>${escapeHtml(item.status === "Approved" ? txt.approved : txt.pending)}</td>
+                            <td>${escapeHtml(item.approved_at || "")}</td>
                         </tr>
                     `).join("")}
                 </tbody>
