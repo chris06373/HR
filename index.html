@@ -674,6 +674,12 @@ function showModule(moduleName) {
         window.location.href = "kpi.html";
         return;
     }
+
+    // Redirect ke halaman leave.html
+    if (moduleName === "leave") {
+        window.location.href = "leave.html";
+        return;
+    }
     
     const module = modules[moduleName];
 
