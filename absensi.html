@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -81,6 +80,15 @@
             border-radius: 8px;
         }
 
+        .schedule-hint {
+            font-size: 0.78rem;
+            background-color: #f0f6ff;
+            border: 1px solid #cfe2ff;
+            color: #084298;
+            border-radius: 10px;
+            padding: 8px 12px;
+        }
+
         .table td {
             vertical-align: middle;
         }
@@ -96,7 +104,7 @@
             }
 
             .table {
-                min-width: 450px;
+                min-width: 520px;
             }
         }
     </style>
@@ -108,17 +116,17 @@
 <nav class="navbar navbar-light mb-4 shadow-sm">
     <div class="container d-flex justify-content-between align-items-center">
 
-        <a href="index.html" class="btn-link" a href = "index.html">Home </a>
+        <a href="index.html" id="terminalTitle" class="btn-link text-decoration-none fw-bold">Home</a>
 
         <div class="d-flex align-items-center gap-2">
 
             <div class="btn-group">
-                <button class="btn btn-sm btn-outline-primary lang-btn" data-lang="id">ID</button>
-                <button class="btn btn-sm btn-outline-primary lang-btn" data-lang="en">EN</button>
-                <button class="btn btn-sm btn-outline-primary lang-btn" data-lang="zh">ZH</button>
+                <button type="button" class="btn btn-sm btn-outline-primary lang-btn" data-lang="id">ID</button>
+                <button type="button" class="btn btn-sm btn-outline-primary lang-btn" data-lang="en">EN</button>
+                <button type="button" class="btn btn-sm btn-outline-primary lang-btn" data-lang="zh">ZH</button>
             </div>
 
-            <button onclick="clearAllData()" id="btnClear"
+            <button type="button" onclick="clearAllData()" id="btnClear"
                 class="btn btn-outline-danger btn-sm rounded-pill">
                 Clear Data
             </button>
@@ -143,7 +151,7 @@
                     00:00:00
                 </div>
 
-                <p class="text-muted small mb-4 fw-medium" id="currentDate">
+                <p class="text-muted small mb-3 fw-medium" id="currentDate">
                     Loading date...
                 </p>
 
@@ -166,6 +174,44 @@
                             placeholder="Type name..."
                             required
                         >
+
+                        <div id="employeeQuotaInfo" class="small mt-1 fw-semibold text-muted"></div>
+
+                    </div>
+
+                    <!-- TIPE KERJA: HARIAN / SHIFT -->
+                    <div class="text-start mb-3">
+
+                        <label class="form-label small fw-bold text-secondary d-block" id="labelWorkMode">
+                            Work Type
+                        </label>
+
+                        <div class="btn-group w-100 mb-2" role="group">
+                            <input type="radio" class="btn-check" name="workMode" id="modeDaily" value="daily" checked>
+                            <label class="btn btn-outline-primary btn-sm py-2 fw-semibold" for="modeDaily" id="labelDaily">
+                                Kerja Harian
+                            </label>
+
+                            <input type="radio" class="btn-check" name="workMode" id="modeShift" value="shift">
+                            <label class="btn btn-outline-primary btn-sm py-2 fw-semibold" for="modeShift" id="labelShift">
+                                Shift
+                            </label>
+                        </div>
+
+                        <!-- PILIHAN SHIFT (MUNCUL SAAT MODE SHIFT) -->
+                        <div id="shiftSelectorBox" class="d-none mb-2">
+                            <label class="form-label small fw-bold text-secondary" id="labelSelectShift">
+                                Select Shift
+                            </label>
+                            <select id="shiftSelect" class="form-select bg-light border-0">
+                                <option value="morning">Shift Pagi (06:00 - 14:00)</option>
+                                <option value="afternoon">Shift Siang (14:00 - 22:00)</option>
+                                <option value="night">Shift Malam (22:00 - 06:00)</option>
+                            </select>
+                        </div>
+
+                        <!-- INFO PENYESUAIAN WAKTU -->
+                        <div id="scheduleInfo" class="schedule-hint text-start"></div>
 
                     </div>
 
@@ -287,6 +333,60 @@
 <script>
 
 // ========================================
+// SCHEDULE & TIME CONFIGURATION (WIB)
+// ========================================
+
+const DAILY_SCHEDULE = {
+    startHour: 8,
+    startMinute: 0,
+    endHour: 17,
+    endMinute: 0
+};
+
+const SHIFT_CONFIG = {
+    morning: {
+        id: 'morning',
+        startHour: 6,
+        startMinute: 0,
+        endHour: 14,
+        endMinute: 0,
+        overnight: false,
+        labels: {
+            id: 'Shift Pagi',
+            en: 'Morning Shift',
+            zh: '早班'
+        }
+    },
+    afternoon: {
+        id: 'afternoon',
+        startHour: 14,
+        startMinute: 0,
+        endHour: 22,
+        endMinute: 0,
+        overnight: false,
+        labels: {
+            id: 'Shift Siang',
+            en: 'Afternoon Shift',
+            zh: '中班'
+        }
+    },
+    night: {
+        id: 'night',
+        startHour: 22,
+        startMinute: 0,
+        endHour: 6,
+        endMinute: 0,
+        overnight: true,
+        labels: {
+            id: 'Shift Malam',
+            en: 'Night Shift',
+            zh: '夜班'
+        }
+    }
+};
+
+
+// ========================================
 // TRANSLATION CONFIGURATION
 // ========================================
 
@@ -295,8 +395,11 @@ const translations = {
     id: {
         title: 'Sistem Absensi Local',
         terminal: 'Home',
-        submission_title: 'Pengajuan Cuti',
         emp_name: 'Nama Karyawan',
+        work_mode: 'Tipe Kerja',
+        daily_work: 'Kerja Harian',
+        shift_work: 'Shift',
+        select_shift: 'Pilih Shift',
         take_selfie: 'Ambil Foto',
         in: 'Masuk',
         out: 'Pulang',
@@ -308,19 +411,34 @@ const translations = {
         time: 'Waktu',
         photo: 'Foto',
         map: 'Peta',
-        search_placeholder: 'Cari nama atau status...',
+        search_placeholder: 'Cari nama, shift, atau status...',
         clear_data: 'Hapus Data',
         confirm_clear: 'Hapus semua data absensi di perangkat ini?',
         success_msg: 'Berhasil Absen',
         input_placeholder: 'Ketik nama...',
-        no_data: 'Belum ada data absensi'
+        no_data: 'Belum ada data absensi',
+        daily_desc: 'Kerja Harian (08:00 - 17:00 WIB)',
+        shift_auto_hint: 'Rekomendasi waktu saat ini',
+        on_time: 'Tepat Waktu',
+        late: 'Terlambat',
+        early_out: 'Pulang Awal',
+        overtime: 'Lembur',
+        already_in: 'Sudah Check-In 1x pada periode ini',
+        need_in_first: 'Harus Check-In terlebih dahulu sebelum Check-Out',
+        already_completed: 'Sudah Check-In 1x dan Check-Out 1x pada periode ini',
+        ready_in: 'Siap Check-In (1x)',
+        ready_out: 'Sudah Check-In — Siap Check-Out (1x)',
+        completed_badge: 'Selesai (1x Masuk & 1x Pulang)'
     },
 
     en: {
         title: 'Local Attendance System',
         terminal: 'Home',
-        submission_title: 'Leave Request',
         emp_name: 'Employee Name',
+        work_mode: 'Work Type',
+        daily_work: 'Daily Work',
+        shift_work: 'Shift',
+        select_shift: 'Select Shift',
         take_selfie: 'Take Selfie',
         in: 'Clock In',
         out: 'Clock Out',
@@ -332,19 +450,34 @@ const translations = {
         time: 'Time',
         photo: 'Photo',
         map: 'Map',
-        search_placeholder: 'Search name or status...',
+        search_placeholder: 'Search name, shift, or status...',
         clear_data: 'Clear Data',
         confirm_clear: 'Delete all attendance data on this device?',
         success_msg: 'Attendance Success',
         input_placeholder: 'Type name...',
-        no_data: 'No attendance records'
+        no_data: 'No attendance records',
+        daily_desc: 'Daily Work (08:00 - 17:00 WIB)',
+        shift_auto_hint: 'Recommended for current time',
+        on_time: 'On Time',
+        late: 'Late',
+        early_out: 'Early Leave',
+        overtime: 'Overtime',
+        already_in: 'Already Clocked In once for this period',
+        need_in_first: 'Must Clock In before Clock Out',
+        already_completed: 'Already Clocked In once and Clocked Out once for this period',
+        ready_in: 'Ready to Clock In (1x)',
+        ready_out: 'Clocked In — Ready to Clock Out (1x)',
+        completed_badge: 'Completed (1x In & 1x Out)'
     },
 
     zh: {
         title: '本地考勤系统',
         terminal: '数字考勤',
-        submission_title: '请假申请',
         emp_name: '员工姓名',
+        work_mode: '工作类型',
+        daily_work: '日常工作',
+        shift_work: '排班',
+        select_shift: '选择班次',
         take_selfie: '自拍',
         in: '签到',
         out: '签退',
@@ -356,12 +489,24 @@ const translations = {
         time: '时间',
         photo: '照片',
         map: '地图',
-        search_placeholder: '搜索姓名或状态...',
+        search_placeholder: '搜索姓名、班次或状态...',
         clear_data: '清除数据',
         confirm_clear: '删除此设备上的所有考勤数据？',
         success_msg: '签到成功',
         input_placeholder: '输入姓名...',
-        no_data: '暂无考勤记录'
+        no_data: '暂无考勤记录',
+        daily_desc: '日常工作 (08:00 - 17:00 WIB)',
+        shift_auto_hint: '当前时间推荐班次',
+        on_time: '准时',
+        late: '迟到',
+        early_out: '早退',
+        overtime: '加班',
+        already_in: '本周期已完成 1 次签到',
+        need_in_first: '必须先签到才能签退',
+        already_completed: '本周期已完成 1 次签到和 1 次签退',
+        ready_in: '可签到 (限1次)',
+        ready_out: '已签到 — 可签退 (限1次)',
+        completed_badge: '已完成 (1次签到 & 1次签退)'
     }
 
 };
@@ -408,44 +553,28 @@ function applyTranslations() {
 
     document.title = uiLabels.title;
 
-    document.getElementById('terminalTitle').textContent =
-        uiLabels.terminal;
+    document.getElementById('terminalTitle').textContent = uiLabels.terminal;
+    document.getElementById('labelName').textContent = uiLabels.emp_name;
+    document.getElementById('namaKaryawan').placeholder = uiLabels.input_placeholder;
+    document.getElementById('labelWorkMode').textContent = uiLabels.work_mode;
+    document.getElementById('labelDaily').textContent = uiLabels.daily_work;
+    document.getElementById('labelShift').textContent = uiLabels.shift_work;
+    document.getElementById('labelSelectShift').textContent = uiLabels.select_shift;
+    document.getElementById('labelSelfie').textContent = uiLabels.take_selfie;
+    document.getElementById('btnMasuk').textContent = uiLabels.in;
+    document.getElementById('btnPulang').textContent = uiLabels.out;
+    document.getElementById('labelLog').textContent = uiLabels.log_attendance;
+    document.getElementById('labelStaff').textContent = uiLabels.staff;
+    document.getElementById('labelTime').textContent = uiLabels.time;
+    document.getElementById('labelMap').textContent = uiLabels.map;
+    document.getElementById('labelPhoto').textContent = uiLabels.photo;
+    document.getElementById('fuzzySearch').placeholder = uiLabels.search_placeholder;
+    document.getElementById('btnClear').textContent = uiLabels.clear_data;
 
-    document.getElementById('labelName').textContent =
-        uiLabels.emp_name;
-
-    document.getElementById('namaKaryawan').placeholder =
-        uiLabels.input_placeholder;
-
-    document.getElementById('labelSelfie').textContent =
-        uiLabels.take_selfie;
-
-    document.getElementById('btnMasuk').textContent =
-        uiLabels.in;
-
-    document.getElementById('btnPulang').textContent =
-        uiLabels.out;
-
-    document.getElementById('labelLog').textContent =
-        uiLabels.log_attendance;
-
-    document.getElementById('labelStaff').textContent =
-        uiLabels.staff;
-
-    document.getElementById('labelTime').textContent =
-        uiLabels.time;
-
-    document.getElementById('labelMap').textContent =
-        uiLabels.map;
-
-    document.getElementById('labelPhoto').textContent =
-        uiLabels.photo;
-
-    document.getElementById('fuzzySearch').placeholder =
-        uiLabels.search_placeholder;
-
-    document.getElementById('btnClear').textContent =
-        uiLabels.clear_data;
+    updateShiftOptionLabels();
+    updateScheduleInfo();
+    updateEmployeeQuotaInfo();
+    checkReady();
 
     document.querySelectorAll('.lang-btn').forEach(btn => {
 
@@ -484,7 +613,162 @@ let userCoords = {
     lng: null
 };
 
+let userManuallySelectedShift = false;
+let lastAutoShift = null;
+
 const video = document.getElementById('video');
+
+
+// ========================================
+// TIME & SCHEDULE HELPERS (ASIA/JAKARTA)
+// ========================================
+
+function getJakartaParts(date = new Date()) {
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Jakarta',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+
+    const parts = formatter.formatToParts(date);
+    const map = {};
+    parts.forEach(p => {
+        if (p.type !== 'literal') map[p.type] = p.value;
+    });
+
+    return {
+        year: Number(map.year),
+        month: Number(map.month),
+        day: Number(map.day),
+        hour: Number(map.hour),
+        minute: Number(map.minute),
+        second: Number(map.second),
+        dateKey: `${map.year}-${map.month}-${map.day}`
+    };
+}
+
+function shiftDateKey(dateKey, deltaDays) {
+    const [y, m, d] = dateKey.split('-').map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d + deltaDays));
+    const yy = dt.getUTCFullYear();
+    const mm = String(dt.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(dt.getUTCDate()).padStart(2, '0');
+    return `${yy}-${mm}-${dd}`;
+}
+
+function getWorkMode() {
+    const checked = document.querySelector('input[name="workMode"]:checked');
+    return checked ? checked.value : 'daily';
+}
+
+function detectRecommendedShift(jakartaParts) {
+    const mins = jakartaParts.hour * 60 + jakartaParts.minute;
+    // 05:00 - 13:59 -> Shift Pagi
+    if (mins >= 5 * 60 && mins < 14 * 60) return 'morning';
+    // 14:00 - 21:59 -> Shift Siang
+    if (mins >= 14 * 60 && mins < 22 * 60) return 'afternoon';
+    // 22:00 - 04:59 -> Shift Malam
+    return 'night';
+}
+
+function getActivePeriodKey(workMode, shiftId, jakartaParts) {
+    if (workMode === 'daily') {
+        return `daily:${jakartaParts.dateKey}`;
+    }
+
+    const shift = SHIFT_CONFIG[shiftId] || SHIFT_CONFIG.morning;
+    if (shift.overnight && jakartaParts.hour < 12) {
+        // Jam dini hari untuk shift malam milik tanggal mulai shift kemarin
+        const startDate = shiftDateKey(jakartaParts.dateKey, -1);
+        return `shift:${shift.id}:${startDate}`;
+    }
+
+    return `shift:${shift.id}:${jakartaParts.dateKey}`;
+}
+
+function evaluatePunctuality(tipe, workMode, shiftId, jakartaParts) {
+    const currentMins = jakartaParts.hour * 60 + jakartaParts.minute;
+
+    if (workMode === 'daily') {
+        const startMins = DAILY_SCHEDULE.startHour * 60 + DAILY_SCHEDULE.startMinute;
+        const endMins = DAILY_SCHEDULE.endHour * 60 + DAILY_SCHEDULE.endMinute;
+
+        if (tipe === 'in') {
+            return currentMins <= startMins ? uiLabels.on_time : uiLabels.late;
+        } else {
+            if (currentMins < endMins) return uiLabels.early_out;
+            if (currentMins > endMins + 15) return uiLabels.overtime;
+            return uiLabels.on_time;
+        }
+    }
+
+    const shift = SHIFT_CONFIG[shiftId] || SHIFT_CONFIG.morning;
+    const startMins = shift.startHour * 60 + shift.startMinute;
+    let endMins = shift.endHour * 60 + shift.endMinute;
+    let adjustedCurrent = currentMins;
+
+    if (shift.overnight) {
+        endMins += 24 * 60;
+        if (currentMins < 12 * 60) {
+            adjustedCurrent += 24 * 60;
+        }
+    }
+
+    if (tipe === 'in') {
+        return adjustedCurrent <= startMins ? uiLabels.on_time : uiLabels.late;
+    } else {
+        if (adjustedCurrent < endMins) return uiLabels.early_out;
+        if (adjustedCurrent > endMins + 15) return uiLabels.overtime;
+        return uiLabels.on_time;
+    }
+}
+
+function updateShiftOptionLabels() {
+    const select = document.getElementById('shiftSelect');
+    Array.from(select.options).forEach(opt => {
+        const cfg = SHIFT_CONFIG[opt.value];
+        if (!cfg) return;
+        const rangeText = cfg.overnight ? '22:00 - 06:00' :
+            `${String(cfg.startHour).padStart(2, '0')}:00 - ${String(cfg.endHour).padStart(2, '0')}:00`;
+        opt.textContent = `${cfg.labels[currentLang]} (${rangeText})`;
+    });
+}
+
+function syncShiftWithCurrentTime() {
+    const parts = getJakartaParts();
+    const recommended = detectRecommendedShift(parts);
+
+    if (recommended !== lastAutoShift) {
+        lastAutoShift = recommended;
+        if (!userManuallySelectedShift) {
+            document.getElementById('shiftSelect').value = recommended;
+        }
+    }
+}
+
+function updateScheduleInfo() {
+    const workMode = getWorkMode();
+    const shiftId = document.getElementById('shiftSelect').value;
+    const box = document.getElementById('scheduleInfo');
+    const parts = getJakartaParts();
+    const recommended = detectRecommendedShift(parts);
+    const recLabel = SHIFT_CONFIG[recommended].labels[currentLang];
+
+    if (workMode === 'daily') {
+        box.innerHTML = `<i class="bi bi-clock me-1"></i> ${uiLabels.daily_desc}`;
+    } else {
+        const currentShiftLabel = SHIFT_CONFIG[shiftId].labels[currentLang];
+        box.innerHTML = `
+            <i class="bi bi-calendar2-check me-1"></i>
+            <strong>${currentShiftLabel}</strong> — ${uiLabels.shift_auto_hint}: <strong>${recLabel}</strong>
+        `;
+    }
+}
 
 
 // ========================================
@@ -514,11 +798,38 @@ function updateClock() {
             }
         ) + ' (Asia/Jakarta)';
 
+    syncShiftWithCurrentTime();
+    updateScheduleInfo();
 }
 
 updateClock();
 
 setInterval(updateClock, 1000);
+
+
+// ========================================
+// WORK MODE & SHIFT EVENTS
+// ========================================
+
+document.querySelectorAll('input[name="workMode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        const isShift = getWorkMode() === 'shift';
+        document.getElementById('shiftSelectorBox').classList.toggle('d-none', !isShift);
+        if (isShift && !userManuallySelectedShift) {
+            document.getElementById('shiftSelect').value = detectRecommendedShift(getJakartaParts());
+        }
+        updateScheduleInfo();
+        updateEmployeeQuotaInfo();
+        checkReady();
+    });
+});
+
+document.getElementById('shiftSelect').addEventListener('change', () => {
+    userManuallySelectedShift = true;
+    updateScheduleInfo();
+    updateEmployeeQuotaInfo();
+    checkReady();
+});
 
 
 // ========================================
@@ -640,30 +951,86 @@ function takeSnapshot() {
 
 
 // ========================================
+// ONCE-PER-PERIOD CHECK-IN / CHECK-OUT STATE
+// ========================================
+
+function getEmployeePeriodRecords(nama, periodKey) {
+    const cleanName = nama.trim().toLowerCase();
+    if (!cleanName) return { hasIn: false, hasOut: false };
+
+    const listAbsensi = JSON.parse(localStorage.getItem('absensi_data')) || [];
+    const matching = listAbsensi.filter(item =>
+        (item.nama_karyawan || '').trim().toLowerCase() === cleanName &&
+        item.period_key === periodKey
+    );
+
+    return {
+        hasIn: matching.some(item => item.tipe_kode === 'in'),
+        hasOut: matching.some(item => item.tipe_kode === 'out')
+    };
+}
+
+function updateEmployeeQuotaInfo() {
+    const nama = document.getElementById('namaKaryawan').value.trim();
+    const infoEl = document.getElementById('employeeQuotaInfo');
+
+    if (nama.length <= 2) {
+        infoEl.textContent = '';
+        return;
+    }
+
+    const workMode = getWorkMode();
+    const shiftId = document.getElementById('shiftSelect').value;
+    const periodKey = getActivePeriodKey(workMode, shiftId, getJakartaParts());
+    const { hasIn, hasOut } = getEmployeePeriodRecords(nama, periodKey);
+
+    if (hasIn && hasOut) {
+        infoEl.className = 'small mt-1 fw-semibold text-secondary';
+        infoEl.textContent = uiLabels.already_completed;
+    } else if (hasIn) {
+        infoEl.className = 'small mt-1 fw-semibold text-primary';
+        infoEl.textContent = uiLabels.ready_out;
+    } else {
+        infoEl.className = 'small mt-1 fw-semibold text-success';
+        infoEl.textContent = uiLabels.ready_in;
+    }
+}
+
+
+// ========================================
 // CHECK FORM READY
 // ========================================
 
 function checkReady() {
 
-    const nama =
-        document.getElementById('namaKaryawan').value.trim();
+    const nama = document.getElementById('namaKaryawan').value.trim();
 
-    const isReady =
+    const baseFormReady =
         nama.length > 2 &&
         selfieBase64 !== null &&
         userCoords.lat !== null &&
         userCoords.lng !== null;
 
-    document.getElementById('btnMasuk').disabled = !isReady;
+    const workMode = getWorkMode();
+    const shiftId = document.getElementById('shiftSelect').value;
+    const periodKey = getActivePeriodKey(workMode, shiftId, getJakartaParts());
+    const { hasIn, hasOut } = getEmployeePeriodRecords(nama, periodKey);
 
-    document.getElementById('btnPulang').disabled = !isReady;
+    // Masuk hanya 1 kali per periode
+    const canIn = baseFormReady && !hasIn;
+
+    // Pulang hanya 1 kali per periode dan setelah Masuk
+    const canOut = baseFormReady && hasIn && !hasOut;
+
+    document.getElementById('btnMasuk').disabled = !canIn;
+    document.getElementById('btnPulang').disabled = !canOut;
 
 }
 
-document.getElementById('namaKaryawan').addEventListener(
-    'input',
-    checkReady
-);
+document.getElementById('namaKaryawan').addEventListener('input', () => {
+    updateEmployeeQuotaInfo();
+    checkReady();
+});
 
 
 // ========================================
@@ -672,8 +1039,7 @@ document.getElementById('namaKaryawan').addEventListener(
 
 function submitAbsen(tipe) {
 
-    const nama =
-        document.getElementById('namaKaryawan').value.trim();
+    const nama = document.getElementById('namaKaryawan').value.trim();
 
     if (
         nama.length <= 2 ||
@@ -681,57 +1047,72 @@ function submitAbsen(tipe) {
         userCoords.lat === null ||
         userCoords.lng === null
     ) {
-
         showNotif('Please complete the attendance form!', 'danger');
-
         return;
-
     }
 
-    const waktu = new Date().toISOString();
+    const now = new Date();
+    const jakartaParts = getJakartaParts(now);
+    const workMode = getWorkMode();
+    const shiftId = document.getElementById('shiftSelect').value;
+    const periodKey = getActivePeriodKey(workMode, shiftId, jakartaParts);
+    const { hasIn, hasOut } = getEmployeePeriodRecords(nama, periodKey);
+
+    if (tipe === 'in' && hasIn) {
+        showNotif(uiLabels.already_in, 'warning');
+        checkReady();
+        return;
+    }
+
+    if (tipe === 'out' && !hasIn) {
+        showNotif(uiLabels.need_in_first, 'warning');
+        checkReady();
+        return;
+    }
+
+    if (tipe === 'out' && hasOut) {
+        showNotif(uiLabels.already_completed, 'warning');
+        checkReady();
+        return;
+    }
 
     const tipeLabel = uiLabels[tipe];
+    const modeLabel = workMode === 'daily'
+        ? uiLabels.daily_work
+        : SHIFT_CONFIG[shiftId].labels[currentLang];
+
+    const punctualityLabel = evaluatePunctuality(tipe, workMode, shiftId, jakartaParts);
 
     const dataBaru = {
-
         nama_karyawan: nama,
-
+        tipe_kode: tipe,
         tipe_absen: tipeLabel,
-
-        waktu: waktu,
-
+        work_mode: workMode,
+        shift_id: workMode === 'shift' ? shiftId : null,
+        mode_label: modeLabel,
+        punctuality_label: punctualityLabel,
+        period_key: periodKey,
+        waktu: now.toISOString(),
         lat: userCoords.lat,
-
         lng: userCoords.lng,
-
         foto: selfieBase64
-
     };
 
-
-    let listAbsensi =
-        JSON.parse(localStorage.getItem('absensi_data')) || [];
+    let listAbsensi = JSON.parse(localStorage.getItem('absensi_data')) || [];
 
     listAbsensi.unshift(dataBaru);
 
-    localStorage.setItem(
-        'absensi_data',
-        JSON.stringify(listAbsensi)
-    );
-
+    localStorage.setItem('absensi_data', JSON.stringify(listAbsensi));
 
     // RESET FORM
-
     selfieBase64 = null;
-
     document.getElementById('namaKaryawan').value = '';
-
+    updateEmployeeQuotaInfo();
     checkReady();
-
-    renderTable();
+    renderTable(document.getElementById('fuzzySearch').value);
 
     showNotif(
-        `${uiLabels.success_msg}: ${tipeLabel}`,
+        `${uiLabels.success_msg}: ${tipeLabel} (${modeLabel} • ${punctualityLabel})`,
         'success'
     );
 
@@ -744,29 +1125,22 @@ function submitAbsen(tipe) {
 
 function renderTable(filter = '') {
 
-    const tbody =
-        document.getElementById('attendanceTableBody');
+    const tbody = document.getElementById('attendanceTableBody');
 
-    const data =
-        JSON.parse(localStorage.getItem('absensi_data')) || [];
+    const data = JSON.parse(localStorage.getItem('absensi_data')) || [];
 
     tbody.innerHTML = '';
 
     const filteredData = data.filter(item => {
 
-        return (
+        const haystack = [
+            item.nama_karyawan,
+            item.tipe_absen,
+            item.mode_label,
+            item.punctuality_label
+        ].filter(Boolean).join(' ').toLowerCase();
 
-            item.nama_karyawan
-                .toLowerCase()
-                .includes(filter.toLowerCase())
-
-            ||
-
-            item.tipe_absen
-                .toLowerCase()
-                .includes(filter.toLowerCase())
-
-        );
+        return haystack.includes(filter.toLowerCase());
 
     });
 
@@ -798,87 +1172,83 @@ function renderTable(filter = '') {
             }
         );
 
+        const displayType = item.tipe_kode && uiLabels[item.tipe_kode]
+            ? uiLabels[item.tipe_kode]
+            : item.tipe_absen;
+
+        const displayMode = item.work_mode === 'daily'
+            ? uiLabels.daily_work
+            : (item.shift_id && SHIFT_CONFIG[item.shift_id]
+                ? SHIFT_CONFIG[item.shift_id].labels[currentLang]
+                : (item.mode_label || ''));
 
         const tr = document.createElement('tr');
-
         tr.className = 'small border-bottom align-middle';
-
 
         const tdNama = document.createElement('td');
 
         const namaDiv = document.createElement('div');
-
         namaDiv.className = 'fw-bold';
-
         namaDiv.textContent = item.nama_karyawan;
 
+        const badgeGroup = document.createElement('div');
+        badgeGroup.className = 'd-flex flex-wrap gap-1 mt-1';
 
-        const badge = document.createElement('span');
+        const badgeType = document.createElement('span');
+        badgeType.className = `badge ${item.tipe_kode === 'out' ? 'bg-danger' : 'bg-primary'} px-2`;
+        badgeType.style.fontSize = '0.62rem';
+        badgeType.textContent = displayType.toUpperCase();
+        badgeGroup.appendChild(badgeType);
 
-        badge.className = 'badge bg-primary px-2';
+        if (displayMode) {
+            const badgeMode = document.createElement('span');
+            badgeMode.className = 'badge bg-secondary px-2';
+            badgeMode.style.fontSize = '0.62rem';
+            badgeMode.textContent = displayMode;
+            badgeGroup.appendChild(badgeMode);
+        }
 
-        badge.style.fontSize = '0.6rem';
-
-        badge.textContent = item.tipe_absen.toUpperCase();
-
+        if (item.punctuality_label) {
+            const badgeStatus = document.createElement('span');
+            badgeStatus.className = 'badge bg-info text-dark px-2';
+            badgeStatus.style.fontSize = '0.62rem';
+            badgeStatus.textContent = item.punctuality_label;
+            badgeGroup.appendChild(badgeStatus);
+        }
 
         tdNama.appendChild(namaDiv);
-
-        tdNama.appendChild(badge);
-
+        tdNama.appendChild(badgeGroup);
 
         const tdWaktu = document.createElement('td');
-
         tdWaktu.className = 'fw-bold';
-
         tdWaktu.textContent = jam;
 
-
         const tdMap = document.createElement('td');
-
         tdMap.className = 'text-center';
 
         const mapLink = document.createElement('a');
-
-        mapLink.href =
-            `https://www.google.com/maps?q=${item.lat},${item.lng}`;
-
+        mapLink.href = `https://www.google.com/maps?q=${item.lat},${item.lng}`;
         mapLink.target = '_blank';
-
         mapLink.rel = 'noopener noreferrer';
-
-        mapLink.className =
-            'btn btn-sm btn-light border text-danger';
-
-        mapLink.innerHTML =
-            '<i class="bi bi-geo-alt-fill"></i>';
+        mapLink.className = 'btn btn-sm btn-light border text-danger';
+        mapLink.innerHTML = '<i class="bi bi-geo-alt-fill"></i>';
 
         tdMap.appendChild(mapLink);
 
-
         const tdFoto = document.createElement('td');
-
         tdFoto.className = 'text-end';
 
         const img = document.createElement('img');
-
         img.src = item.foto;
-
         img.alt = 'Attendance Photo';
-
         img.className = 'attendance-photo shadow-sm';
 
         tdFoto.appendChild(img);
 
-
         tr.appendChild(tdNama);
-
         tr.appendChild(tdWaktu);
-
         tr.appendChild(tdMap);
-
         tr.appendChild(tdFoto);
-
 
         tbody.appendChild(tr);
 
@@ -911,7 +1281,9 @@ function clearAllData() {
 
         localStorage.removeItem('absensi_data');
 
-        renderTable();
+        updateEmployeeQuotaInfo();
+        checkReady();
+        renderTable(document.getElementById('fuzzySearch').value);
 
     }
 
@@ -924,8 +1296,7 @@ function clearAllData() {
 
 function showNotif(msg, type) {
 
-    const container =
-        document.getElementById('notifContainer');
+    const container = document.getElementById('notifContainer');
 
     container.innerHTML = `
         <div class="alert alert-${type} py-2 small border-0 shadow-sm">
@@ -946,8 +1317,8 @@ function showNotif(msg, type) {
 // INITIALIZATION
 // ========================================
 
+syncShiftWithCurrentTime();
 applyTranslations();
-
 renderTable();
 
 </script>
