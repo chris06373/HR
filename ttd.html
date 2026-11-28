@@ -12,9 +12,9 @@
       font-size: 0.95rem;
     }
 
-    #sigCanvas {
+    .sig-canvas {
       width: 100%;
-      height: 190px;
+      height: 155px;
       border: 2px dashed #adb5bd;
       border-radius: 0.5rem;
       background-color: #ffffff;
@@ -33,7 +33,7 @@
       border: 1px solid #ced4da;
       border-radius: 0.375rem;
       padding: 0.4rem;
-      min-height: 78px;
+      min-height: 76px;
       background: #fafafa;
       display: flex;
       flex-direction: column;
@@ -42,16 +42,14 @@
     }
 
     .sig-box-preview img {
-      max-height: 54px;
+      max-height: 52px;
       max-width: 100%;
     }
 
-    /* Area cetak khusus disembunyikan di layar normal */
     #areaCetakKhusus {
       display: none;
     }
 
-    /* Cetak 1 halaman sesuai dokumen yang dipilih */
     @media print {
       @page {
         size: A4 portrait;
@@ -93,55 +91,27 @@
 <body>
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+  <nav class="navbar navbar-dark bg-dark sticky-top shadow-sm">
     <div class="container-fluid">
       <a class="navbar-brand fw-bold" href="#">
         <i class="bi bi-vector-pen me-2 text-warning"></i>e-Sign Suite
       </a>
-
-      <div class="d-flex align-items-center gap-2 ms-auto">
-        <span class="text-light small d-none d-md-inline">Mode Kerja:</span>
-        <div class="btn-group btn-group-sm" role="group" aria-label="Mode Kerja">
-          <input type="radio" class="btn-check" name="modeKerja" id="modeUsaha" value="Usaha" checked />
-          <label class="btn btn-outline-warning" for="modeUsaha">
-            <i class="bi bi-shop me-1"></i>Usaha
-          </label>
-
-          <input type="radio" class="btn-check" name="modeKerja" id="modeKantor" value="Perkantoran" />
-          <label class="btn btn-outline-info" for="modeKantor">
-            <i class="bi bi-building me-1"></i>Perkantoran
-          </label>
-        </div>
-      </div>
     </div>
   </nav>
 
   <!-- Kontainer 1 Halaman -->
   <main class="container py-3 py-md-4">
 
-    <!-- Status Mode (On-Click / On-Change, Tanpa Listener) -->
-    <div class="alert alert-light border d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-      <div>
-        <span class="badge bg-primary me-1" id="badgeModeAktif">Mode Usaha</span>
-        <span id="deskripsiModeAktif" class="text-muted small">
-          Alur cepat untuk transaksi langsung (PO &amp; Invoice) dengan tanda tangan wajib sebelum arsip.
-        </span>
-      </div>
-      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="sinkronManual()">
-        <i class="bi bi-arrow-clockwise me-1"></i>Muat Ulang Arsip
-      </button>
-    </div>
-
     <!-- Tab Navigasi -->
     <ul class="nav nav-tabs nav-fill mb-3 bg-white rounded-top shadow-sm pt-1 px-1" id="mainTabs" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active fw-semibold" id="tab-ttd-btn" data-bs-toggle="tab" data-bs-target="#tab-ttd" type="button" role="tab">
-          <i class="bi bi-pen me-1"></i>1. Buat &amp; TTD
+        <button class="nav-link active fw-semibold" id="tab-template-btn" data-bs-toggle="tab" data-bs-target="#tab-template" type="button" role="tab">
+          <i class="bi bi-file-earmark-text me-1"></i>1. Template Surat
         </button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link fw-semibold" id="tab-template-btn" data-bs-toggle="tab" data-bs-target="#tab-template" type="button" role="tab">
-          <i class="bi bi-file-earmark-text me-1"></i>2. Template Surat
+        <button class="nav-link fw-semibold" id="tab-ttd-btn" data-bs-toggle="tab" data-bs-target="#tab-ttd" type="button" role="tab">
+          <i class="bi bi-pen me-1"></i>2. Buat &amp; TTD
         </button>
       </li>
       <li class="nav-item" role="presentation">
@@ -153,104 +123,8 @@
 
     <div class="tab-content" id="mainTabsContent">
 
-      <!-- ==================== TAB 1: BUAT & TTD ==================== -->
-      <div class="tab-pane fade show active" id="tab-ttd" role="tabpanel">
-        <div class="row g-3">
-          <div class="col-12 col-lg-7">
-            <div class="card shadow-sm border-0">
-              <div class="card-header bg-white fw-bold">
-                <i class="bi bi-pencil-square me-1 text-primary"></i>Form Dokumen &amp; Tanda Tangan (Wajib TTD)
-              </div>
-              <div class="card-body">
-                <form id="formTTD" onsubmit="simpanDokumenTTD(event)">
-                  <div class="row g-2 mb-2">
-                    <div class="col-12 col-sm-7">
-                      <label class="form-label small fw-semibold">Judul / Nomor Dokumen</label>
-                      <input type="text" class="form-control form-control-sm" id="docJudul" required />
-                    </div>
-                    <div class="col-12 col-sm-5">
-                      <label class="form-label small fw-semibold">Kategori</label>
-                      <select class="form-select form-select-sm" id="docKategori">
-                        <option value="PO">Purchase Order (PO)</option>
-                        <option value="Invoice">Invoice</option>
-                        <option value="PKWT">Surat Perjanjian Kerja</option>
-                        <option value="Internal">Memo / Persetujuan Kantor</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="row g-2 mb-2">
-                    <div class="col-12 col-sm-6">
-                      <label class="form-label small fw-semibold">Pihak Terkait / Klien / Karyawan</label>
-                      <input type="text" class="form-control form-control-sm" id="docPihak" required />
-                    </div>
-                    <div class="col-12 col-sm-6">
-                      <label class="form-label small fw-semibold">Nama Penanda Tangan</label>
-                      <input type="text" class="form-control form-control-sm" id="docPenandatangan" required />
-                    </div>
-                  </div>
-
-                  <div class="mb-2">
-                    <label class="form-label small fw-semibold">Rincian Utama</label>
-                    <input type="text" class="form-control form-control-sm" id="docDetail" placeholder="Item, nominal, jabatan, atau masa kerja" />
-                  </div>
-
-                  <div class="mb-2">
-                    <label class="form-label small fw-semibold">Catatan / Klausul</label>
-                    <textarea class="form-control form-control-sm" id="docCatatan" rows="2"></textarea>
-                  </div>
-
-                  <div class="mb-2" id="boxApprovalKantor" style="display: none;">
-                    <label class="form-label small fw-semibold">Tahap Persetujuan Perkantoran</label>
-                    <select class="form-select form-select-sm" id="docTahap">
-                      <option value="Selesai (Final)">Tahap Akhir — Final</option>
-                      <option value="Menunggu Manajer">Tahap 1 — Menunggu Manajer</option>
-                      <option value="Menunggu HRD/Legal">Tahap 2 — Menunggu HRD / Legal</option>
-                    </select>
-                  </div>
-
-                  <div class="mb-2">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                      <label class="form-label small fw-semibold mb-0">Kanvas Tanda Tangan (Wajib diisi)</label>
-                      <button type="button" class="btn btn-sm btn-outline-danger py-0" onclick="bersihkanKanvas()">
-                        <i class="bi bi-eraser me-1"></i>Hapus TTD
-                      </button>
-                    </div>
-                    <canvas id="sigCanvas"></canvas>
-                  </div>
-
-                  <div class="d-grid gap-2 d-sm-flex justify-content-sm-end mt-3">
-                    <button type="submit" class="btn btn-primary btn-sm px-3">
-                      <i class="bi bi-check2-circle me-1"></i>Simpan ke Histori
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-lg-5">
-            <div class="card shadow-sm border-0">
-              <div class="card-header bg-white fw-bold">
-                <i class="bi bi-info-circle me-1 text-success"></i>Aturan Penyimpanan
-              </div>
-              <div class="card-body small">
-                <p class="text-muted mb-2">
-                  Dokumen hanya dapat masuk ke <strong>Histori Arsip</strong> apabila tanda tangan sudah dibubuhkan pada kanvas.
-                </p>
-                <ul class="list-group list-group-flush mb-0">
-                  <li class="list-group-item px-0">Belum ada tanda tangan = <strong>tidak bisa disimpan ke histori</strong>.</li>
-                  <li class="list-group-item px-0">Data tersimpan di <code>localStorage</code> tanpa data bawaan/dummy.</li>
-                  <li class="list-group-item px-0">Gunakan <strong>Clear Storage</strong> di Tab Histori untuk menghapus seluruh data tersimpan.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ==================== TAB 2: TEMPLATE SURAT ==================== -->
-      <div class="tab-pane fade" id="tab-template" role="tabpanel">
+      <!-- ==================== TAB 1: TEMPLATE SURAT (DEFAULT KOSONG) ==================== -->
+      <div class="tab-pane fade show active" id="tab-template" role="tabpanel">
         <div class="row g-3">
           <div class="col-12 col-lg-5">
             <div class="card shadow-sm border-0">
@@ -260,7 +134,7 @@
               <div class="card-body">
                 <div class="mb-2">
                   <label class="form-label small fw-semibold">Jenis Template</label>
-                  <select class="form-select form-select-sm" id="jenisTemplate" onchange="renderTemplate()">
+                  <select class="form-select form-select-sm" id="jenisTemplate" onchange="perbaruiNomorTemplateOtomatis(); renderTemplate();">
                     <option value="PO">Surat Purchase Order (PO)</option>
                     <option value="Invoice">Surat Tagihan (Invoice)</option>
                     <option value="PKWT">Surat Perjanjian Kerja Karyawan</option>
@@ -268,17 +142,17 @@
                 </div>
 
                 <div class="mb-2">
-                  <label class="form-label small fw-semibold">Nomor Dokumen</label>
+                  <label class="form-label small fw-semibold">Nomor Dokumen (Otomatis)</label>
                   <input type="text" class="form-control form-control-sm" id="tplNomor" oninput="renderTemplate()" />
                 </div>
 
                 <div class="mb-2">
-                  <label class="form-label small fw-semibold">Nama Perusahaan / Pembuat</label>
+                  <label class="form-label small fw-semibold">Pihak Pertama (Perusahaan / Pembuat)</label>
                   <input type="text" class="form-control form-control-sm" id="tplPerusahaan" oninput="renderTemplate()" />
                 </div>
 
                 <div class="mb-2">
-                  <label class="form-label small fw-semibold">Nama Pihak Kedua</label>
+                  <label class="form-label small fw-semibold">Pihak Kedua (Vendor / Klien / Karyawan)</label>
                   <input type="text" class="form-control form-control-sm" id="tplPihakKedua" oninput="renderTemplate()" />
                 </div>
 
@@ -315,6 +189,83 @@
         </div>
       </div>
 
+      <!-- ==================== TAB 2: BUAT & TTD (WAJIB 2 TTD) ==================== -->
+      <div class="tab-pane fade" id="tab-ttd" role="tabpanel">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white fw-bold">
+            <i class="bi bi-pencil-square me-1 text-primary"></i>Form Dokumen &amp; Dua Tanda Tangan (Wajib Keduanya)
+          </div>
+          <div class="card-body">
+            <form id="formTTD" onsubmit="simpanDokumenTTD(event)">
+              <div class="row g-2 mb-2">
+                <div class="col-12 col-sm-4">
+                  <label class="form-label small fw-semibold">Kategori</label>
+                  <select class="form-select form-select-sm" id="docKategori" onchange="perbaruiNomorDokumenOtomatis()">
+                    <option value="PO">Purchase Order (PO)</option>
+                    <option value="Invoice">Invoice</option>
+                    <option value="PKWT">Surat Perjanjian Kerja</option>
+                  </select>
+                </div>
+                <div class="col-12 col-sm-8">
+                  <label class="form-label small fw-semibold">Nomor Dokumen (Otomatis)</label>
+                  <input type="text" class="form-control form-control-sm" id="docNomor" required />
+                </div>
+              </div>
+
+              <div class="row g-2 mb-2">
+                <div class="col-12 col-sm-6">
+                  <label class="form-label small fw-semibold">Nama Pihak Pertama</label>
+                  <input type="text" class="form-control form-control-sm" id="docPihakPertama" required />
+                </div>
+                <div class="col-12 col-sm-6">
+                  <label class="form-label small fw-semibold">Nama Pihak Kedua</label>
+                  <input type="text" class="form-control form-control-sm" id="docPihakKedua" required />
+                </div>
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small fw-semibold">Rincian Utama</label>
+                <input type="text" class="form-control form-control-sm" id="docDetail" />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Catatan / Klausul</label>
+                <textarea class="form-control form-control-sm" id="docCatatan" rows="2"></textarea>
+              </div>
+
+              <!-- Dua Kanvas Tanda Tangan Wajib -->
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label class="form-label small fw-semibold mb-0">TTD Pihak Pertama (Wajib)</label>
+                    <button type="button" class="btn btn-sm btn-outline-danger py-0" onclick="bersihkanKanvas('pihak1')">
+                      <i class="bi bi-eraser me-1"></i>Hapus
+                    </button>
+                  </div>
+                  <canvas id="canvasPihak1" class="sig-canvas"></canvas>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label class="form-label small fw-semibold mb-0">TTD Pihak Kedua (Wajib)</label>
+                    <button type="button" class="btn btn-sm btn-outline-danger py-0" onclick="bersihkanKanvas('pihak2')">
+                      <i class="bi bi-eraser me-1"></i>Hapus
+                    </button>
+                  </div>
+                  <canvas id="canvasPihak2" class="sig-canvas"></canvas>
+                </div>
+              </div>
+
+              <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                <button type="submit" class="btn btn-primary btn-sm px-3">
+                  <i class="bi bi-check2-circle me-1"></i>Simpan ke Histori
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
       <!-- ==================== TAB 3: HISTORI ARSIP ==================== -->
       <div class="tab-pane fade" id="tab-histori" role="tabpanel">
         <div class="card shadow-sm border-0">
@@ -328,34 +279,24 @@
           </div>
           <div class="card-body">
 
-            <!-- Search, Filter & Per Page -->
             <div class="row g-2 mb-3">
-              <div class="col-12 col-md-4">
+              <div class="col-12 col-md-5">
                 <div class="input-group input-group-sm">
                   <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                  <input type="text" class="form-control" id="searchHistori" placeholder="Cari judul, ID, atau pihak..." oninput="resetHalamanDanRender()" />
+                  <input type="text" class="form-control" id="searchHistori" placeholder="Cari nomor, pihak pertama, atau pihak kedua..." oninput="resetHalamanDanRender()" />
                 </div>
               </div>
 
-              <div class="col-6 col-md-3">
+              <div class="col-6 col-md-4">
                 <select class="form-select form-select-sm" id="filterKategori" onchange="resetHalamanDanRender()">
                   <option value="">Semua Kategori</option>
                   <option value="PO">PO</option>
                   <option value="Invoice">Invoice</option>
                   <option value="PKWT">Perjanjian Kerja</option>
-                  <option value="Internal">Internal</option>
                 </select>
               </div>
 
               <div class="col-6 col-md-3">
-                <select class="form-select form-select-sm" id="filterMode" onchange="resetHalamanDanRender()">
-                  <option value="">Semua Mode</option>
-                  <option value="Usaha">Mode Usaha</option>
-                  <option value="Perkantoran">Mode Perkantoran</option>
-                </select>
-              </div>
-
-              <div class="col-12 col-md-2">
                 <select class="form-select form-select-sm" id="perPageSelect" onchange="resetHalamanDanRender()">
                   <option value="5" selected>5 / hal</option>
                   <option value="10">10 / hal</option>
@@ -364,16 +305,14 @@
               </div>
             </div>
 
-            <!-- Tabel Histori -->
             <div class="table-responsive">
               <table class="table table-hover align-middle mb-0">
                 <thead class="table-light small">
                   <tr>
-                    <th>ID / Judul</th>
+                    <th>Nomor Dokumen</th>
                     <th>Kategori</th>
-                    <th>Mode</th>
-                    <th>Pihak Terkait</th>
-                    <th>Status</th>
+                    <th>Pihak Pertama</th>
+                    <th>Pihak Kedua</th>
                     <th>Tanggal</th>
                     <th class="text-end">Aksi</th>
                   </tr>
@@ -382,7 +321,6 @@
               </table>
             </div>
 
-            <!-- Pagination -->
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3 pt-2 border-top">
               <div class="text-muted small" id="infoPagination">Menampilkan 0 data</div>
               <nav aria-label="Navigasi halaman histori">
@@ -419,17 +357,14 @@
     </div>
   </div>
 
-  <!-- Container Cetak Khusus (Hanya mencetak 1 dokumen terpilih dalam 1 halaman) -->
+  <!-- Container Cetak Khusus -->
   <div id="areaCetakKhusus"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const STORAGE_KEY = "esign_suite_arsip_v1";
-    let modeAktif = "Usaha";
+    const STORAGE_KEY = "esign_suite_arsip_v2";
     let halamanSaatIni = 1;
     let dokumenModalAktif = null;
-
-    // Tanpa data dummy: muat dari localStorage atau array kosong
     let arsipDokumen = muatDariStorage();
 
     function muatDariStorage() {
@@ -451,7 +386,7 @@
         alert("Storage sudah kosong.");
         return;
       }
-      if (confirm("Hapus seluruh data histori yang tersimpan di browser (localStorage)?")) {
+      if (confirm("Hapus seluruh data histori yang tersimpan di browser?")) {
         arsipDokumen = [];
         localStorage.removeItem(STORAGE_KEY);
         halamanSaatIni = 1;
@@ -459,201 +394,221 @@
       }
     }
 
-    function sinkronManual() {
-      arsipDokumen = muatDariStorage();
-      renderHistori();
-      renderTemplate();
-      alert("Data arsip dimuat ulang dari storage.");
-    }
+    // ==================== NOMOR OTOMATIS (PO-tgl-bulan-tahun) ====================
+    function buatNomorOtomatis(kategori) {
+      const now = new Date();
+      const tgl = String(now.getDate()).padStart(2, "0");
+      const bln = String(now.getMonth() + 1).padStart(2, "0");
+      const thn = now.getFullYear();
+      const tanggalFormat = `${tgl}-${bln}-${thn}`;
 
-    // ==================== SWITCHER MODE ====================
-    document.querySelectorAll('input[name="modeKerja"]').forEach((radio) => {
-      radio.addEventListener("change", (e) => {
-        modeAktif = e.target.value;
-        const badge = document.getElementById("badgeModeAktif");
-        const desc = document.getElementById("deskripsiModeAktif");
-        const boxApproval = document.getElementById("boxApprovalKantor");
-
-        if (modeAktif === "Usaha") {
-          badge.className = "badge bg-primary me-1";
-          badge.textContent = "Mode Usaha";
-          desc.textContent = "Alur cepat untuk transaksi langsung (PO & Invoice) dengan tanda tangan wajib sebelum arsip.";
-          boxApproval.style.display = "none";
-        } else {
-          badge.className = "badge bg-info text-dark me-1";
-          badge.textContent = "Mode Perkantoran";
-          desc.textContent = "Mendukung tahap persetujuan internal, kontrak karyawan (PKWT), dan arsip divisi.";
-          boxApproval.style.display = "block";
-        }
-        renderTemplate();
-      });
-    });
-
-    // ==================== KANVAS TTD ====================
-    const canvas = document.getElementById("sigCanvas");
-    const ctx = canvas.getContext("2d");
-    let sedangMenggambar = false;
-    let adaGoresan = false;
-
-    function sesuaikanUkuranKanvas() {
-      const rect = canvas.getBoundingClientRect();
-      const tempImage = adaGoresan ? canvas.toDataURL("image/png") : null;
-      canvas.width = rect.width || 400;
-      canvas.height = 190;
-      ctx.lineWidth = 2.5;
-      ctx.lineCap = "round";
-      ctx.strokeStyle = "#0d6efd";
-      if (tempImage) {
-        const img = new Image();
-        img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        img.src = tempImage;
+      if (kategori === "PO") {
+        return `PO-${tanggalFormat}`;
       }
+      return `${kategori.toUpperCase()}-${tanggalFormat}`;
     }
 
-    function ambilKoordinat(evt) {
+    function perbaruiNomorTemplateOtomatis() {
+      const jenis = document.getElementById("jenisTemplate").value;
+      document.getElementById("tplNomor").value = buatNomorOtomatis(jenis);
+    }
+
+    function perbaruiNomorDokumenOtomatis() {
+      const kat = document.getElementById("docKategori").value;
+      document.getElementById("docNomor").value = buatNomorOtomatis(kat);
+    }
+
+    // ==================== DUA KANVAS TANDA TANGAN ====================
+    const stateKanvas = {
+      pihak1: {
+        canvas: document.getElementById("canvasPihak1"),
+        ctx: null,
+        menggambar: false,
+        adaGoresan: false
+      },
+      pihak2: {
+        canvas: document.getElementById("canvasPihak2"),
+        ctx: null,
+        menggambar: false,
+        adaGoresan: false
+      }
+    };
+
+    stateKanvas.pihak1.ctx = stateKanvas.pihak1.canvas.getContext("2d");
+    stateKanvas.pihak2.ctx = stateKanvas.pihak2.canvas.getContext("2d");
+
+    function sesuaikanSemuaKanvas() {
+      ["pihak1", "pihak2"].forEach((key) => {
+        const st = stateKanvas[key];
+        const rect = st.canvas.getBoundingClientRect();
+        const tempImg = st.adaGoresan ? st.canvas.toDataURL("image/png") : null;
+        st.canvas.width = rect.width || 300;
+        st.canvas.height = 155;
+        st.ctx.lineWidth = 2.5;
+        st.ctx.lineCap = "round";
+        st.ctx.strokeStyle = key === "pihak1" ? "#0d6efd" : "#198754";
+        if (tempImg) {
+          const img = new Image();
+          img.onload = () => st.ctx.drawImage(img, 0, 0, st.canvas.width, st.canvas.height);
+          img.src = tempImg;
+        }
+      });
+    }
+
+    function ambilKoordinat(canvas, evt) {
       const rect = canvas.getBoundingClientRect();
       const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
       const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
       return { x: clientX - rect.left, y: clientY - rect.top };
     }
 
-    function mulaiGambar(evt) {
-      evt.preventDefault();
-      sedangMenggambar = true;
-      adaGoresan = true;
-      const pos = ambilKoordinat(evt);
-      ctx.beginPath();
-      ctx.moveTo(pos.x, pos.y);
+    function pasangEventKanvas(key) {
+      const st = stateKanvas[key];
+
+      const mulai = (evt) => {
+        evt.preventDefault();
+        st.menggambar = true;
+        st.adaGoresan = true;
+        const pos = ambilKoordinat(st.canvas, evt);
+        st.ctx.beginPath();
+        st.ctx.moveTo(pos.x, pos.y);
+      };
+
+      const gerak = (evt) => {
+        if (!st.menggambar) return;
+        evt.preventDefault();
+        const pos = ambilKoordinat(st.canvas, evt);
+        st.ctx.lineTo(pos.x, pos.y);
+        st.ctx.stroke();
+      };
+
+      const berhenti = () => {
+        st.menggambar = false;
+        st.ctx.closePath();
+      };
+
+      st.canvas.addEventListener("mousedown", mulai);
+      st.canvas.addEventListener("mousemove", gerak);
+      window.addEventListener("mouseup", berhenti);
+
+      st.canvas.addEventListener("touchstart", mulai, { passive: false });
+      st.canvas.addEventListener("touchmove", gerak, { passive: false });
+      window.addEventListener("touchend", berhenti);
     }
 
-    function lanjutGambar(evt) {
-      if (!sedangMenggambar) return;
-      evt.preventDefault();
-      const pos = ambilKoordinat(evt);
-      ctx.lineTo(pos.x, pos.y);
-      ctx.stroke();
+    function bersihkanKanvas(key) {
+      const st = stateKanvas[key];
+      st.ctx.clearRect(0, 0, st.canvas.width, st.canvas.height);
+      st.adaGoresan = false;
     }
 
-    function selesaiGambar() {
-      sedangMenggambar = false;
-      ctx.closePath();
+    function resetTemplateKosong() {
+      document.getElementById("jenisTemplate").value = "PO";
+      document.getElementById("tplNomor").value = buatNomorOtomatis("PO");
+      document.getElementById("tplPerusahaan").value = "";
+      document.getElementById("tplPihakKedua").value = "";
+      document.getElementById("tplDetail").value = "";
+      document.getElementById("tplCatatan").value = "";
+      renderTemplate();
     }
-
-    function bersihkanKanvas() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      adaGoresan = false;
-    }
-
-    canvas.addEventListener("mousedown", mulaiGambar);
-    canvas.addEventListener("mousemove", lanjutGambar);
-    window.addEventListener("mouseup", selesaiGambar);
-    canvas.addEventListener("touchstart", mulaiGambar, { passive: false });
-    canvas.addEventListener("touchmove", lanjutGambar, { passive: false });
-    window.addEventListener("touchend", selesaiGambar);
-    window.addEventListener("resize", sesuaikanUkuranKanvas);
 
     function simpanDokumenTTD(event) {
       event.preventDefault();
 
-      // Validasi wajib tanda tangan
-      if (!adaGoresan) {
-        alert("Dokumen belum ditandatangani. Silakan gambar tanda tangan pada kanvas terlebih dahulu sebelum menyimpan ke histori.");
+      // Wajib kedua tanda tangan terisi
+      if (!stateKanvas.pihak1.adaGoresan || !stateKanvas.pihak2.adaGoresan) {
+        alert("Tanda tangan Pihak Pertama dan Pihak Kedua wajib diisi keduanya sebelum dokumen dapat disimpan ke histori.");
         return;
       }
 
-      const judul = document.getElementById("docJudul").value.trim();
       const kategori = document.getElementById("docKategori").value;
-      const pihak = document.getElementById("docPihak").value.trim();
-      const penandatangan = document.getElementById("docPenandatangan").value.trim();
-      const detail = document.getElementById("docDetail").value.trim();
-      const catatan = document.getElementById("docCatatan").value.trim();
-      const status = modeAktif === "Perkantoran"
-        ? document.getElementById("docTahap").value
-        : "Tertandatangani";
+      const nomor = document.getElementById("docNomor").value.trim();
+      const pihakPertama = document.getElementById("docPihakPertama").value.trim();
+      const pihakKedua = document.getElementById("docPihakKedua").value.trim();
+      const detail = document.getElementById("docDetail").value.trim() || "-";
+      const catatan = document.getElementById("docCatatan").value.trim() || "-";
 
-      const dataURL = canvas.toDataURL("image/png");
-      const sekarang = new Date().toISOString().slice(0, 16).replace("T", " ");
-      const idBaru = "SIG-" + Date.now().toString().slice(-6);
+      const ttd1 = stateKanvas.pihak1.canvas.toDataURL("image/png");
+      const ttd2 = stateKanvas.pihak2.canvas.toDataURL("image/png");
+      const tanggal = new Date().toISOString().slice(0, 16).replace("T", " ");
 
       arsipDokumen.unshift({
-        id: idBaru,
-        judul,
+        id: "ARC-" + Date.now().toString().slice(-6),
+        nomor,
         kategori,
-        mode: modeAktif,
-        pihak,
-        penandatangan,
-        status,
-        tanggal: sekarang,
-        detail: detail || "-",
-        catatan: catatan || "-",
-        ttdData: dataURL
+        pihakPertama,
+        pihakKedua,
+        detail,
+        catatan,
+        tanggal,
+        ttd1,
+        ttd2
       });
 
       simpanKeStorage();
-      event.target.reset();
-      bersihkanKanvas();
       renderHistori();
 
-      const tabHistori = new bootstrap.Tab(document.getElementById("tab-histori-btn"));
-      tabHistori.show();
+      // Bersihkan form TTD & kembalikan ke halaman template kosong
+      document.getElementById("formTTD").reset();
+      bersihkanKanvas("pihak1");
+      bersihkanKanvas("pihak2");
+      resetTemplateKosong();
+
+      const tabTemplate = new bootstrap.Tab(document.getElementById("tab-template-btn"));
+      tabTemplate.show();
     }
 
     // ==================== TEMPLATE SURAT ====================
     function buatHTMLTemplate() {
       const jenis = document.getElementById("jenisTemplate").value;
       const nomor = document.getElementById("tplNomor").value.trim() || "-";
-      const perusahaan = document.getElementById("tplPerusahaan").value.trim() || "-";
-      const pihakKedua = document.getElementById("tplPihakKedua").value.trim() || "-";
+      const pihak1 = document.getElementById("tplPerusahaan").value.trim() || "-";
+      const pihak2 = document.getElementById("tplPihakKedua").value.trim() || "-";
       const detail = document.getElementById("tplDetail").value.trim() || "-";
       const catatan = document.getElementById("tplCatatan").value.trim() || "-";
 
       let judulSurat = "PURCHASE ORDER (PO)";
-      let labelPihak = "Kepada Vendor / Pemasok";
-      let labelDetail = "Rincian Barang / Jasa & Total";
-
-      if (jenis === "Invoice") {
-        judulSurat = "INVOICE / TAGIHAN RESMI";
-        labelPihak = "Ditagihkan Kepada";
-        labelDetail = "Rincian Tagihan & Nominal";
-      } else if (jenis === "PKWT") {
-        judulSurat = "SURAT PERJANJIAN KERJA KARYAWAN";
-        labelPihak = "Pihak Kedua (Karyawan)";
-        labelDetail = "Jabatan, Penempatan & Kompensasi";
-      }
+      if (jenis === "Invoice") judulSurat = "INVOICE / TAGIHAN RESMI";
+      if (jenis === "PKWT") judulSurat = "SURAT PERJANJIAN KERJA KARYAWAN";
 
       return `
         <div class="doc-paper">
           <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-2">
             <div>
               <h6 class="fw-bold mb-0">${judulSurat}</h6>
-              <small class="text-muted">${perusahaan} &bull; Mode: ${modeAktif}</small>
+              <small class="text-muted">Kategori: ${jenis}</small>
             </div>
             <span class="badge bg-secondary">${nomor}</span>
           </div>
 
           <div class="row g-2 mb-2 small">
             <div class="col-6">
-              <div class="text-muted">${labelPihak}:</div>
-              <div class="fw-bold">${pihakKedua}</div>
+              <div class="text-muted">Pihak Pertama:</div>
+              <div class="fw-bold">${pihak1}</div>
             </div>
             <div class="col-6">
-              <div class="text-muted">${labelDetail}:</div>
-              <div class="fw-bold">${detail}</div>
+              <div class="text-muted">Pihak Kedua:</div>
+              <div class="fw-bold">${pihak2}</div>
             </div>
+          </div>
+
+          <div class="mb-2 small">
+            <div class="text-muted">Rincian Utama:</div>
+            <div class="fw-bold">${detail}</div>
           </div>
 
           <p class="small mb-3" style="white-space: pre-line;">${catatan}</p>
 
           <div class="row g-2 pt-2 border-top small">
             <div class="col-6">
-              <div class="text-muted mb-1">Pihak Pertama:</div>
-              <div class="sig-box-preview"><span class="text-muted small">TTD di Tab Buat &amp; TTD</span></div>
-              <div class="fw-semibold mt-1">${perusahaan}</div>
+              <div class="text-muted mb-1">TTD Pihak Pertama:</div>
+              <div class="sig-box-preview"><span class="text-muted small">Diisi pada Tab Buat &amp; TTD</span></div>
+              <div class="fw-semibold mt-1">${pihak1}</div>
             </div>
             <div class="col-6">
-              <div class="text-muted mb-1">Pihak Kedua:</div>
-              <div class="sig-box-preview"><span class="text-muted small">TTD Pihak Kedua</span></div>
-              <div class="fw-semibold mt-1">${pihakKedua}</div>
+              <div class="text-muted mb-1">TTD Pihak Kedua:</div>
+              <div class="sig-box-preview"><span class="text-muted small">Diisi pada Tab Buat &amp; TTD</span></div>
+              <div class="fw-semibold mt-1">${pihak2}</div>
             </div>
           </div>
         </div>
@@ -666,32 +621,35 @@
 
     function panggilTemplateKeTTD() {
       const jenis = document.getElementById("jenisTemplate").value;
-      const nomor = document.getElementById("tplNomor").value.trim();
-      const perusahaan = document.getElementById("tplPerusahaan").value.trim();
-      const pihakKedua = document.getElementById("tplPihakKedua").value.trim();
+      const nomor = document.getElementById("tplNomor").value.trim() || buatNomorOtomatis(jenis);
+      const pihak1 = document.getElementById("tplPerusahaan").value.trim();
+      const pihak2 = document.getElementById("tplPihakKedua").value.trim();
       const detail = document.getElementById("tplDetail").value.trim();
       const catatan = document.getElementById("tplCatatan").value.trim();
 
-      document.getElementById("docJudul").value = nomor ? `${jenis} — ${nomor}` : jenis;
       document.getElementById("docKategori").value = jenis;
-      document.getElementById("docPihak").value = pihakKedua;
-      document.getElementById("docPenandatangan").value = perusahaan;
+      document.getElementById("docNomor").value = nomor;
+      document.getElementById("docPihakPertama").value = pihak1;
+      document.getElementById("docPihakKedua").value = pihak2;
       document.getElementById("docDetail").value = detail;
       document.getElementById("docCatatan").value = catatan;
 
       const tabTTD = new bootstrap.Tab(document.getElementById("tab-ttd-btn"));
       tabTTD.show();
+      sesuaikanSemuaKanvas();
     }
 
     function bagikanTemplate() {
       const nomor = document.getElementById("tplNomor").value.trim() || "Dokumen";
-      const pihak = document.getElementById("tplPihakKedua").value.trim() || "-";
-      const teks = `Dokumen ${nomor} untuk ${pihak}.`;
+      const pihak1 = document.getElementById("tplPerusahaan").value.trim() || "-";
+      const pihak2 = document.getElementById("tplPihakKedua").value.trim() || "-";
+      const teks = `Dokumen ${nomor} (${pihak1} & ${pihak2}).`;
+
       if (navigator.share) {
         navigator.share({ title: nomor, text: teks }).catch(() => {});
       } else {
         navigator.clipboard?.writeText(teks);
-        alert("Teks ringkasan disalin:\n" + teks);
+        alert("Info dokumen disalin:\n" + teks);
       }
     }
 
@@ -707,18 +665,32 @@
         <div class="doc-paper">
           <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-2">
             <div>
-              <h6 class="fw-bold mb-0">${dok.judul}</h6>
-              <small class="text-muted">ID: ${dok.id} &bull; Tanggal: ${dok.tanggal}</small>
+              <h6 class="fw-bold mb-0">${dok.nomor}</h6>
+              <small class="text-muted">Kategori: ${dok.kategori} &bull; Tanggal: ${dok.tanggal}</small>
             </div>
-            <span class="badge bg-primary">${dok.mode} — ${dok.kategori}</span>
+            <span class="badge bg-success">2 TTD Lengkap</span>
           </div>
-          <p class="small mb-1"><strong>Pihak Terkait:</strong> ${dok.pihak}</p>
-          <p class="small mb-1"><strong>Status:</strong> ${dok.status}</p>
+          <div class="row g-2 mb-2 small">
+            <div class="col-6"><strong>Pihak Pertama:</strong> ${dok.pihakPertama}</div>
+            <div class="col-6"><strong>Pihak Kedua:</strong> ${dok.pihakKedua}</div>
+          </div>
           <p class="small mb-1"><strong>Rincian:</strong> ${dok.detail}</p>
           <p class="small mb-3"><strong>Catatan:</strong> ${dok.catatan}</p>
-          <div class="sig-box-preview">
-            <img src="${dok.ttdData}" alt="Tanda Tangan" />
-            <div class="small fw-semibold mt-1">${dok.penandatangan}</div>
+          <div class="row g-2 pt-2 border-top small">
+            <div class="col-6">
+              <div class="text-muted mb-1">TTD Pihak Pertama:</div>
+              <div class="sig-box-preview">
+                <img src="${dok.ttd1}" alt="TTD Pihak Pertama" />
+                <div class="small fw-semibold mt-1">${dok.pihakPertama}</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="text-muted mb-1">TTD Pihak Kedua:</div>
+              <div class="sig-box-preview">
+                <img src="${dok.ttd2}" alt="TTD Pihak Kedua" />
+                <div class="small fw-semibold mt-1">${dok.pihakKedua}</div>
+              </div>
+            </div>
           </div>
         </div>
       `;
@@ -728,17 +700,15 @@
     function ambilDataTerfilter() {
       const kataKunci = document.getElementById("searchHistori").value.toLowerCase().trim();
       const kategori = document.getElementById("filterKategori").value;
-      const mode = document.getElementById("filterMode").value;
 
       return arsipDokumen.filter((item) => {
         const cocokKata =
           !kataKunci ||
-          item.judul.toLowerCase().includes(kataKunci) ||
-          item.id.toLowerCase().includes(kataKunci) ||
-          item.pihak.toLowerCase().includes(kataKunci);
+          item.nomor.toLowerCase().includes(kataKunci) ||
+          item.pihakPertama.toLowerCase().includes(kataKunci) ||
+          item.pihakKedua.toLowerCase().includes(kataKunci);
         const cocokKat = !kategori || item.kategori === kategori;
-        const cocokMode = !mode || item.mode === mode;
-        return cocokKata && cocokKat && cocokMode;
+        return cocokKata && cocokKat;
       });
     }
 
@@ -760,22 +730,18 @@
       if (potong.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="text-center text-muted py-4">
-              Belum ada dokumen tersimpan atau tidak ada data yang cocok dengan filter.
+            <td colspan="6" class="text-center text-muted py-4">
+              Belum ada dokumen tersimpan atau tidak ada data yang sesuai filter.
             </td>
           </tr>
         `;
       } else {
         tbody.innerHTML = potong.map((dok) => `
           <tr>
-            <td>
-              <div class="fw-bold">${dok.judul}</div>
-              <div class="text-muted" style="font-size: 0.78rem;">${dok.id}</div>
-            </td>
+            <td class="fw-bold">${dok.nomor}</td>
             <td><span class="badge bg-light text-dark border">${dok.kategori}</span></td>
-            <td>${dok.mode}</td>
-            <td>${dok.pihak}</td>
-            <td><span class="badge bg-success">${dok.status}</span></td>
+            <td>${dok.pihakPertama}</td>
+            <td>${dok.pihakKedua}</td>
             <td class="text-nowrap">${dok.tanggal}</td>
             <td class="text-end text-nowrap">
               <button class="btn btn-sm btn-outline-primary me-1" onclick="bukaModalDetail('${dok.id}')" title="Lihat">
@@ -831,7 +797,7 @@
       if (!dok) return;
       dokumenModalAktif = dok;
 
-      document.getElementById("modalJudulDok").textContent = dok.judul;
+      document.getElementById("modalJudulDok").textContent = dok.nomor;
       document.getElementById("modalIsiDok").innerHTML = buatHTMLDokumenArsip(dok);
 
       const modal = new bootstrap.Modal(document.getElementById("modalDetailDok"));
@@ -845,17 +811,24 @@
 
     function bagikanModalAktif() {
       if (!dokumenModalAktif) return;
-      const info = `Dokumen: ${dokumenModalAktif.judul} (${dokumenModalAktif.id}) - Status: ${dokumenModalAktif.status}`;
+      const info = `Dokumen ${dokumenModalAktif.nomor} (${dokumenModalAktif.pihakPertama} & ${dokumenModalAktif.pihakKedua})`;
       if (navigator.share) {
-        navigator.share({ title: dokumenModalAktif.judul, text: info }).catch(() => {});
+        navigator.share({ title: dokumenModalAktif.nomor, text: info }).catch(() => {});
       } else {
         navigator.clipboard?.writeText(info);
         alert("Info dokumen disalin:\n" + info);
       }
     }
 
-    // Inisialisasi awal (kosong / tanpa dummy)
-    sesuaikanUkuranKanvas();
+    // Inisialisasi awal
+    pasangEventKanvas("pihak1");
+    pasangEventKanvas("pihak2");
+    window.addEventListener("resize", sesuaikanSemuaKanvas);
+    document.getElementById("tab-ttd-btn").addEventListener("shown.bs.tab", sesuaikanSemuaKanvas);
+
+    perbaruiNomorTemplateOtomatis();
+    perbaruiNomorDokumenOtomatis();
+    sesuaikanSemuaKanvas();
     renderTemplate();
     renderHistori();
   </script>
