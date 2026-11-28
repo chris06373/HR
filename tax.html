@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator & Simulasi Pajak 1 Halaman</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f6f9;
+      font-size: 0.95rem;
+    }
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    .table-responsive {
+      max-height: 340px;
+      overflow-y: auto;
+    }
+    .badge-crit {
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-primary sticky-top shadow-sm">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Sistem Kalkulasi Pajak (1 Halaman)</span>
+      <span class="text-white small d-none d-md-inline">Responsif Mobile &bull; Tablet &bull; Desktop</span>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <!-- Navigasi Tab Utama -->
+    <ul class="nav nav-pills nav-fill bg-white p-2 rounded-3 shadow-sm mb-4 gap-1" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active fw-semibold" id="tab-hitung-btn" data-bs-toggle="pill" data-bs-target="#pane-hitung" type="button" role="tab">
+          1. Hitung &amp; Simulasi
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fw-semibold" id="tab-massal-btn" data-bs-toggle="pill" data-bs-target="#pane-massal" type="button" role="tab">
+          2. Impor &amp; Ekspor Massal
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fw-semibold" id="tab-histori-btn" data-bs-toggle="pill" data-bs-target="#pane-histori" type="button" role="tab">
+          3. Histori &amp; Data
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <!-- TAB 1: PERHITUNGAN KRITERIA & SIMULASI GROSS / NET / GROSS-UP -->
+      <div class="tab-pane fade show active" id="pane-hitung" role="tabpanel">
+        <div class="row g-4">
+          <!-- Kolom Form Input -->
+          <div class="col-12 col-lg-6">
+            <div class="card p-3 p-md-4">
+              <h5 class="card-title mb-3 fw-bold text-primary">Input Kriteria Pajak</h5>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Jenis Pajak / Kriteria</label>
+                <select id="jenisPajak" class="form-select" onchange="ubahKriteriaForm()">
+                  <option value="pph21">PPh Pasal 21 Bulanan (TER)</option>
+                  <option value="umkm">PPh Final UMKM (0,5%)</option>
+                  <option value="ppn">PPN Transaksi (12%)</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Nama / Keterangan Objek</label>
+                <input type="text" id="namaObjek" class="form-control" placeholder="Contoh: Budi Santoso / Toko Maju / Invoice #01">
+              </div>
+
+              <!-- Kriteria PPh 21 -->
+              <div id="form-pph21">
+                <div class="row g-2 mb-3">
+                  <div class="col-12 col-sm-6">
+                    <label class="form-label fw-semibold">Kategori TER (PTKP)</label>
+                    <select id="kategoriTer" class="form-select">
+                      <option value="A">Kategori A (TK/0, TK/1, K/0)</option>
+                      <option value="B">Kategori B (TK/2, TK/3, K/1, K/2)</option>
+                      <option value="C">Kategori C (K/3)</option>
+                    </select>
+                  </div>
+                  <div class="col-12 col-sm-6">
+                    <label class="form-label fw-semibold">Metode Skema Gaji</label>
+                    <select id="metodeGaji" class="form-select">
+                      <option value="gross">Gross (Pajak Ditanggung Karyawan)</option>
+                      <option value="net">Net (Gaji Bersih Diterima Karyawan)</option>
+                      <option value="grossup">Gross-Up (Tunjangan Pajak)</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold" id="labelNominalPph21">Penghasilan Bruto / Gaji Pokok (Rp)</label>
+                  <input type="number" id="nominalPph21" class="form-control" min="0" step="1000" value="10000000">
+                </div>
+              </div>
+
+              <!-- Kriteria UMKM -->
+              <div id="form-umkm" class="d-none">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Omzet Bruto Bulan Ini (Rp)</label>
+                  <input type="number" id="omzetUmkm" class="form-control" min="0" step="1000" value="15000000">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Akumulasi Omzet Tahun Berjalan (Rp)</label>
+                  <input type="number" id="akumulasiUmkm" class="form-control" min="0" step="1000" value="100000000">
+                  <div class="form-text">Omzet bruto WP OP sampai Rp500 juta/tahun tidak dikenai PPh Final 0,5%.</div>
+                </div>
+              </div>
+
+              <!-- Kriteria PPN -->
+              <div id="form-ppn" class="d-none">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Nilai Transaksi / Penggantian (Rp)</label>
+                  <input type="number" id="nilaiTransaksi" class="form-control" min="0" step="1000" value="25000000">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Skema Dasar Pengenaan Pajak (DPP)</label>
+                  <select id="skemaPpn" class="form-select">
+                    <option value="penuh">DPP Penuh (Tarif 12%)</option>
+                    <option value="nilai_lain">DPP Nilai Lain 11/12 (Efektif 11%)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="d-grid gap-2 d-sm-flex mt-3">
+                <button type="button" class="btn btn-primary flex-fill" onclick="prosesHitungUtama()">
+                  Hitung &amp; Simpan ke Histori
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="resetFormUtama()">
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kolom Hasil & Perbandingan Simulasi Gross / Net / Gross-Up -->
+          <div class="col-12 col-lg-6">
+            <div class="card p-3 p-md-4 mb-4">
+              <h5 class="card-title mb-3 fw-bold text-success">Hasil Perhitungan</h5>
+              <div id="hasilUtamaBox" class="bg-light p-3 rounded-3 border">
+                <p class="text-muted mb-0">Masukkan data di sebelah kiri lalu klik <strong>Hitung &amp; Simpan ke Histori</strong>.</p>
+              </div>
+            </div>
+
+            <div class="card p-3 p-md-4">
+              <h5 class="card-title mb-3 fw-bold text-dark">Perbandingan Simulasi Gross, Net &amp; Gross-Up (PPh 21)</h5>
+              <p class="text-muted small mb-2">Menggunakan angka input PPh 21 &amp; Kategori TER yang dipilih sebagai acuan perbandingan 3 skema.</p>
+              <div class="table-responsive">
+                <table class="table table-bordered table-sm align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Skema</th>
+                      <th>Bruto / Tunj.</th>
+                      <th>PPh 21</th>
+                      <th>Take Home Pay</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabelSimulasiTigaSkema">
+                    <tr>
+                      <td colspan="4" class="text-center text-muted py-3">Klik hitung pada mode PPh 21 untuk melihat perbandingan.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: IMPOR & EKSPOR DATA MASSAL -->
+      <div class="tab-pane fade" id="pane-massal" role="tabpanel">
+        <div class="card p-3 p-md-4 mb-4">
+          <h5 class="card-title mb-2 fw-bold text-primary">Impor &amp; Ekspor Data Massal (CSV)</h5>
+          <p class="text-muted small">
+            Format kolom CSV: <code>nama,jenis_pajak,kategori_ter,metode,nominal</code><br>
+            Contoh: <code>Andi,pph21,A,gross,12000000</code> atau <code>Warung Sari,umkm,A,gross,8000000</code> atau <code>Jasa IT,ppn,A,gross,50000000</code>
+          </p>
+
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">Pilih File CSV</label>
+              <input type="file" id="fileCsv" class="form-control" accept=".csv,text/csv">
+            </div>
+            <div class="col-12 col-md-6 d-flex flex-wrap gap-2">
+              <button type="button" class="btn btn-primary" onclick="prosesImporCsv()">
+                Impor &amp; Hitung Massal
+              </button>
+              <button type="button" class="btn btn-outline-primary" onclick="muatContohDataMassal()">
+                Isi Contoh Data
+              </button>
+              <button type="button" class="btn btn-success" onclick="eksporHasilCsv()">
+                Ekspor Hasil (CSV)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pratinjau Data Impor & Hasil Hitung Massal -->
+        <div class="card p-3 p-md-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0 fw-bold">Data Impor &amp; Hasil Kalkulasi Massal</h5>
+            <span id="jumlahDataMassal" class="badge bg-secondary">0 baris</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover table-sm align-middle mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>#</th>
+                  <th>Nama / Objek</th>
+                  <th>Jenis</th>
+                  <th>Kriteria / Skema</th>
+                  <th>Dasar / Bruto</th>
+                  <th>Pajak</th>
+                  <th>Nilai Bersih / Total</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyMassal">
+                <tr>
+                  <td colspan="7" class="text-center text-muted py-3">Belum ada data massal yang diimpor.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: HISTORI PERHITUNGAN, SIMULASI, IMPOR & EKSPOR -->
+      <div class="tab-pane fade" id="pane-histori" role="tabpanel">
+        <div class="card p-3 p-md-4">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+              <h5 class="card-title mb-0 fw-bold text-primary">Histori Perhitungan, Simulasi &amp; Impor/Ekspor</h5>
+              <small class="text-muted">Semua aktivitas perhitungan, simulasi, impor, dan ekspor tercatat di sini.</small>
+            </div>
+            <div class="d-flex gap-2">
+              <select id="filterHistori" class="form-select form-select-sm w-auto" onchange="renderHistori()">
+                <option value="ALL">Semua Sumber</option>
+                <option value="KALKULASI">Kalkulasi &amp; Simulasi</option>
+                <option value="IMPOR">Impor Massal</option>
+                <option value="EKSPOR">Ekspor Massal</option>
+              </select>
+              <button type="button" class="btn btn-sm btn-outline-danger" onclick="hapusSemuaHistori()">
+                Hapus Histori
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover table-sm align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Waktu</th>
+                  <th>Sumber</th>
+                  <th>Objek / Keterangan</th>
+                  <th>Kriteria</th>
+                  <th>Nominal Dasar</th>
+                  <th>Pajak</th>
+                  <th>Hasil Akhir</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyHistori">
+                <tr>
+                  <td colspan="7" class="text-center text-muted py-3">Belum ada histori tersimpan.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detail Item -->
+  <div class="modal fade" id="modalDetail" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Detail Catatan Pajak</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+        </div>
+        <div class="modal-body" id="isiModalDetail"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    var STORAGE_KEY = "histori_pajak_1hal_v1";
+    var dataMassalAktif = [];
+
+    function formatRupiah(angka) {
+      var num = Number(angka) || 0;
+      return "Rp" + Math.round(num).toLocaleString("id-ID");
+    }
+
+    function escapeHtml(teks) {
+      return String(teks || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function ubahKriteriaForm() {
+      var jenis = document.getElementById("jenisPajak").value;
+      document.getElementById("form-pph21").classList.toggle("d-none", jenis !== "pph21");
+      document.getElementById("form-umkm").classList.toggle("d-none", jenis !== "umkm");
+      document.getElementById("form-ppn").classList.toggle("d-none", jenis !== "ppn");
+    }
+
+    function resetFormUtama() {
+      document.getElementById("namaObjek").value = "";
+      document.getElementById("nominalPph21").value = "10000000";
+      document.getElementById("omzetUmkm").value = "15000000";
+      document.getElementById("akumulasiUmkm").value = "100000000";
+      document.getElementById("nilaiTransaksi").value = "25000000";
+    }
+
+    // Tabel tarif efektif rata-rata bulanan (contoh ilustrasi bertingkat)
+    function getTarifTer(kategori, bruto) {
+      var b = Number(bruto) || 0;
+      if (b <= 5400000) return 0;
+      if (kategori === "A") {
+        if (b <= 6200000) return 0.0075;
+        if (b <= 7000000) return 0.015;
+        if (b <= 8500000) return 0.025;
+        if (b <= 12000000) return 0.045;
+        if (b <= 20000000) return 0.08;
+        return 0.14;
+      }
+      if (kategori === "B") {
+        if (b <= 6600000) return 0.005;
+        if (b <= 7500000) return 0.0125;
+        if (b <= 9500000) return 0.02;
+        if (b <= 14000000) return 0.0375;
+        if (b <= 24000000) return 0.07;
+        return 0.125;
+      }
+      // Kategori C
+      if (b <= 7200000) return 0.005;
+      if (b <= 8500000) return 0.01;
+      if (b <= 11000000) return 0.0175;
+      if (b <= 16000000) return 0.03;
+      if (b <= 28000000) return 0.055;
+      return 0.11;
+    }
+
+    // Hitung PPh 21 berdasarkan skema gross, net, atau gross-up
+    function hitungPph21Skema(kategori, metode, nilaiInput) {
+      var val = Math.max(0, Number(nilaiInput) || 0);
+      var bruto = 0;
+      var pajak = 0;
+      var thp = 0;
+      var tunjanganPajak = 0;
+
+      if (metode === "gross") {
+        bruto = val;
+        var tarif = getTarifTer(kategori, bruto);
+        pajak = bruto * tarif;
+        thp = bruto - pajak;
+      } else if (metode === "net") {
+        thp = val;
+        // Iterasi pendekatan bruto agar (bruto - pajak(bruto)) mendekati thp
+        var estimasiBruto = thp;
+        for (var i = 0; i < 25; i++) {
+          var t = getTarifTer(kategori, estimasiBruto);
+          estimasiBruto = thp / Math.max(0.1, (1 - t));
+        }
+        bruto = estimasiBruto;
+        pajak = Math.max(0, bruto - thp);
+      } else if (metode === "grossup") {
+        var gajiPokok = val;
+        var estimasiTunj = 0;
+        for (var j = 0; j < 25; j++) {
+          var brutoSementara = gajiPokok + estimasiTunj;
+          var t2 = getTarifTer(kategori, brutoSementara);
+          estimasiTunj = brutoSementara * t2;
+        }
+        tunjanganPajak = estimasiTunj;
+        bruto = gajiPokok + tunjanganPajak;
+        pajak = tunjanganPajak;
+        thp = gajiPokok;
+      }
+
+      return {
+        bruto: bruto,
+        pajak: pajak,
+        thp: thp,
+        tunjanganPajak: tunjanganPajak
+      };
+    }
+
+    function hitungUmkm(omzetBulan, akumulasiTahun) {
+      var omzet = Math.max(0, Number(omzetBulan) || 0);
+      var akum = Math.max(0, Number(akumulasiTahun) || 0);
+      var batasBebas = 500000000;
+      var kenaPajak = 0;
+
+      if (akum <= batasBebas) {
+        kenaPajak = 0;
+      } else {
+        var sisaBebas = Math.max(0, batasBebas - (akum - omzet));
+        kenaPajak = Math.max(0, omzet - sisaBebas);
+      }
+
+      var pajak = kenaPajak * 0.005;
+      return {
+        omzet: omzet,
+        kenaPajak: kenaPajak,
+        pajak: pajak,
+        bersih: omzet - pajak
+      };
+    }
+
+    function hitungPpn(nilaiTransaksi, skema) {
+      var nilai = Math.max(0, Number(nilaiTransaksi) || 0);
+      var dpp = skema === "nilai_lain" ? (nilai * 11 / 12) : nilai;
+      var ppn = dpp * 0.12;
+      return {
+        nilai: nilai,
+        dpp: dpp,
+        ppn: ppn,
+        total: nilai + ppn
+      };
+    }
+
+    function prosesHitungUtama() {
+      var jenis = document.getElementById("jenisPajak").value;
+      var nama = document.getElementById("namaObjek").value.trim() || "Tanpa Nama";
+      var hasilHtml = "";
+      var record = {
+        id: "TRX-" + Date.now(),
+        waktu: new Date().toLocaleString("id-ID"),
+        sumber: "KALKULASI",
+        nama: nama,
+        jenis: jenis.toUpperCase(),
+        kriteria: "",
+        nominalDasar: 0,
+        pajak: 0,
+        hasilAkhir: 0
+      };
+
+      if (jenis === "pph21") {
+        var kategori = document.getElementById("kategoriTer").value;
+        var metode = document.getElementById("metodeGaji").value;
+        var nominal = Number(document.getElementById("nominalPph21").value) || 0;
+        var res = hitungPph21Skema(kategori, metode, nominal);
+
+        record.kriteria = "TER " + kategori + " | " + metode.toUpperCase();
+        record.nominalDasar = res.bruto;
+        record.pajak = res.pajak;
+        record.hasilAkhir = res.thp;
+
+        hasilHtml =
+          '<div class="mb-2"><span class="badge bg-primary badge-crit">PPh 21 &bull; TER ' + kategori + ' &bull; ' + metode.toUpperCase() + '</span></div>' +
+          '<ul class="list-group list-group-flush mb-0">' +
+          '<li class="list-group-item d-flex justify-content-between px-0"><span>Penghasilan Bruto</span><strong>' + formatRupiah(res.bruto) + '</strong></li>' +
+          (metode === "grossup" ? '<li class="list-group-item d-flex justify-content-between px-0"><span>Tunjangan Pajak</span><strong>' + formatRupiah(res.tunjanganPajak) + '</strong></li>' : '') +
+          '<li class="list-group-item d-flex justify-content-between px-0 text-danger"><span>Estimasi PPh 21</span><strong>' + formatRupiah(res.pajak) + '</strong></li>' +
+          '<li class="list-group-item d-flex justify-content-between px-0 text-success"><span>Take Home Pay (Net)</span><strong>' + formatRupiah(res.thp) + '</strong></li>' +
+          '</ul>';
+
+        renderTabelTigaSkema(kategori, nominal);
+      } else if (jenis === "umkm") {
+        var omzet = Number(document.getElementById("omzetUmkm").value) || 0;
+        var akum = Number(document.getElementById("akumulasiUmkm").value) || 0;
+        var resUmkm = hitungUmkm(omzet, akum);
+
+        record.kriteria = "Final 0,5% (Akum: " + formatRupiah(akum) + ")";
+        record.nominalDasar = resUmkm.omzet;
+        record.pajak = resUmkm.pajak;
+        record.hasilAkhir = resUmkm.bersih;
+
+        hasilHtml =
+          '<div class="mb-2"><span class="badge bg-info text-dark badge-crit">PPh Final UMKM 0,5%</span></div>' +
+          '<ul class="list-group list-group-flush mb-0">' +
+          '<li class="list-group-item d-flex justify-content-between px-0"><span>Omzet Bulan Ini</span><strong>' + formatRupiah(resUmkm.omzet) + '</strong></li>' +
+          '<li class="list-group-item d-flex justify-content-between px-0"><span>Dasar Kena Pajak</span><strong>' + formatRupiah(resUmkm.kenaPajak) + '</strong></li>' +
+          '<li class="list-group-item d-flex justify-content-between px-0 text-danger"><span>PPh Final (0,5%)</span><strong>' + formatRupiah(resUmkm.pajak) + '</strong></li>' +
+          '<li class="list-group-item d-flex justify-content-between px-0 text-success"><span>Omzet Setelah Pajak</span><strong>' + formatRupiah(resUmkm.bersih) + '</strong></li>' +
+          '</ul>';
+      } else {
+        var nilai = Number(document.getElementById("nilaiTransaksi").value) || 0;
+        var skemaPpn = document.getElementById("skemaPpn").value;
+        var resPpn = hitungPpn(nilai, skemaPpn);
+
+        record.kriteria = skemaPpn === "nilai_lain" ? "DPP Nilai Lain (11/12)" : "DPP Penuh (12%)";
+        record.nominalDasar = resPpn.nilai;
+        record.pajak = resPpn.ppn;
+        record.hasilAkhir = resPpn.total;
+
+        hasilHtml =
+          '<div class="mb-2"><span class="badge bg-warning text-dark badge-crit">PPN &bull; ' + escapeHtml(record.kriteria) + '</span></div>' +
+          '<ul class="list-group list-group-flush mb-0">' +
+          '<li class="list-group-item d-flex justify-content-between px-0"><span>Nilai Transaksi</span><strong>' + formatRupiah(resPpn.nilai) + '</strong></li>' +
+          '<li class="list-group-item d-flex justify-content-between px-0"><span>DPP</span><strong>' + formatRupiah(resPpn.dpp) + '</strong></li>' +
+          '<li class="list-group-item d-flex justify-content-between px-0 text-danger"><span>PPN Dipungut</span><strong>' + formatRupiah(resPpn.ppn) + '</strong></li>' +
+          '<li class="list-group-item d-flex justify-content-between px-0 text-success"><span>Total Tagihan</span><strong>' + formatRupiah(resPpn.total) + '</strong></li>' +
+          '</ul>';
+      }
+
+      document.getElementById("hasilUtamaBox").innerHTML = hasilHtml;
+      simpanKeHistori(record);
+    }
+
+    function renderTabelTigaSkema(kategori, nilaiAcuan) {
+      var sGross = hitungPph21Skema(kategori, "gross", nilaiAcuan);
+      var sNet = hitungPph21Skema(kategori, "net", nilaiAcuan);
+      var sUp = hitungPph21Skema(kategori, "grossup", nilaiAcuan);
+
+      var rows = [
+        { nama: "Gross", bruto: sGross.bruto, pajak: sGross.pajak, thp: sGross.thp },
+        { nama: "Net", bruto: sNet.bruto, pajak: sNet.pajak, thp: sNet.thp },
+        { nama: "Gross-Up", bruto: sUp.bruto, pajak: sUp.pajak, thp: sUp.thp }
+      ];
+
+      var html = "";
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        html +=
+          "<tr>" +
+          "<td><strong>" + r.nama + "</strong></td>" +
+          "<td>" + formatRupiah(r.bruto) + "</td>" +
+          "<td class='text-danger'>" + formatRupiah(r.pajak) + "</td>" +
+          "<td class='text-success fw-semibold'>" + formatRupiah(r.thp) + "</td>" +
+          "</tr>";
+      }
+      document.getElementById("tabelSimulasiTigaSkema").innerHTML = html;
+    }
+
+    // --- IMPOR & EKSPOR DATA MASSAL ---
+    function muatContohDataMassal() {
+      var contohRows = [
+        { nama: "Rina Wijaya", jenis: "pph21", kategori: "A", metode: "gross", nominal: 9500000 },
+        { nama: "Dedi Kurniawan", jenis: "pph21", kategori: "B", metode: "grossup", nominal: 14000000 },
+        { nama: "Toko Berkah Jaya", jenis: "umkm", kategori: "A", metode: "gross", nominal: 25000000 },
+        { nama: "CV Nusantara Digital", jenis: "ppn", kategori: "A", metode: "gross", nominal: 40000000 }
+      ];
+      olahBarisMassal(contohRows);
+    }
+
+    function prosesImporCsv() {
+      var input = document.getElementById("fileCsv");
+      if (!input.files || input.files.length === 0) {
+        alert("Silakan pilih file CSV terlebih dahulu atau klik 'Isi Contoh Data'.");
+        return;
+      }
+
+      var file = input.files[0];
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var teks = e.target.result || "";
+        var barisList = teks.split(/\r?\n/);
+        var parsed = [];
+
+        for (var i = 0; i < barisList.length; i++) {
+          var line = barisList[i].trim();
+          if (!line) continue;
+          var cols = line.split(",");
+          if (i === 0 && cols[0].toLowerCase().indexOf("nama") !== -1) continue;
+          if (cols.length < 5) continue;
+
+          parsed.push({
+            nama: cols[0].trim(),
+            jenis: cols[1].trim().toLowerCase(),
+            kategori: (cols[2].trim() || "A").toUpperCase(),
+            metode: (cols[3].trim() || "gross").toLowerCase(),
+            nominal: Number(cols[4].trim()) || 0
+          });
+        }
+
+        if (parsed.length === 0) {
+          alert("Tidak ada baris data valid ditemukan pada CSV.");
+          return;
+        }
+        olahBarisMassal(parsed);
+      };
+      reader.readAsText(file);
+    }
+
+    function olahBarisMassal(listInput) {
+      dataMassalAktif = [];
+      var html = "";
+
+      for (var i = 0; i < listInput.length; i++) {
+        var item = listInput[i];
+        var dasar = item.nominal;
+        var pajak = 0;
+        var akhir = 0;
+        var kriteriaLabel = "";
+
+        if (item.jenis === "pph21") {
+          var h21 = hitungPph21Skema(item.kategori, item.metode, item.nominal);
+          dasar = h21.bruto;
+          pajak = h21.pajak;
+          akhir = h21.thp;
+          kriteriaLabel = "TER " + item.kategori + " (" + item.metode + ")";
+        } else if (item.jenis === "umkm") {
+          var humkm = hitungUmkm(item.nominal, 600000000);
+          dasar = humkm.omzet;
+          pajak = humkm.pajak;
+          akhir = humkm.bersih;
+          kriteriaLabel = "Final 0,5%";
+        } else {
+          var hppn = hitungPpn(item.nominal, "penuh");
+          dasar = hppn.nilai;
+          pajak = hppn.ppn;
+          akhir = hppn.total;
+          kriteriaLabel = "PPN 12%";
+        }
+
+        var rowObj = {
+          no: i + 1,
+          nama: item.nama,
+          jenis: item.jenis.toUpperCase(),
+          kriteria: kriteriaLabel,
+          dasar: dasar,
+          pajak: pajak,
+          akhir: akhir
+        };
+        dataMassalAktif.push(rowObj);
+
+        html +=
+          "<tr>" +
+          "<td>" + rowObj.no + "</td>" +
+          "<td>" + escapeHtml(rowObj.nama) + "</td>" +
+          "<td><span class='badge bg-secondary'>" + escapeHtml(rowObj.jenis) + "</span></td>" +
+          "<td>" + escapeHtml(rowObj.kriteria) + "</td>" +
+          "<td>" + formatRupiah(rowObj.dasar) + "</td>" +
+          "<td class='text-danger'>" + formatRupiah(rowObj.pajak) + "</td>" +
+          "<td class='text-success fw-semibold'>" + formatRupiah(rowObj.akhir) + "</td>" +
+          "</tr>";
+
+        simpanKeHistori({
+          id: "IMP-" + Date.now() + "-" + i,
+          waktu: new Date().toLocaleString("id-ID"),
+          sumber: "IMPOR",
+          nama: rowObj.nama,
+          jenis: rowObj.jenis,
+          kriteria: rowObj.kriteria,
+          nominalDasar: rowObj.dasar,
+          pajak: rowObj.pajak,
+          hasilAkhir: rowObj.akhir
+        });
+      }
+
+      document.getElementById("tbodyMassal").innerHTML = html;
+      document.getElementById("jumlahDataMassal").textContent = dataMassalAktif.length + " baris";
+    }
+
+    function eksporHasilCsv() {
+      if (dataMassalAktif.length === 0) {
+        alert("Belum ada data massal untuk diekspor.");
+        return;
+      }
+
+      var csvLines = ["No,Nama Objek,Jenis Pajak,Kriteria,Dasar Perhitungan,Pajak,Hasil Akhir"];
+      for (var i = 0; i < dataMassalAktif.length; i++) {
+        var r = dataMassalAktif[i];
+        csvLines.push([
+          r.no,
+          '"' + r.nama.replace(/"/g, '""') + '"',
+          r.jenis,
+          '"' + r.kriteria.replace(/"/g, '""') + '"',
+          Math.round(r.dasar),
+          Math.round(r.pajak),
+          Math.round(r.akhir)
+        ].join(","));
+      }
+
+      var blob = new Blob([csvLines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "hasil_kalkulasi_pajak_" + Date.now() + ".csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      simpanKeHistori({
+        id: "EXP-" + Date.now(),
+        waktu: new Date().toLocaleString("id-ID"),
+        sumber: "EKSPOR",
+        nama: "Ekspor " + dataMassalAktif.length + " baris data ke CSV",
+        jenis: "CSV",
+        kriteria: "Ekspor Massal",
+        nominalDasar: 0,
+        pajak: 0,
+        hasilAkhir: dataMassalAktif.length
+      });
+    }
+
+    // --- HISTORI PERHITUNGAN ---
+    function ambilHistori() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function simpanKeHistori(record) {
+      var list = ambilHistori();
+      list.unshift(record);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {
+        // Abaikan jika penyimpanan penuh
+      }
+      renderHistori();
+    }
+
+    function hapusSemuaHistori() {
+      if (!confirm("Hapus seluruh histori yang tersimpan?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      renderHistori();
+    }
+
+    function renderHistori() {
+      var list = ambilHistori();
+      var filter = document.getElementById("filterHistori").value;
+      var filtered = [];
+
+      for (var i = 0; i < list.length; i++) {
+        if (filter === "ALL" || list[i].sumber === filter) {
+          filtered.push(list[i]);
+        }
+      }
+
+      if (filtered.length === 0) {
+        document.getElementById("tbodyHistori").innerHTML =
+          '<tr><td colspan="7" class="text-center text-muted py-3">Tidak ada histori untuk filter ini.</td></tr>';
+        return;
+      }
+
+      var html = "";
+      for (var j = 0; j < filtered.length; j++) {
+        var item = filtered[j];
+        var badgeClass = item.sumber === "IMPOR" ? "bg-info text-dark" : (item.sumber === "EKSPOR" ? "bg-success" : "bg-primary");
+        var hasilFmt = item.sumber === "EKSPOR" ? (item.hasilAkhir + " baris") : formatRupiah(item.hasilAkhir);
+
+        html +=
+          "<tr onclick='tampilDetailHistori(\"" + escapeHtml(item.id) + "\")' style='cursor:pointer;'>" +
+          "<td class='small'>" + escapeHtml(item.waktu) + "</td>" +
+          "<td><span class='badge " + badgeClass + "'>" + escapeHtml(item.sumber) + "</span></td>" +
+          "<td><strong>" + escapeHtml(item.nama) + "</strong> <span class='text-muted small'>(" + escapeHtml(item.jenis) + ")</span></td>" +
+          "<td class='small'>" + escapeHtml(item.kriteria) + "</td>" +
+          "<td>" + formatRupiah(item.nominalDasar) + "</td>" +
+          "<td class='text-danger'>" + formatRupiah(item.pajak) + "</td>" +
+          "<td class='text-success fw-semibold'>" + hasilFmt + "</td>" +
+          "</tr>";
+      }
+      document.getElementById("tbodyHistori").innerHTML = html;
+    }
+
+    function tampilDetailHistori(id) {
+      var list = ambilHistori();
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].id === id) {
+          var d = list[i];
+          document.getElementById("isiModalDetail").innerHTML =
+            "<p><strong>ID:</strong> " + escapeHtml(d.id) + "</p>" +
+            "<p><strong>Waktu:</strong> " + escapeHtml(d.waktu) + "</p>" +
+            "<p><strong>Sumber:</strong> " + escapeHtml(d.sumber) + "</p>" +
+            "<p><strong>Objek:</strong> " + escapeHtml(d.nama) + " (" + escapeHtml(d.jenis) + ")</p>" +
+            "<p><strong>Kriteria:</strong> " + escapeHtml(d.kriteria) + "</p>" +
+            "<p><strong>Nominal Dasar:</strong> " + formatRupiah(d.nominalDasar) + "</p>" +
+            "<p><strong>Pajak:</strong> " + formatRupiah(d.pajak) + "</p>" +
+            "<p><strong>Hasil Akhir:</strong> " + (d.sumber === "EKSPOR" ? escapeHtml(d.hasilAkhir) + " baris" : formatRupiah(d.hasilAkhir)) + "</p>";
+          var modal = new bootstrap.Modal(document.getElementById("modalDetail"));
+          modal.show();
+          break;
+        }
+      }
+    }
+
+    // Tampilkan histori awal saat halaman dimuat
+    renderHistori();
+  </script>
+</body>
+</html>
