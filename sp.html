@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistem Surat Peringatan (SP) Karyawan</title>
+  <title data-i18n="pageTitle">Sistem Surat Peringatan (SP) Karyawan</title>
   <style>
     :root {
       --bg: #f4f6f9;
@@ -17,7 +17,6 @@
       --success: #047857;
       --warning: #b45309;
       --danger: #b91c1c;
-      --term-bg: #450a0a;
     }
 
     * {
@@ -43,7 +42,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       margin-bottom: 14px;
+      flex-wrap: wrap;
     }
 
     .home-btn {
@@ -62,6 +63,27 @@
 
     .home-btn:hover {
       background-color: var(--primary-hover);
+    }
+
+    .lang-switch {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .lang-btn {
+      border-radius: 0;
+      padding: 7px 12px;
+      font-size: 0.82rem;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .lang-btn.active {
+      background: var(--primary);
+      color: #fff;
     }
 
     .top-grid {
@@ -153,62 +175,19 @@
       min-height: 70px;
     }
 
-    /* Alert Riwayat Pelanggaran & Escalation */
-    .history-alert {
+    .violation-alert {
       display: none;
-      border-radius: 8px;
       padding: 12px 14px;
-      margin-bottom: 14px;
-      font-size: 0.85rem;
-      border: 1px solid transparent;
-    }
-
-    .history-alert.info {
-      display: block;
-      background: #eff6ff;
-      border-color: #bfdbfe;
-      color: #1e3a8a;
-    }
-
-    .history-alert.warn {
-      display: block;
-      background: #fffbeb;
-      border-color: #fcd34d;
-      color: #92400e;
-    }
-
-    .history-alert.danger {
-      display: block;
+      border-radius: 8px;
       background: #fef2f2;
-      border-color: #fca5a5;
+      border: 1px solid #fca5a5;
       color: #991b1b;
-    }
-
-    .termination-box {
-      display: none;
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      border-radius: 8px;
-      padding: 12px 14px;
-      margin-bottom: 14px;
       font-size: 0.85rem;
+      margin-bottom: 12px;
     }
 
-    .termination-box.active {
+    .violation-alert.show {
       display: block;
-    }
-
-    .checkbox-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      margin-top: 8px;
-      font-weight: 600;
-      color: #7f1d1d;
-    }
-
-    .checkbox-row input {
-      margin-top: 3px;
     }
 
     .approval-box {
@@ -303,6 +282,16 @@
       color: #fff;
     }
 
+    .btn-berhenti {
+      display: none;
+      background: #7f1d1d;
+      color: #fff;
+    }
+
+    .btn-berhenti.visible {
+      display: inline-block;
+    }
+
     .btn-print {
       background: var(--success);
       color: #fff;
@@ -331,10 +320,6 @@
       border-radius: 8px;
       background: #fff;
       font-size: 0.88rem;
-    }
-
-    .surat-sheet.termination-mode {
-      border: 2px solid #991b1b;
     }
 
     .surat-header {
@@ -368,7 +353,7 @@
     .badge-sp1 { background: #fef3c7; color: var(--warning); }
     .badge-sp2 { background: #ffedd5; color: #c2410c; }
     .badge-sp3 { background: #fee2e2; color: var(--danger); }
-    .badge-term { background: #450a0a; color: #ffffff; }
+    .badge-keluar { background: #450a0a; color: #ffffff; }
 
     .info-table {
       width: 100%;
@@ -413,7 +398,6 @@
       text-decoration: underline;
     }
 
-    /* History Section */
     .history-toolbar {
       display: flex;
       justify-content: space-between;
@@ -461,6 +445,12 @@
       background: #f8fafc;
     }
 
+    .action-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
     .empty-state {
       text-align: center;
       padding: 28px 16px;
@@ -490,143 +480,159 @@
       color: var(--text);
       padding: 0 6px;
     }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+      .page-header,
+      .form-panel,
+      .history-section {
+        display: none !important;
+      }
+      .top-grid {
+        display: block;
+        margin: 0;
+      }
+      .card {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+      }
+      .card > h2 {
+        display: none;
+      }
+      .surat-sheet {
+        border: none;
+        padding: 0;
+      }
+    }
   </style>
 </head>
 <body>
   <main class="container">
     <div class="page-header">
-      <a href="index.html" class="home-btn">Home</a>
+      <a href="index.html" class="home-btn" data-i18n="homeBtn">Home</a>
+      <div class="lang-switch" role="group" aria-label="Language Switcher">
+        <button type="button" class="lang-btn active" id="langIdBtn" onclick="setLanguage('id')">Indonesia</button>
+        <button type="button" class="lang-btn" id="langEnBtn" onclick="setLanguage('en')">English</button>
+      </div>
     </div>
 
     <div class="top-grid">
       <!-- Form Pengajuan -->
       <section class="card form-panel">
-        <h2>Form Pengajuan SP & Termination</h2>
+        <h2 data-i18n="formTitle">Form Pengajuan Surat Peringatan</h2>
         <form id="spForm">
           <div class="form-grid">
             <div class="form-group">
-              <label for="noSurat">Nomor Surat (Otomatis)</label>
+              <label for="noSurat" data-i18n="lblNoSurat">Nomor Surat (Otomatis)</label>
               <input type="text" id="noSurat" readonly />
             </div>
 
             <div class="form-group">
-              <label for="tingkatSp">Tingkat Dokumen / Sanksi</label>
+              <label for="tingkatSp" data-i18n="lblTingkatSp">Tingkat SP</label>
               <select id="tingkatSp" required>
-                <option value="">-- Pilih Tingkat --</option>
-                <option value="SP 1">SP 1 (Pelanggaran Ringan - 6 Bulan)</option>
-                <option value="SP 2">SP 2 (Pelanggaran Menengah / Ulangan SP 1 - 6 Bulan)</option>
-                <option value="SP 3">SP 3 (Pelanggaran Berat / Ulangan SP 2 - 6 Bulan)</option>
-                <option value="TERMINATION">TERMINATION LETTER (Pemutusan Hubungan Kerja)</option>
+                <option value="" data-i18n="optSelectTingkat">-- Pilih Tingkat SP --</option>
+                <option value="SP 1" data-i18n="optSp1">SP 1 (Pelanggaran Ringan - 6 Bulan)</option>
+                <option value="SP 2" data-i18n="optSp2">SP 2 (Pelanggaran Menengah / Ulangan SP 1 - 6 Bulan)</option>
+                <option value="SP 3" data-i18n="optSp3">SP 3 (Pelanggaran Berat / Ulangan SP 2 - 6 Bulan)</option>
+                <option value="SURAT PERNYATAAN KELUAR" data-i18n="optKeluar">SURAT PERNYATAAN KELUAR</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="namaKaryawan">Nama Karyawan</label>
-              <input type="text" id="namaKaryawan" placeholder="Masukkan nama lengkap karyawan" required />
+              <label for="namaKaryawan" data-i18n="lblNama">Nama Karyawan</label>
+              <input type="text" id="namaKaryawan" data-i18n-placeholder="phNama" placeholder="Masukkan nama lengkap karyawan" required />
             </div>
 
             <div class="form-group">
-              <label for="nikKaryawan">NIK</label>
-              <input type="text" id="nikKaryawan" placeholder="Masukkan NIK karyawan" required />
+              <label for="nikKaryawan" data-i18n="lblNik">NIK</label>
+              <input type="text" id="nikKaryawan" data-i18n-placeholder="phNik" placeholder="Masukkan NIK karyawan" required />
             </div>
 
             <div class="form-group">
-              <label for="jabatan">Jabatan</label>
-              <input type="text" id="jabatan" placeholder="Masukkan jabatan" required />
+              <label for="jabatan" data-i18n="lblJabatan">Jabatan</label>
+              <input type="text" id="jabatan" data-i18n-placeholder="phJabatan" placeholder="Masukkan jabatan" required />
             </div>
 
             <div class="form-group">
-              <label for="departemen">Departemen</label>
-              <input type="text" id="departemen" placeholder="Masukkan departemen" required />
+              <label for="departemen" data-i18n="lblDept">Departemen</label>
+              <input type="text" id="departemen" data-i18n-placeholder="phDept" placeholder="Masukkan departemen" required />
             </div>
 
             <div class="form-group">
-              <label for="tanggalKejadian">Tanggal Kejadian</label>
+              <label for="tanggalKejadian" data-i18n="lblTglKejadian">Tanggal Kejadian</label>
               <input type="date" id="tanggalKejadian" required />
             </div>
 
             <div class="form-group">
-              <label for="tanggalTerbit">Tanggal Terbit Surat</label>
+              <label for="tanggalTerbit" data-i18n="lblTglTerbit">Tanggal Terbit SP</label>
               <input type="date" id="tanggalTerbit" required />
             </div>
 
-            <!-- Info Riwayat Pelanggaran Otomatis -->
             <div class="form-group full">
-              <div id="employeeHistoryAlert" class="history-alert"></div>
-            </div>
-
-            <!-- Panel Kebijakan Pelanggaran ke-3 & Termination -->
-            <div class="form-group full">
-              <div id="terminationBox" class="termination-box">
-                <strong>Catatan Kebijakan Termination Letter:</strong>
-                <p style="margin-top: 4px; color: #7f1d1d;">
-                  Pelanggaran ke-3 <strong>tidak langsung otomatis menerbitkan Termination Letter</strong> tanpa verifikasi. Pastikan telah melalui proses evaluasi/SP sebelumnya, persetujuan HR &amp; Manajemen/Legal, serta memenuhi ketentuan peraturan perusahaan.
-                </p>
-                <label class="checkbox-row">
-                  <input type="checkbox" id="confirmTerminationPolicy" />
-                  <span>Saya menyatakan kasus ini telah diverifikasi HR/Atasan dan disetujui untuk penerbitan Termination Letter.</span>
-                </label>
-              </div>
+              <div id="violationAlert" class="violation-alert"></div>
             </div>
 
             <div class="form-group full">
-              <label for="alasanPelanggaran">Alasan Pelanggaran / Dasar Tindakan</label>
+              <label for="alasanPelanggaran" data-i18n="lblAlasan">Alasan Pelanggaran</label>
               <select id="alasanPelanggaran" required>
-                <option value="">-- Pilih Alasan --</option>
-                <optgroup label="Kategori SP 1 - Kedisiplinan Ringan">
-                  <option value="Terlambat masuk kerja tanpa alasan sah lebih dari 3 kali dalam sebulan">Terlambat masuk kerja tanpa alasan sah (&gt; 3x/bulan)</option>
-                  <option value="Mangkir atau tidak masuk kerja tanpa keterangan selama 1–2 hari">Mangkir tanpa keterangan selama 1–2 hari</option>
-                  <option value="Tidak menggunakan seragam kerja atau atribut standar perusahaan">Tidak menggunakan seragam / atribut standar</option>
+                <option value="" data-i18n="optSelectAlasan">-- Pilih Alasan Pelanggaran --</option>
+                <optgroup label="Kategori SP 1 - Kedisiplinan Ringan" data-i18n-label="grpSp1">
+                  <option value="Terlambat masuk kerja tanpa alasan sah lebih dari 3 kali dalam sebulan" data-i18n="alasanSp1_1">Terlambat masuk kerja tanpa alasan sah (&gt; 3x/bulan)</option>
+                  <option value="Mangkir atau tidak masuk kerja tanpa keterangan selama 1–2 hari" data-i18n="alasanSp1_2">Mangkir tanpa keterangan selama 1–2 hari</option>
+                  <option value="Tidak menggunakan seragam kerja atau atribut standar perusahaan" data-i18n="alasanSp1_3">Tidak menggunakan seragam / atribut standar</option>
                 </optgroup>
-                <optgroup label="Kategori SP 2 - Pelanggaran Menengah / Pengulangan SP 1">
-                  <option value="Mengulangi pelanggaran disiplin saat masa berlaku SP 1 masih aktif">Mengulangi pelanggaran saat SP 1 masih aktif</option>
-                  <option value="Mangkir atau tidak masuk kerja tanpa keterangan selama 3–4 hari berturut-turut">Mangkir tanpa keterangan selama 3–4 hari berturut-turut</option>
-                  <option value="Menolak instruksi kerja yang wajar dari atasan langsung">Menolak perintah kerja yang layak dari atasan</option>
+                <optgroup label="Kategori SP 2 - Pelanggaran Menengah / Pengulangan SP 1" data-i18n-label="grpSp2">
+                  <option value="Mengulangi pelanggaran disiplin saat masa berlaku SP 1 masih aktif" data-i18n="alasanSp2_1">Mengulangi pelanggaran saat SP 1 masih aktif</option>
+                  <option value="Mangkir atau tidak masuk kerja tanpa keterangan selama 3–4 hari berturut-turut" data-i18n="alasanSp2_2">Mangkir tanpa keterangan selama 3–4 hari berturut-turut</option>
+                  <option value="Menolak instruksi kerja yang wajar dari atasan langsung" data-i18n="alasanSp2_3">Menolak perintah kerja yang layak dari atasan</option>
                 </optgroup>
-                <optgroup label="Kategori SP 3 - Pelanggaran Berat / Pengulangan SP 2">
-                  <option value="Mengulangi pelanggaran saat masa berlaku SP 2 masih aktif">Mengulangi pelanggaran saat SP 2 masih aktif</option>
-                  <option value="Mangkir selama 5 hari kerja atau lebih tanpa keterangan sah">Mangkir 5 hari kerja atau lebih tanpa keterangan</option>
-                  <option value="Pelanggaran tata tertib berat, penyalahgunaan wewenang, atau kebocoran data">Pelanggaran berat / penyalahgunaan wewenang / data</option>
+                <optgroup label="Kategori SP 3 - Pelanggaran Berat / Pengulangan SP 2" data-i18n-label="grpSp3">
+                  <option value="Mengulangi pelanggaran saat masa berlaku SP 2 masih aktif" data-i18n="alasanSp3_1">Mengulangi pelanggaran saat SP 2 masih aktif</option>
+                  <option value="Mangkir selama 5 hari kerja atau lebih tanpa keterangan sah" data-i18n="alasanSp3_2">Mangkir 5 hari kerja atau lebih tanpa keterangan</option>
+                  <option value="Pelanggaran tata tertib berat, penyalahgunaan wewenang, atau kebocoran data" data-i18n="alasanSp3_3">Pelanggaran berat / penyalahgunaan wewenang / data</option>
                 </optgroup>
-                <optgroup label="Kategori Termination Letter (PHK)">
-                  <option value="Pelanggaran berulang hingga pelanggaran ke-3 / melampaui batas sanksi SP">Pelanggaran berulang hingga pelanggaran ke-3 / melampaui batas sanksi SP</option>
-                  <option value="Pelanggaran berat sesuai peraturan perusahaan / perjanjian kerja setelah proses klarifikasi">Pelanggaran berat sesuai aturan perusahaan setelah klarifikasi</option>
+                <optgroup label="Kategori Pernyataan Keluar (3x Pelanggaran)" data-i18n-label="grpKeluar">
+                  <option value="Mencapai 3 kali pelanggaran dan diproses pernyataan keluar karyawan" data-i18n="alasanKeluar">Mencapai 3 kali pelanggaran dan diproses pernyataan keluar karyawan</option>
                 </optgroup>
               </select>
             </div>
 
             <div class="form-group full">
-              <label for="kronologi">Kronologi &amp; Uraian Kejadian</label>
-              <textarea id="kronologi" placeholder="Tuliskan kronologi kejadian secara jelas dan objektif..." required></textarea>
+              <label for="kronologi" data-i18n="lblKronologi">Kronologi &amp; Uraian Kejadian</label>
+              <textarea id="kronologi" data-i18n-placeholder="phKronologi" placeholder="Tuliskan kronologi kejadian secara jelas dan objektif..." required></textarea>
             </div>
 
             <div class="form-group full">
-              <label for="perbaikan">Rencana Perbaikan / Catatan Penyelesaian Hak &amp; Administrasi</label>
-              <textarea id="perbaikan" placeholder="Untuk SP: target perbaikan. Untuk Termination: tanggal efektif berhenti & serah terima aset..." required></textarea>
+              <label for="perbaikan" data-i18n="lblPerbaikan">Rencana Perbaikan (Corrective Action)</label>
+              <textarea id="perbaikan" data-i18n-placeholder="phPerbaikan" placeholder="Tuliskan target atau tindakan perbaikan yang harus dipenuhi karyawan..." required></textarea>
             </div>
 
             <div class="form-group">
-              <label for="namaAtasan">Atasan Langsung (Pengaju)</label>
-              <input type="text" id="namaAtasan" placeholder="Nama &amp; jabatan atasan langsung" required />
+              <label for="namaAtasan" data-i18n="lblAtasan">Atasan Langsung (Pengaju)</label>
+              <input type="text" id="namaAtasan" data-i18n-placeholder="phAtasan" placeholder="Nama &amp; jabatan atasan langsung" required />
             </div>
 
             <div class="form-group">
-              <label for="namaHr">Pejabat HR / Approver</label>
-              <input type="text" id="namaHr" placeholder="Nama &amp; jabatan pejabat HR" required />
+              <label for="namaHr" data-i18n="lblHr">Pejabat HR (Approver)</label>
+              <input type="text" id="namaHr" data-i18n-placeholder="phHr" placeholder="Nama &amp; jabatan pejabat HR" required />
             </div>
           </div>
 
           <!-- Jenjang Approval Dinamis -->
           <div class="approval-box">
-            <div class="approval-title">Jenjang Persetujuan (Approval Workflow)</div>
+            <div class="approval-title" data-i18n="approvalTitle">Jenjang Persetujuan (Approval Workflow)</div>
             <ol class="step-list" id="approvalSteps"></ol>
           </div>
 
           <div class="btn-row">
-            <button type="submit" class="btn-primary" id="submitBtn">Simpan ke Histori &amp; Update Draft</button>
-            <button type="button" class="btn-secondary" id="resetFormBtn">Reset Form</button>
-            <button type="button" class="btn-danger" id="clearStorageBtn">Clear Storage</button>
-            <button type="button" class="btn-print" onclick="window.print()">Cetak / PDF</button>
+            <button type="submit" class="btn-primary" id="saveBtn" data-i18n="btnSimpan">Simpan</button>
+            <button type="button" class="btn-berhenti" id="berhentiBtn" data-i18n="btnBerhenti">Berhenti</button>
+            <button type="button" class="btn-secondary" id="resetFormBtn" data-i18n="btnReset">Reset Form</button>
+            <button type="button" class="btn-danger" id="clearStorageBtn" data-i18n="btnClear">Clear Storage</button>
+            <button type="button" class="btn-print" onclick="window.print()" data-i18n="btnPrint">PDF</button>
           </div>
 
           <div class="status-banner" id="statusBanner"></div>
@@ -635,80 +641,107 @@
 
       <!-- Preview Surat -->
       <section class="card">
-        <h2>Preview Draft Surat</h2>
+        <h2 data-i18n="previewTitle">Preview Draft Surat Peringatan</h2>
         <div class="surat-sheet" id="suratPreview">
           <div class="surat-header">
             <h3 id="prevJudulSp">SURAT PERINGATAN</h3>
             <div class="surat-meta">
-              Nomor: <span id="prevNoSurat">-</span> &nbsp;|&nbsp;
-              Status: <span id="prevBadge" class="badge badge-sp1">DRAFT</span>
+              <span data-i18n="prevNoLabel">Nomor</span>: <span id="prevNoSurat">-</span> &nbsp;|&nbsp;
+              <span data-i18n="prevStatusLabel">Status</span>: <span id="prevBadge" class="badge badge-sp1">DRAFT</span>
             </div>
           </div>
 
-          <p id="prevIntroText">Diberikan kepada karyawan berikut:</p>
-          <table class="info-table">
-            <tr>
-              <td class="label-col">Nama Karyawan</td>
-              <td>: <span id="prevNama">-</span></td>
-            </tr>
-            <tr>
-              <td class="label-col">NIK</td>
-              <td>: <span id="prevNik">-</span></td>
-            </tr>
-            <tr>
-              <td class="label-col">Jabatan / Departemen</td>
-              <td>: <span id="prevJabatan">-</span> / <span id="prevDept">-</span></td>
-            </tr>
-            <tr>
-              <td class="label-col">Riwayat Catatan Terdeteksi</td>
-              <td>: <span id="prevRiwayatCount">0 catatan</span></td>
-            </tr>
-            <tr>
-              <td class="label-col">Tanggal Kejadian</td>
-              <td>: <span id="prevTglKejadian">-</span></td>
-            </tr>
-            <tr>
-              <td class="label-col">Alasan / Dasar</td>
-              <td>: <span id="prevAlasan">-</span></td>
-            </tr>
-          </table>
+          <!-- Mode SP -->
+          <div id="spBody">
+            <p data-i18n="prevSpIntro">Diberikan kepada karyawan berikut:</p>
+            <table class="info-table">
+              <tr>
+                <td class="label-col" data-i18n="lblNama">Nama Karyawan</td>
+                <td>: <span id="prevNama">-</span></td>
+              </tr>
+              <tr>
+                <td class="label-col" data-i18n="lblNik">NIK</td>
+                <td>: <span id="prevNik">-</span></td>
+              </tr>
+              <tr>
+                <td class="label-col" data-i18n="lblJabatanDept">Jabatan / Departemen</td>
+                <td>: <span id="prevJabatan">-</span> / <span id="prevDept">-</span></td>
+              </tr>
+              <tr>
+                <td class="label-col" data-i18n="lblTglKejadian">Tanggal Kejadian</td>
+                <td>: <span id="prevTglKejadian">-</span></td>
+              </tr>
+              <tr>
+                <td class="label-col" data-i18n="lblAlasan">Alasan Pelanggaran</td>
+                <td>: <span id="prevAlasan">-</span></td>
+              </tr>
+            </table>
 
-          <p><strong>Uraian Kronologi:</strong></p>
-          <p id="prevKronologi" style="margin-bottom: 10px;">-</p>
+            <p><strong data-i18n="prevKronologiTitle">Uraian Kronologi:</strong></p>
+            <p id="prevKronologi" style="margin-bottom: 10px;">-</p>
 
-          <div id="prevSpClause">
-            <p><strong>Ketentuan &amp; Rencana Perbaikan:</strong></p>
-            <p style="margin-bottom: 8px;">
+            <p><strong data-i18n="prevPerbaikanTitle">Ketentuan &amp; Rencana Perbaikan:</strong></p>
+            <p id="prevSpClauseText" style="margin-bottom: 8px;">
               Surat Peringatan ini berlaku selama <strong>6 (enam) bulan</strong> sejak tanggal terbit (<span id="prevTglTerbit">-</span>). Selama masa berlaku, karyawan wajib menjalankan tindakan perbaikan berikut:
             </p>
-            <p id="prevPerbaikanSp" style="margin-bottom: 10px; font-style: italic;">-</p>
-            <p style="font-size: 0.84rem; color: #374151;">
-              Apabila dalam masa berlaku terjadi pelanggaran kembali atau tidak ada perbaikan, perusahaan dapat menjatuhkan sanksi lanjutan hingga pemutusan hubungan kerja sesuai peraturan perusahaan.
+            <p id="prevPerbaikan" style="margin-bottom: 10px; font-style: italic;">-</p>
+            <p id="prevSpFooterNote" style="font-size: 0.84rem; color: #374151;">
+              Apabila dalam masa berlaku terjadi pelanggaran kembali atau tidak ada perbaikan, perusahaan dapat menjatuhkan sanksi lanjutan sesuai peraturan perusahaan yang berlaku.
             </p>
           </div>
 
-          <div id="prevTermClause" style="display: none;">
-            <p><strong>Ketentuan Pemutusan Hubungan Kerja (Termination):</strong></p>
-            <p style="margin-bottom: 8px;">
-              Terhitung sejak tanggal terbit (<span id="prevTglTerbitTerm">-</span>), hubungan kerja dinyatakan berakhir sesuai hasil evaluasi pelanggaran dan persetujuan manajemen. Catatan administrasi &amp; penyelesaian:
+          <!-- Mode Surat Pernyataan Keluar (3x Pelanggaran -> Tombol Berhenti) -->
+          <div id="resignBody" style="display: none;">
+            <p id="prevResignStatement">
+              Yang bertanda tangan di bawah ini, karyawan dengan data berikut, menyatakan <strong>keluar / berhenti bekerja</strong> dari perusahaan terhitung sejak tanggal terbit surat (<span id="prevResignTglTerbit">-</span>) setelah tercatat melakukan pelanggaran sebanyak 3 kali dan diproses melalui tombol Berhenti:
             </p>
-            <p id="prevPerbaikanTerm" style="margin-bottom: 10px; font-style: italic;">-</p>
+            <table class="info-table">
+              <tr>
+                <td class="label-col" data-i18n="lblNama">Nama Karyawan</td>
+                <td>: <span id="prevResignNama">-</span></td>
+              </tr>
+              <tr>
+                <td class="label-col" data-i18n="lblNik">NIK</td>
+                <td>: <span id="prevResignNik">-</span></td>
+              </tr>
+              <tr>
+                <td class="label-col" data-i18n="lblJabatanDept">Jabatan / Departemen</td>
+                <td>: <span id="prevResignJabatan">-</span> / <span id="prevResignDept">-</span></td>
+              </tr>
+              <tr>
+                <td class="label-col" data-i18n="lblTglKejadian">Tanggal Kejadian</td>
+                <td>: <span id="prevResignTglKejadian">-</span></td>
+              </tr>
+              <tr>
+                <td class="label-col" data-i18n="lblAlasan">Alasan Pelanggaran</td>
+                <td>: <span id="prevResignAlasan">-</span></td>
+              </tr>
+            </table>
+
+            <p><strong data-i18n="prevKronologiTitle">Uraian Kronologi:</strong></p>
+            <p id="prevResignKronologi" style="margin-bottom: 10px;">-</p>
+
+            <p><strong data-i18n="prevResignNotesTitle">Pernyataan &amp; Catatan Penyelesaian:</strong></p>
+            <p id="prevResignPerbaikan" style="margin-bottom: 10px; font-style: italic;">-</p>
+            <p id="prevResignClosing" style="font-size: 0.84rem; color: #374151;">
+              Pernyataan keluar ini dibuat dengan sebenar-benarnya dan akan ditindaklanjuti dengan penyelesaian administrasi serta serah terima tugas/aset sesuai ketentuan perusahaan.
+            </p>
           </div>
 
           <div class="ttd-grid">
             <div class="ttd-box">
-              <div>Diajukan Oleh,</div>
-              <div class="ttd-role">Atasan Langsung</div>
+              <div data-i18n="ttdPreparedBy">Diajukan Oleh,</div>
+              <div class="ttd-role" data-i18n="ttdRoleAtasan">Atasan Langsung</div>
               <div class="ttd-name" id="prevAtasan">-</div>
             </div>
             <div class="ttd-box">
-              <div>Disetujui Oleh,</div>
+              <div data-i18n="ttdApprovedBy">Disetujui Oleh,</div>
               <div class="ttd-role" id="prevRoleApprover">Approver</div>
               <div class="ttd-name" id="prevHr">-</div>
             </div>
             <div class="ttd-box">
-              <div id="prevKaryawanSignLabel">Diterima Oleh,</div>
-              <div class="ttd-role">Karyawan</div>
+              <div data-i18n="ttdReceivedBy">Diterima Oleh,</div>
+              <div class="ttd-role" data-i18n="ttdRoleKaryawan">Karyawan</div>
               <div class="ttd-name" id="prevTtdKaryawan">-</div>
             </div>
           </div>
@@ -716,21 +749,21 @@
       </section>
     </div>
 
-    <!-- Histori Karyawan Yang Di-SP / Termination -->
+    <!-- Histori Karyawan Yang Di-SP -->
     <section class="card history-section">
-      <h2>Histori Surat Peringatan &amp; Termination Karyawan</h2>
+      <h2 data-i18n="historyTitle">Histori Karyawan yang Diberikan Surat Peringatan</h2>
 
       <div class="history-toolbar">
         <div class="search-box">
-          <input type="text" id="searchInput" placeholder="Cari nama, NIK, nomor surat, departemen, SP, atau alasan..." />
+          <input type="text" id="searchInput" data-i18n-placeholder="phSearch" placeholder="Cari nama, NIK, nomor surat, departemen, SP, atau alasan..." />
         </div>
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
           <select id="pageSizeSelect" style="width: auto; padding: 8px 10px;">
-            <option value="5" selected>5 baris / hal</option>
-            <option value="10">10 baris / hal</option>
-            <option value="20">20 baris / hal</option>
+            <option value="5" selected data-i18n="optPage5">5 baris / hal</option>
+            <option value="10" data-i18n="optPage10">10 baris / hal</option>
+            <option value="20" data-i18n="optPage20">20 baris / hal</option>
           </select>
-          <button type="button" class="btn-excel" id="downloadExcelBtn">Download Excel</button>
+          <button type="button" class="btn-excel" id="downloadExcelBtn" data-i18n="btnExcel">Download Excel</button>
         </div>
       </div>
 
@@ -738,13 +771,13 @@
         <table class="history-table">
           <thead>
             <tr>
-              <th>No. Surat</th>
-              <th>Tingkat</th>
-              <th>Karyawan (NIK)</th>
-              <th>Jabatan / Dept</th>
-              <th>Tgl Terbit</th>
-              <th>Alasan</th>
-              <th>Aksi</th>
+              <th data-i18n="thNoSurat">No. Surat</th>
+              <th data-i18n="thTingkat">Tingkat</th>
+              <th data-i18n="thKaryawan">Karyawan (NIK)</th>
+              <th data-i18n="thJabatanDept">Jabatan / Dept</th>
+              <th data-i18n="thTglTerbit">Tgl Terbit</th>
+              <th data-i18n="thAlasan">Alasan Pelanggaran</th>
+              <th data-i18n="thAksi">Aksi</th>
             </tr>
           </thead>
           <tbody id="historyTbody"></tbody>
@@ -754,9 +787,9 @@
       <div class="pagination-bar">
         <div id="paginationSummary">Menampilkan 0 data</div>
         <div class="pagination-controls">
-          <button type="button" class="btn-secondary" id="prevPageBtn">Sebelumnya</button>
+          <button type="button" class="btn-secondary" id="prevPageBtn" data-i18n="btnPrev">Sebelumnya</button>
           <span class="page-info" id="pageIndicator">Hal 1 / 1</span>
-          <button type="button" class="btn-secondary" id="nextPageBtn">Berikutnya</button>
+          <button type="button" class="btn-secondary" id="nextPageBtn" data-i18n="btnNext">Berikutnya</button>
         </div>
       </div>
     </section>
@@ -764,20 +797,267 @@
 
   <script>
     const STORAGE_KEY = "hris_sp_history_v1";
-    const SP_VALIDITY_DAYS = 180; // ~6 bulan
+    const LANG_KEY = "hris_sp_lang_v1";
+
+    const i18n = {
+      id: {
+        pageTitle: "Sistem Surat Peringatan (SP) Karyawan",
+        homeBtn: "Home",
+        formTitle: "Form Pengajuan Surat Peringatan",
+        lblNoSurat: "Nomor Surat (Otomatis)",
+        lblTingkatSp: "Tingkat SP",
+        optSelectTingkat: "-- Pilih Tingkat SP --",
+        optSp1: "SP 1 (Pelanggaran Ringan - 6 Bulan)",
+        optSp2: "SP 2 (Pelanggaran Menengah / Ulangan SP 1 - 6 Bulan)",
+        optSp3: "SP 3 (Pelanggaran Berat / Ulangan SP 2 - 6 Bulan)",
+        optKeluar: "SURAT PERNYATAAN KELUAR",
+        lblNama: "Nama Karyawan",
+        phNama: "Masukkan nama lengkap karyawan",
+        lblNik: "NIK",
+        phNik: "Masukkan NIK karyawan",
+        lblJabatan: "Jabatan",
+        phJabatan: "Masukkan jabatan",
+        lblDept: "Departemen",
+        phDept: "Masukkan departemen",
+        lblJabatanDept: "Jabatan / Departemen",
+        lblTglKejadian: "Tanggal Kejadian",
+        lblTglTerbit: "Tanggal Terbit SP",
+        lblAlasan: "Alasan Pelanggaran",
+        optSelectAlasan: "-- Pilih Alasan Pelanggaran --",
+        grpSp1: "Kategori SP 1 - Kedisiplinan Ringan",
+        grpSp2: "Kategori SP 2 - Pelanggaran Menengah / Pengulangan SP 1",
+        grpSp3: "Kategori SP 3 - Pelanggaran Berat / Pengulangan SP 2",
+        grpKeluar: "Kategori Pernyataan Keluar (3x Pelanggaran)",
+        alasanSp1_1: "Terlambat masuk kerja tanpa alasan sah (> 3x/bulan)",
+        alasanSp1_2: "Mangkir tanpa keterangan selama 1–2 hari",
+        alasanSp1_3: "Tidak menggunakan seragam / atribut standar",
+        alasanSp2_1: "Mengulangi pelanggaran saat SP 1 masih aktif",
+        alasanSp2_2: "Mangkir tanpa keterangan selama 3–4 hari berturut-turut",
+        alasanSp2_3: "Menolak perintah kerja yang layak dari atasan",
+        alasanSp3_1: "Mengulangi pelanggaran saat SP 2 masih aktif",
+        alasanSp3_2: "Mangkir 5 hari kerja atau lebih tanpa keterangan",
+        alasanSp3_3: "Pelanggaran berat / penyalahgunaan wewenang / data",
+        alasanKeluar: "Mencapai 3 kali pelanggaran dan diproses pernyataan keluar karyawan",
+        lblKronologi: "Kronologi & Uraian Kejadian",
+        phKronologi: "Tuliskan kronologi kejadian secara jelas dan objektif...",
+        lblPerbaikan: "Rencana Perbaikan (Corrective Action)",
+        phPerbaikan: "Tuliskan target atau tindakan perbaikan yang harus dipenuhi karyawan...",
+        lblAtasan: "Atasan Langsung (Pengaju)",
+        phAtasan: "Nama & jabatan atasan langsung",
+        lblHr: "Pejabat HR (Approver)",
+        phHr: "Nama & jabatan pejabat HR",
+        approvalTitle: "Jenjang Persetujuan (Approval Workflow)",
+        btnSimpan: "Simpan",
+        btnBerhenti: "Berhenti",
+        btnReset: "Reset Form",
+        btnClear: "Clear Storage",
+        btnPrint: "PDF",
+        previewTitle: "Preview Draft Surat Peringatan",
+        prevNoLabel: "Nomor",
+        prevStatusLabel: "Status",
+        prevSpIntro: "Diberikan kepada karyawan berikut:",
+        prevKronologiTitle: "Uraian Kronologi:",
+        prevPerbaikanTitle: "Ketentuan & Rencana Perbaikan:",
+        prevResignNotesTitle: "Pernyataan & Catatan Penyelesaian:",
+        ttdPreparedBy: "Diajukan Oleh,",
+        ttdRoleAtasan: "Atasan Langsung",
+        ttdApprovedBy: "Disetujui Oleh,",
+        ttdReceivedBy: "Diterima Oleh,",
+        ttdRoleKaryawan: "Karyawan",
+        historyTitle: "Histori Karyawan yang Diberikan Surat Peringatan",
+        phSearch: "Cari nama, NIK, nomor surat, departemen, SP, atau alasan...",
+        optPage5: "5 baris / hal",
+        optPage10: "10 baris / hal",
+        optPage20: "20 baris / hal",
+        btnExcel: "Download Excel",
+        thNoSurat: "No. Surat",
+        thTingkat: "Tingkat",
+        thKaryawan: "Karyawan (NIK)",
+        thJabatanDept: "Jabatan / Dept",
+        thTglTerbit: "Tgl Terbit",
+        thAlasan: "Alasan Pelanggaran",
+        thAksi: "Aksi",
+        btnPrev: "Sebelumnya",
+        btnNext: "Berikutnya",
+        btnLihat: "Lihat",
+        btnRowPdf: "Cetak PDF",
+        emptyNoData: "Belum ada data histori Surat Peringatan tersimpan.",
+        emptyNoMatch: "Tidak ada data yang cocok dengan kata kunci pencarian.",
+        savedMsg: (tingkat, noSurat, nama) => `Data ${tingkat} (${noSurat}) untuk ${nama} berhasil disimpan.`,
+        loadedMsg: (noSurat, nama) => `Menampilkan arsip ${noSurat} milik ${nama} pada preview.`,
+        resignedMsg: (noSurat, nama) => `Draft Surat Pernyataan Keluar (${noSurat}) untuk ${nama} diproses dan disimpan.`,
+        violation3Msg: (count, nama) => `Karyawan <strong>${nama}</strong> sudah memiliki <strong>${count} kali pelanggaran</strong>. Tombol <strong>Berhenti</strong> aktif untuk memproses Surat Pernyataan Keluar.`,
+        confirmClear: "Hapus seluruh histori tersimpan di browser dan reset nomor urut ke 001?",
+        clearedMsg: "Storage berhasil dibersihkan. Nomor surat kembali ke urutan 001.",
+        noExcelData: "Tidak ada data histori untuk diunduh.",
+        summaryText: (start, end, filtered, total) => `Menampilkan ${start}–${end} dari ${filtered} data (Total histori: ${total})`,
+        pageText: (curr, total) => `Hal ${curr} / ${total}`,
+        approverSp1: "Dept. Head & HR Manager",
+        approverSp2: "Div. Head & HR Manager",
+        approverSp3: "Director & Head of HR",
+        approverKeluar: "HRD & Manajemen",
+        approverDefault: "Approver",
+        stepsDefault: ["Pilih <strong>Tingkat SP</strong> pada formulir untuk melihat jenjang persetujuan yang berlaku."],
+        stepsSp1: [
+          "<strong>Level 1 - Pengaju (Atasan Langsung):</strong> Membuat draf SP 1 dan mengisi kronologi kejadian.",
+          "<strong>Level 2 - Reviewer (HRBP / Industrial Relations):</strong> Memeriksa kesesuaian alasan dengan aturan perusahaan.",
+          "<strong>Level 3 - Approver Final (Department Head & HR Manager):</strong> Menyetujui penerbitan SP 1.",
+          "<strong>Level 4 - Konfirmasi Karyawan:</strong> Karyawan menerima dan menandatangani surat peringatan."
+        ],
+        stepsSp2: [
+          "<strong>Level 1 - Pengaju (Atasan Langsung):</strong> Mengajukan SP 2 beserta riwayat evaluasi SP sebelumnya.",
+          "<strong>Level 2 - Reviewer (HRBP / Industrial Relations):</strong> Memverifikasi status masa berlaku SP 1 atau tingkat pelanggaran.",
+          "<strong>Level 3 - Approver Final (Division Head & HR Manager):</strong> Menyetujui penerbitan SP 2.",
+          "<strong>Level 4 - Konfirmasi Karyawan:</strong> Karyawan menerima dan menandatangani SP 2."
+        ],
+        stepsSp3: [
+          "<strong>Level 1 - Pengaju (Atasan Langsung):</strong> Mengajukan rekomendasi SP 3 atas pelanggaran berat atau pengulangan SP 2.",
+          "<strong>Level 2 - Reviewer (HRBP / Industrial Relations & Legal):</strong> Memastikan kepatuhan prosedur hubungan industrial.",
+          "<strong>Level 3 - Approver Final (Director Terkait & Head of HR):</strong> Menyetujui penerbitan SP 3.",
+          "<strong>Level 4 - Konfirmasi Karyawan:</strong> Penyampaian resmi kepada karyawan dengan pencatatan saksi."
+        ],
+        stepsKeluar: [
+          "<strong>Level 1 - Pencatatan 3x Pelanggaran:</strong> Sistem memproses tombol Berhenti berdasarkan rekap pelanggaran karyawan.",
+          "<strong>Level 2 - Pernyataan Keluar Karyawan:</strong> Draf pernyataan keluar disiapkan dan ditandatangani oleh Karyawan.",
+          "<strong>Level 3 - Persetujuan Atasan & HRD:</strong> Ditandatangani oleh Atasan Langsung dan Pejabat HRD.",
+          "<strong>Level 4 - Arsip & Cetak PDF:</strong> Disimpan ke histori dan dapat dicetak ke PDF per baris."
+        ]
+      },
+      en: {
+        pageTitle: "Employee Warning Letter (SP) System",
+        homeBtn: "Home",
+        formTitle: "Warning Letter Submission Form",
+        lblNoSurat: "Letter Number (Auto)",
+        lblTingkatSp: "Warning Level (SP)",
+        optSelectTingkat: "-- Select Warning Level --",
+        optSp1: "SP 1 (Minor Violation - 6 Months)",
+        optSp2: "SP 2 (Moderate Violation / Repeat SP 1 - 6 Months)",
+        optSp3: "SP 3 (Severe Violation / Repeat SP 2 - 6 Months)",
+        optKeluar: "EMPLOYEE EXIT STATEMENT LETTER",
+        lblNama: "Employee Name",
+        phNama: "Enter employee full name",
+        lblNik: "Employee ID (NIK)",
+        phNik: "Enter employee ID / NIK",
+        lblJabatan: "Job Title",
+        phJabatan: "Enter job title",
+        lblDept: "Department",
+        phDept: "Enter department",
+        lblJabatanDept: "Title / Department",
+        lblTglKejadian: "Incident Date",
+        lblTglTerbit: "Issue Date",
+        lblAlasan: "Violation Reason",
+        optSelectAlasan: "-- Select Violation Reason --",
+        grpSp1: "Category SP 1 - Minor Discipline",
+        grpSp2: "Category SP 2 - Moderate / Repeat SP 1",
+        grpSp3: "Category SP 3 - Severe / Repeat SP 2",
+        grpKeluar: "Category Exit Statement (3 Violations)",
+        alasanSp1_1: "Arriving late without valid reason (> 3x/month)",
+        alasanSp1_2: "Unexcused absence for 1–2 days",
+        alasanSp1_3: "Not wearing uniform or standard company attire",
+        alasanSp2_1: "Repeating discipline violation while SP 1 is active",
+        alasanSp2_2: "Unexcused absence for 3–4 consecutive days",
+        alasanSp2_3: "Refusing reasonable work instructions from direct supervisor",
+        alasanSp3_1: "Repeating violation while SP 2 is active",
+        alasanSp3_2: "Unexcused absence for 5 working days or more",
+        alasanSp3_3: "Severe misconduct, abuse of authority, or data breach",
+        alasanKeluar: "Reached 3 violations and processed through employee exit statement",
+        lblKronologi: "Chronology & Incident Description",
+        phKronologi: "Write a clear and objective chronology of the incident...",
+        lblPerbaikan: "Corrective Action Plan",
+        phPerbaikan: "Write improvement targets or corrective actions required...",
+        lblAtasan: "Direct Supervisor (Requester)",
+        phAtasan: "Direct supervisor name & title",
+        lblHr: "HR Officer (Approver)",
+        phHr: "HR officer name & title",
+        approvalTitle: "Approval Workflow",
+        btnSimpan: "Save",
+        btnBerhenti: "Terminate / Exit",
+        btnReset: "Reset Form",
+        btnClear: "Clear Storage",
+        btnPrint: "Print / PDF",
+        previewTitle: "Warning Letter Draft Preview",
+        prevNoLabel: "Number",
+        prevStatusLabel: "Status",
+        prevSpIntro: "Issued to the following employee:",
+        prevKronologiTitle: "Incident Chronology:",
+        prevPerbaikanTitle: "Terms & Corrective Action Plan:",
+        prevResignNotesTitle: "Exit Statement & Settlement Notes:",
+        ttdPreparedBy: "Submitted By,",
+        ttdRoleAtasan: "Direct Supervisor",
+        ttdApprovedBy: "Approved By,",
+        ttdReceivedBy: "Acknowledged By,",
+        ttdRoleKaryawan: "Employee",
+        historyTitle: "Employee Warning Letter History",
+        phSearch: "Search name, NIK, letter number, department, SP, or reason...",
+        optPage5: "5 rows / page",
+        optPage10: "10 rows / page",
+        optPage20: "20 rows / page",
+        btnExcel: "Download Excel",
+        thNoSurat: "Letter No.",
+        thTingkat: "Level",
+        thKaryawan: "Employee (NIK)",
+        thJabatanDept: "Title / Dept",
+        thTglTerbit: "Issue Date",
+        thAlasan: "Violation Reason",
+        thAksi: "Actions",
+        btnPrev: "Previous",
+        btnNext: "Next",
+        btnLihat: "View",
+        btnRowPdf: "Print PDF",
+        emptyNoData: "No warning letter history records saved yet.",
+        emptyNoMatch: "No records match your search keyword.",
+        savedMsg: (tingkat, noSurat, nama) => `${tingkat} (${noSurat}) for ${nama} has been saved.`,
+        loadedMsg: (noSurat, nama) => `Showing archive ${noSurat} for ${nama} in preview.`,
+        resignedMsg: (noSurat, nama) => `Employee Exit Statement Draft (${noSurat}) for ${nama} processed and saved.`,
+        violation3Msg: (count, nama) => `Employee <strong>${nama}</strong> has reached <strong>${count} violations</strong>. The <strong>Terminate / Exit</strong> button is active to process the Exit Statement Letter.`,
+        confirmClear: "Delete all history saved in browser and reset sequence number to 001?",
+        clearedMsg: "Storage cleared. Letter sequence reset to 001.",
+        noExcelData: "No history data available to download.",
+        summaryText: (start, end, filtered, total) => `Showing ${start}–${end} of ${filtered} records (Total history: ${total})`,
+        pageText: (curr, total) => `Page ${curr} / ${total}`,
+        approverSp1: "Dept. Head & HR Manager",
+        approverSp2: "Div. Head & HR Manager",
+        approverSp3: "Director & Head of HR",
+        approverKeluar: "HRD & Management",
+        approverDefault: "Approver",
+        stepsDefault: ["Select <strong>Warning Level (SP)</strong> in the form to view the applicable approval workflow."],
+        stepsSp1: [
+          "<strong>Level 1 - Requester (Direct Supervisor):</strong> Drafts SP 1 and records the incident chronology.",
+          "<strong>Level 2 - Reviewer (HRBP / Industrial Relations):</strong> Reviews alignment with company policies.",
+          "<strong>Level 3 - Final Approver (Department Head & HR Manager):</strong> Approves issuance of SP 1.",
+          "<strong>Level 4 - Employee Acknowledgment:</strong> Employee receives and signs the warning letter."
+        ],
+        stepsSp2: [
+          "<strong>Level 1 - Requester (Direct Supervisor):</strong> Submits SP 2 along with prior SP evaluation history.",
+          "<strong>Level 2 - Reviewer (HRBP / Industrial Relations):</strong> Verifies active SP 1 period or violation level.",
+          "<strong>Level 3 - Final Approver (Division Head & HR Manager):</strong> Approves issuance of SP 2.",
+          "<strong>Level 4 - Employee Acknowledgment:</strong> Employee receives and signs SP 2."
+        ],
+        stepsSp3: [
+          "<strong>Level 1 - Requester (Direct Supervisor):</strong> Recommends SP 3 for severe violation or repeat SP 2.",
+          "<strong>Level 2 - Reviewer (HRBP / Industrial Relations & Legal):</strong> Ensures industrial relations compliance.",
+          "<strong>Level 3 - Final Approver (Relevant Director & Head of HR):</strong> Approves issuance of SP 3.",
+          "<strong>Level 4 - Employee Acknowledgment:</strong> Official delivery to employee with witness record."
+        ],
+        stepsKeluar: [
+          "<strong>Level 1 - 3 Violations Trigger:</strong> System enables the Terminate/Exit action based on recorded violations.",
+          "<strong>Level 2 - Employee Exit Statement:</strong> Exit statement draft is generated and signed by the Employee.",
+          "<strong>Level 3 - Supervisor & HRD Approval:</strong> Signed by Direct Supervisor and HRD Officer.",
+          "<strong>Level 4 - Archive & Row PDF:</strong> Saved to history and printable to PDF per row."
+        ]
+      }
+    };
+
+    let currentLang = localStorage.getItem(LANG_KEY) || "id";
 
     const form = document.getElementById("spForm");
     const noSuratInput = document.getElementById("noSurat");
     const tingkatSelect = document.getElementById("tingkatSp");
-    const namaInput = document.getElementById("namaKaryawan");
-    const nikInput = document.getElementById("nikKaryawan");
     const tanggalTerbitInput = document.getElementById("tanggalTerbit");
-    const employeeHistoryAlert = document.getElementById("employeeHistoryAlert");
-    const terminationBox = document.getElementById("terminationBox");
-    const confirmTerminationPolicy = document.getElementById("confirmTerminationPolicy");
+    const violationAlert = document.getElementById("violationAlert");
+    const berhentiBtn = document.getElementById("berhentiBtn");
     const approvalStepsEl = document.getElementById("approvalSteps");
     const statusBanner = document.getElementById("statusBanner");
-    const submitBtn = document.getElementById("submitBtn");
     const resetFormBtn = document.getElementById("resetFormBtn");
     const clearStorageBtn = document.getElementById("clearStorageBtn");
     const searchInput = document.getElementById("searchInput");
@@ -797,32 +1077,48 @@
       "Januari", "Februari", "Maret", "April", "Mei", "Juni",
       "Juli", "Agustus", "September", "Oktober", "November", "Desember"
     ];
+    const engMonths = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
 
-    const approvalMatrix = {
-      "SP 1": [
-        "<strong>Level 1 - Pengaju (Atasan Langsung):</strong> Membuat draf SP 1 dan mengisi kronologi kejadian.",
-        "<strong>Level 2 - Reviewer (HRBP / Industrial Relations):</strong> Memeriksa kesesuaian alasan dengan aturan perusahaan.",
-        "<strong>Level 3 - Approver Final (Department Head &amp; HR Manager):</strong> Menyetujui penerbitan SP 1.",
-        "<strong>Level 4 - Konfirmasi Karyawan:</strong> Karyawan menerima dan menandatangani surat peringatan."
-      ],
-      "SP 2": [
-        "<strong>Level 1 - Pengaju (Atasan Langsung):</strong> Mengajukan SP 2 beserta riwayat evaluasi SP sebelumnya.",
-        "<strong>Level 2 - Reviewer (HRBP / Industrial Relations):</strong> Memverifikasi status masa berlaku SP 1 atau tingkat pelanggaran.",
-        "<strong>Level 3 - Approver Final (Division Head &amp; HR Manager):</strong> Menyetujui penerbitan SP 2.",
-        "<strong>Level 4 - Konfirmasi Karyawan:</strong> Karyawan menerima dan menandatangani SP 2."
-      ],
-      "SP 3": [
-        "<strong>Level 1 - Pengaju (Atasan Langsung):</strong> Mengajukan rekomendasi SP 3 atas pelanggaran berat atau pengulangan SP 2.",
-        "<strong>Level 2 - Reviewer (HRBP / Industrial Relations &amp; Legal):</strong> Memastikan kepatuhan prosedur hubungan industrial.",
-        "<strong>Level 3 - Approver Final (Director Terkait &amp; Head of HR):</strong> Menyetujui penerbitan SP 3.",
-        "<strong>Level 4 - Konfirmasi Karyawan:</strong> Penyampaian resmi kepada karyawan dengan pencatatan saksi."
-      ],
-      "TERMINATION": [
-        "<strong>Level 1 - Pengaju / HRBP:</strong> Menyusun kajian pelanggaran, riwayat SP, dan bukti pendukung (bukan otomatis dari pelanggaran ke-3).",
-        "<strong>Level 2 - Review Legal &amp; Industrial Relations:</strong> Memeriksa kepatuhan prosedur PHK &amp; hak karyawan.",
-        "<strong>Level 3 - Approver Final (Head of HR &amp; Director / C-Level):</strong> Menyetujui penerbitan Termination Letter.",
-        "<strong>Level 4 - Offboarding &amp; Serah Terima:</strong> Proses administrasi akhir, aset, dan berita acara."
-      ]
+    function t() {
+      return i18n[currentLang] || i18n.id;
+    }
+
+    function applyTranslations() {
+      document.documentElement.lang = currentLang;
+      document.getElementById("langIdBtn").classList.toggle("active", currentLang === "id");
+      document.getElementById("langEnBtn").classList.toggle("active", currentLang === "en");
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (typeof t()[key] === "string") {
+          el.textContent = t()[key];
+        }
+      });
+
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (typeof t()[key] === "string") {
+          el.placeholder = t()[key];
+        }
+      });
+
+      document.querySelectorAll("[data-i18n-label]").forEach(el => {
+        const key = el.getAttribute("data-i18n-label");
+        if (typeof t()[key] === "string") {
+          el.label = t()[key];
+        }
+      });
+    }
+
+    window.setLanguage = function(lang) {
+      currentLang = lang === "en" ? "en" : "id";
+      localStorage.setItem(LANG_KEY, currentLang);
+      applyTranslations();
+      syncPreview();
+      renderHistoryTable();
     };
 
     function loadHistory() {
@@ -860,151 +1156,133 @@
       const { monthRoman, year } = getMonthYearFromDate(tanggalTerbitInput.value);
       const nextSeq = spHistory.length + 1;
       const paddedSeq = String(nextSeq).padStart(3, "0");
-      const code = tingkat === "TERMINATION" ? "HRD-PHK" : "HRD-SP";
+      const code = tingkat === "SURAT PERNYATAAN KELUAR" ? "HRD-EXIT" : "HRD-SP";
       return `${paddedSeq}/${code}/${monthRoman}/${year}`;
     }
 
-    function formatTanggalIndo(dateStr) {
+    function formatTanggal(dateStr) {
       if (!dateStr) return "-";
       const parts = dateStr.split("-");
       if (parts.length !== 3) return dateStr;
       const year = parseInt(parts[0], 10);
       const month = parseInt(parts[1], 10) - 1;
       const day = parseInt(parts[2], 10);
-      return `${day} ${indoMonths[month] || ""} ${year}`;
+      const months = currentLang === "en" ? engMonths : indoMonths;
+      return currentLang === "en"
+        ? `${months[month] || ""} ${day}, ${year}`
+        : `${day} ${months[month] || ""} ${year}`;
     }
 
-    function getEmployeeRecords() {
-      const nik = nikInput.value.trim().toLowerCase();
-      const nama = namaInput.value.trim().toLowerCase();
-      if (!nik && !nama) return [];
+    function getEmployeeViolationCount(nik, nama) {
+      const cleanNik = (nik || "").trim().toLowerCase();
+      const cleanNama = (nama || "").trim().toLowerCase();
+      if (!cleanNik && !cleanNama) return 0;
 
       return spHistory.filter(item => {
+        if (item.tingkat === "SURAT PERNYATAAN KELUAR") return false;
         const itemNik = (item.nik || "").trim().toLowerCase();
         const itemNama = (item.nama || "").trim().toLowerCase();
-        if (nik && itemNik === nik) return true;
-        if (!nik && nama && itemNama === nama) return true;
+        if (cleanNik && itemNik === cleanNik) return true;
+        if (!cleanNik && cleanNama && itemNama === cleanNama) return true;
         return false;
-      });
+      }).length;
     }
 
-    function isStillActiveSp(item) {
-      if (!item.tanggalTerbit || item.tingkat === "TERMINATION") return false;
-      const issued = new Date(item.tanggalTerbit + "T00:00:00");
-      if (isNaN(issued.getTime())) return false;
-      const diffDays = (Date.now() - issued.getTime()) / (1000 * 60 * 60 * 24);
-      return diffDays >= 0 && diffDays <= SP_VALIDITY_DAYS;
-    }
+    function evaluateViolationRule() {
+      const nama = document.getElementById("namaKaryawan").value.trim();
+      const nik = document.getElementById("nikKaryawan").value.trim();
+      const count = getEmployeeViolationCount(nik, nama);
+      const isReachedThree = count >= 3;
 
-    function evaluateEmployeeHistory() {
-      const records = getEmployeeRecords();
-      const nextViolationNumber = records.length + 1;
-      const activeSps = records.filter(isStillActiveSp);
+      berhentiBtn.classList.toggle("visible", isReachedThree);
 
-      document.getElementById("prevRiwayatCount").textContent =
-        `${records.length} catatan sebelumnya (Pelanggaran ke-${nextViolationNumber})`;
-
-      if (!nikInput.value.trim() && !namaInput.value.trim()) {
-        employeeHistoryAlert.className = "history-alert";
-        employeeHistoryAlert.innerHTML = "";
-        return;
-      }
-
-      if (records.length === 0) {
-        employeeHistoryAlert.className = "history-alert info";
-        employeeHistoryAlert.innerHTML =
-          `Karyawan belum memiliki riwayat SP/Termination di sistem. Pengajuan ini akan tercatat sebagai <strong>catatan ke-1</strong>.`;
-        return;
-      }
-
-      const ringkasan = records.map(r => `${r.tingkat} (${r.noSurat})`).join(", ");
-
-      if (nextViolationNumber >= 3) {
-        employeeHistoryAlert.className = "history-alert danger";
-        employeeHistoryAlert.innerHTML =
-          `<strong>Perhatian — Pelanggaran ke-${nextViolationNumber}:</strong> Karyawan memiliki <strong>${records.length}</strong> riwayat sebelumnya (${escapeHtml(ringkasan)})` +
-          (activeSps.length > 0 ? ` dan <strong>${activeSps.length} SP masih aktif</strong>.` : `.`) +
-          `<br>Pelanggaran ke-3 <strong>tidak langsung otomatis menerbitkan Termination Letter</strong> tanpa verifikasi HR/Atasan/Legal; dapat diarahkan ke <strong>SP 3</strong> atau pengajuan <strong>TERMINATION</strong> yang telah disetujui.`;
+      if (isReachedThree) {
+        violationAlert.classList.add("show");
+        violationAlert.innerHTML = t().violation3Msg(count, escapeHtml(nama || nik));
       } else {
-        employeeHistoryAlert.className = "history-alert warn";
-        employeeHistoryAlert.innerHTML =
-          `<strong>Riwayat Terdeteksi (${records.length} catatan):</strong> ${escapeHtml(ringkasan)}` +
-          (activeSps.length > 0 ? ` — <strong>${activeSps.length} SP aktif</strong>.` : ``) +
-          ` Pengajuan saat ini merupakan <strong>catatan ke-${nextViolationNumber}</strong>.`;
+        violationAlert.classList.remove("show");
+        violationAlert.innerHTML = "";
       }
-    }
-
-    function syncTerminationUI() {
-      const isTerm = tingkatSelect.value === "TERMINATION";
-      terminationBox.classList.toggle("active", isTerm);
-      if (!isTerm) {
-        confirmTerminationPolicy.checked = false;
-      }
-      submitBtn.disabled = isTerm && !confirmTerminationPolicy.checked;
     }
 
     function renderApprovalSteps(tingkat) {
-      const steps = approvalMatrix[tingkat] || [
-        "Pilih <strong>Tingkat Dokumen / Sanksi</strong> pada formulir untuk melihat jenjang persetujuan yang berlaku."
-      ];
+      let steps = t().stepsDefault;
+      if (tingkat === "SP 1") steps = t().stepsSp1;
+      else if (tingkat === "SP 2") steps = t().stepsSp2;
+      else if (tingkat === "SP 3") steps = t().stepsSp3;
+      else if (tingkat === "SURAT PERNYATAAN KELUAR") steps = t().stepsKeluar;
+
       approvalStepsEl.innerHTML = steps.map(step => `<li>${step}</li>`).join("");
 
       const roleApprover = document.getElementById("prevRoleApprover");
-      if (tingkat === "SP 1") roleApprover.textContent = "Dept. Head & HR Manager";
-      else if (tingkat === "SP 2") roleApprover.textContent = "Div. Head & HR Manager";
-      else if (tingkat === "SP 3") roleApprover.textContent = "Director & Head of HR";
-      else if (tingkat === "TERMINATION") roleApprover.textContent = "Head of HR & Director";
-      else roleApprover.textContent = "Approver";
+      if (tingkat === "SP 1") roleApprover.textContent = t().approverSp1;
+      else if (tingkat === "SP 2") roleApprover.textContent = t().approverSp2;
+      else if (tingkat === "SP 3") roleApprover.textContent = t().approverSp3;
+      else if (tingkat === "SURAT PERNYATAAN KELUAR") roleApprover.textContent = t().approverKeluar;
+      else roleApprover.textContent = t().approverDefault;
     }
 
     function syncPreview() {
       const tingkat = tingkatSelect.value;
-      const isTerm = tingkat === "TERMINATION";
+      const isResign = tingkat === "SURAT PERNYATAAN KELUAR";
       const noSurat = noSuratInput.value.trim() || "-";
-      const nama = namaInput.value.trim() || "-";
-      const nik = nikInput.value.trim() || "-";
+      const nama = document.getElementById("namaKaryawan").value.trim() || "-";
+      const nik = document.getElementById("nikKaryawan").value.trim() || "-";
       const jabatan = document.getElementById("jabatan").value.trim() || "-";
       const dept = document.getElementById("departemen").value.trim() || "-";
-      const tglKejadian = formatTanggalIndo(document.getElementById("tanggalKejadian").value);
-      const tglTerbit = formatTanggalIndo(tanggalTerbitInput.value);
+      const tglKejadian = formatTanggal(document.getElementById("tanggalKejadian").value);
+      const tglTerbit = formatTanggal(tanggalTerbitInput.value);
       const alasan = document.getElementById("alasanPelanggaran").value || "-";
       const kronologi = document.getElementById("kronologi").value.trim() || "-";
       const perbaikan = document.getElementById("perbaikan").value.trim() || "-";
       const atasan = document.getElementById("namaAtasan").value.trim() || "-";
       const hr = document.getElementById("namaHr").value.trim() || "-";
 
-      const sheet = document.getElementById("suratPreview");
-      sheet.classList.toggle("termination-mode", isTerm);
-
-      document.getElementById("prevJudulSp").textContent = isTerm
-        ? "TERMINATION LETTER (PEMUTUSAN HUBUNGAN KERJA)"
+      document.getElementById("prevJudulSp").textContent = isResign
+        ? (currentLang === "en" ? "EMPLOYEE EXIT STATEMENT LETTER" : "SURAT PERNYATAAN KELUAR KARYAWAN")
         : tingkat
-          ? `SURAT PERINGATAN (${tingkat})`
-          : "SURAT PERINGATAN";
+          ? (currentLang === "en" ? `WARNING LETTER (${tingkat})` : `SURAT PERINGATAN (${tingkat})`)
+          : (currentLang === "en" ? "WARNING LETTER" : "SURAT PERINGATAN");
 
       document.getElementById("prevNoSurat").textContent = noSurat;
 
       const badge = document.getElementById("prevBadge");
-      if (!tingkat) {
+      if (isResign) {
+        badge.textContent = currentLang === "en" ? "EXIT STATEMENT" : "PERNYATAAN KELUAR";
+        badge.className = "badge badge-keluar";
+      } else if (!tingkat) {
         badge.textContent = "DRAFT";
         badge.className = "badge badge-sp1";
-      } else if (tingkat === "SP 1") {
-        badge.textContent = "SP 1";
-        badge.className = "badge badge-sp1";
-      } else if (tingkat === "SP 2") {
-        badge.textContent = "SP 2";
-        badge.className = "badge badge-sp2";
-      } else if (tingkat === "SP 3") {
-        badge.textContent = "SP 3";
-        badge.className = "badge badge-sp3";
       } else {
-        badge.textContent = "TERMINATION";
-        badge.className = "badge badge-term";
+        badge.textContent = tingkat;
+        badge.className = "badge " + (
+          tingkat === "SP 1" ? "badge-sp1" :
+          tingkat === "SP 2" ? "badge-sp2" : "badge-sp3"
+        );
       }
 
-      document.getElementById("prevIntroText").textContent = isTerm
-        ? "Diberitahukan kepada karyawan berikut mengenai pemutusan hubungan kerja:"
-        : "Diberikan kepada karyawan berikut:";
+      document.getElementById("spBody").style.display = isResign ? "none" : "block";
+      document.getElementById("resignBody").style.display = isResign ? "block" : "none";
+
+      if (currentLang === "en") {
+        document.getElementById("prevSpClauseText").innerHTML =
+          `This Warning Letter is valid for <strong>6 (six) months</strong> from the issue date (<span id="prevTglTerbit">${escapeHtml(tglTerbit)}</span>). During the validity period, the employee must complete the following corrective actions:`;
+        document.getElementById("prevSpFooterNote").textContent =
+          "If another violation occurs during the validity period or no improvement is made, the company may impose further disciplinary action in accordance with company regulations.";
+        document.getElementById("prevResignStatement").innerHTML =
+          `The undersigned employee, with the details below, hereby declares <strong>resignation / exit</strong> from the company effective from the issue date (<span id="prevResignTglTerbit">${escapeHtml(tglTerbit)}</span>) after recording 3 violations and being processed via the Terminate/Exit action:`;
+        document.getElementById("prevResignClosing").textContent =
+          "This exit statement is made truthfully and will be followed up with administrative settlement and handover of duties/assets according to company policy.";
+      } else {
+        document.getElementById("prevSpClauseText").innerHTML =
+          `Surat Peringatan ini berlaku selama <strong>6 (enam) bulan</strong> sejak tanggal terbit (<span id="prevTglTerbit">${escapeHtml(tglTerbit)}</span>). Selama masa berlaku, karyawan wajib menjalankan tindakan perbaikan berikut:`;
+        document.getElementById("prevSpFooterNote").textContent =
+          "Apabila dalam masa berlaku terjadi pelanggaran kembali atau tidak ada perbaikan, perusahaan dapat menjatuhkan sanksi lanjutan sesuai peraturan perusahaan yang berlaku.";
+        document.getElementById("prevResignStatement").innerHTML =
+          `Yang bertanda tangan di bawah ini, karyawan dengan data berikut, menyatakan <strong>keluar / berhenti bekerja</strong> dari perusahaan terhitung sejak tanggal terbit surat (<span id="prevResignTglTerbit">${escapeHtml(tglTerbit)}</span>) setelah tercatat melakukan pelanggaran sebanyak 3 kali dan diproses melalui tombol Berhenti:`;
+        document.getElementById("prevResignClosing").textContent =
+          "Pernyataan keluar ini dibuat dengan sebenar-benarnya dan akan ditindaklanjuti dengan penyelesaian administrasi serta serah terima tugas/aset sesuai ketentuan perusahaan.";
+      }
 
       document.getElementById("prevNama").textContent = nama;
       document.getElementById("prevNik").textContent = nik;
@@ -1013,23 +1291,23 @@
       document.getElementById("prevTglKejadian").textContent = tglKejadian;
       document.getElementById("prevAlasan").textContent = alasan;
       document.getElementById("prevKronologi").textContent = kronologi;
+      document.getElementById("prevPerbaikan").textContent = perbaikan;
 
-      document.getElementById("prevSpClause").style.display = isTerm ? "none" : "block";
-      document.getElementById("prevTermClause").style.display = isTerm ? "block" : "none";
-
-      document.getElementById("prevTglTerbit").textContent = tglTerbit;
-      document.getElementById("prevTglTerbitTerm").textContent = tglTerbit;
-      document.getElementById("prevPerbaikanSp").textContent = perbaikan;
-      document.getElementById("prevPerbaikanTerm").textContent = perbaikan;
+      document.getElementById("prevResignNama").textContent = nama;
+      document.getElementById("prevResignNik").textContent = nik;
+      document.getElementById("prevResignJabatan").textContent = jabatan;
+      document.getElementById("prevResignDept").textContent = dept;
+      document.getElementById("prevResignTglKejadian").textContent = tglKejadian;
+      document.getElementById("prevResignAlasan").textContent = alasan;
+      document.getElementById("prevResignKronologi").textContent = kronologi;
+      document.getElementById("prevResignPerbaikan").textContent = perbaikan;
 
       document.getElementById("prevAtasan").textContent = atasan;
       document.getElementById("prevHr").textContent = hr;
       document.getElementById("prevTtdKaryawan").textContent = nama;
-      document.getElementById("prevKaryawanSignLabel").textContent = isTerm ? "Diketahui Oleh," : "Diterima Oleh,";
 
       renderApprovalSteps(tingkat);
-      evaluateEmployeeHistory();
-      syncTerminationUI();
+      evaluateViolationRule();
     }
 
     function getFilteredHistory() {
@@ -1054,13 +1332,6 @@
         .replace(/"/g, "&quot;");
     }
 
-    function getBadgeClass(tingkat) {
-      if (tingkat === "SP 1") return "badge-sp1";
-      if (tingkat === "SP 2") return "badge-sp2";
-      if (tingkat === "SP 3") return "badge-sp3";
-      return "badge-term";
-    }
-
     function renderHistoryTable() {
       const filtered = getFilteredHistory();
       const pageSize = parseInt(pageSizeSelect.value, 10) || 5;
@@ -1076,43 +1347,48 @@
         historyTbody.innerHTML = `
           <tr>
             <td colspan="7" class="empty-state">
-              ${spHistory.length === 0
-                ? "Belum ada data histori Surat Peringatan / Termination tersimpan."
-                : "Tidak ada data yang cocok dengan kata kunci pencarian."}
+              ${spHistory.length === 0 ? t().emptyNoData : t().emptyNoMatch}
             </td>
           </tr>
         `;
       } else {
-        historyTbody.innerHTML = pageItems.map(item => `
-          <tr>
-            <td><strong>${escapeHtml(item.noSurat)}</strong></td>
-            <td><span class="badge ${getBadgeClass(item.tingkat)}">${escapeHtml(item.tingkat)}</span></td>
-            <td>${escapeHtml(item.nama)}<br><small style="color:#6b7280;">NIK: ${escapeHtml(item.nik)}</small></td>
-            <td>${escapeHtml(item.jabatan)}<br><small style="color:#6b7280;">${escapeHtml(item.departemen)}</small></td>
-            <td>${escapeHtml(formatTanggalIndo(item.tanggalTerbit))}</td>
-            <td>${escapeHtml(item.alasan)}</td>
-            <td>
-              <button type="button" class="btn-secondary" style="padding:6px 10px; font-size:0.78rem;" onclick="loadRecordToForm('${escapeHtml(item.id)}')">Lihat</button>
-            </td>
-          </tr>
-        `).join("");
+        historyTbody.innerHTML = pageItems.map(item => {
+          const badgeClass =
+            item.tingkat === "SURAT PERNYATAAN KELUAR" ? "badge-keluar" :
+            item.tingkat === "SP 1" ? "badge-sp1" :
+            item.tingkat === "SP 2" ? "badge-sp2" : "badge-sp3";
+          return `
+            <tr>
+              <td><strong>${escapeHtml(item.noSurat)}</strong></td>
+              <td><span class="badge ${badgeClass}">${escapeHtml(item.tingkat)}</span></td>
+              <td>${escapeHtml(item.nama)}<br><small style="color:#6b7280;">NIK: ${escapeHtml(item.nik)}</small></td>
+              <td>${escapeHtml(item.jabatan)}<br><small style="color:#6b7280;">${escapeHtml(item.departemen)}</small></td>
+              <td>${escapeHtml(formatTanggal(item.tanggalTerbit))}</td>
+              <td>${escapeHtml(item.alasan)}</td>
+              <td>
+                <div class="action-group">
+                  <button type="button" class="btn-secondary" style="padding:6px 10px; font-size:0.78rem;" onclick="loadRecordToForm('${escapeHtml(item.id)}')">${t().btnLihat}</button>
+                  <button type="button" class="btn-print" style="padding:6px 10px; font-size:0.78rem;" onclick="printRowPdf('${escapeHtml(item.id)}')">${t().btnRowPdf}</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("");
       }
 
       const showStart = filtered.length === 0 ? 0 : startIdx + 1;
       const showEnd = startIdx + pageItems.length;
-      paginationSummary.textContent = `Menampilkan ${showStart}–${showEnd} dari ${filtered.length} data (Total histori: ${spHistory.length})`;
-      pageIndicator.textContent = `Hal ${currentPage} / ${totalPages}`;
+      paginationSummary.textContent = t().summaryText(showStart, showEnd, filtered.length, spHistory.length);
+      pageIndicator.textContent = t().pageText(currentPage, totalPages);
       prevPageBtn.disabled = currentPage <= 1;
       nextPageBtn.disabled = currentPage >= totalPages;
     }
 
-    window.loadRecordToForm = function(id) {
-      const found = spHistory.find(item => item.id === id);
-      if (!found) return;
+    function populateFormFromRecord(found) {
       noSuratInput.value = found.noSurat;
       tingkatSelect.value = found.tingkat;
-      namaInput.value = found.nama;
-      nikInput.value = found.nik;
+      document.getElementById("namaKaryawan").value = found.nama;
+      document.getElementById("nikKaryawan").value = found.nik;
       document.getElementById("jabatan").value = found.jabatan;
       document.getElementById("departemen").value = found.departemen;
       document.getElementById("tanggalKejadian").value = found.tanggalKejadian;
@@ -1122,16 +1398,48 @@
       document.getElementById("perbaikan").value = found.perbaikan;
       document.getElementById("namaAtasan").value = found.atasan;
       document.getElementById("namaHr").value = found.hr;
-      confirmTerminationPolicy.checked = found.tingkat === "TERMINATION";
       syncPreview();
+    }
+
+    window.loadRecordToForm = function(id) {
+      const found = spHistory.find(item => item.id === id);
+      if (!found) return;
+      populateFormFromRecord(found);
       statusBanner.style.display = "block";
-      statusBanner.textContent = `Menampilkan arsip ${found.noSurat} milik ${found.nama} pada preview.`;
+      statusBanner.textContent = t().loadedMsg(found.noSurat, found.nama);
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
+    window.printRowPdf = function(id) {
+      const found = spHistory.find(item => item.id === id);
+      if (!found) return;
+      populateFormFromRecord(found);
+      setTimeout(() => window.print(), 120);
+    };
+
+    function buildRecordFromForm(overrideTingkat, overrideNoSurat) {
+      const tingkat = overrideTingkat || tingkatSelect.value;
+      const noSurat = overrideNoSurat || noSuratInput.value.trim();
+      return {
+        id: "SP-" + Date.now(),
+        noSurat,
+        tingkat,
+        nama: document.getElementById("namaKaryawan").value.trim(),
+        nik: document.getElementById("nikKaryawan").value.trim(),
+        jabatan: document.getElementById("jabatan").value.trim(),
+        departemen: document.getElementById("departemen").value.trim(),
+        tanggalKejadian: document.getElementById("tanggalKejadian").value,
+        tanggalTerbit: tanggalTerbitInput.value,
+        alasan: document.getElementById("alasanPelanggaran").value,
+        kronologi: document.getElementById("kronologi").value.trim(),
+        perbaikan: document.getElementById("perbaikan").value.trim(),
+        atasan: document.getElementById("namaAtasan").value.trim(),
+        hr: document.getElementById("namaHr").value.trim()
+      };
+    }
+
     function clearFormInputs() {
       form.reset();
-      confirmTerminationPolicy.checked = false;
       noSuratInput.value = generateNextLetterNumber(tingkatSelect.value);
       statusBanner.style.display = "none";
       syncPreview();
@@ -1147,28 +1455,7 @@
 
     form.addEventListener("submit", function(e) {
       e.preventDefault();
-
-      if (tingkatSelect.value === "TERMINATION" && !confirmTerminationPolicy.checked) {
-        alert("Centang pernyataan verifikasi & persetujuan Termination Letter terlebih dahulu.");
-        return;
-      }
-
-      const record = {
-        id: "DOC-" + Date.now(),
-        noSurat: noSuratInput.value.trim(),
-        tingkat: tingkatSelect.value,
-        nama: namaInput.value.trim(),
-        nik: nikInput.value.trim(),
-        jabatan: document.getElementById("jabatan").value.trim(),
-        departemen: document.getElementById("departemen").value.trim(),
-        tanggalKejadian: document.getElementById("tanggalKejadian").value,
-        tanggalTerbit: tanggalTerbitInput.value,
-        alasan: document.getElementById("alasanPelanggaran").value,
-        kronologi: document.getElementById("kronologi").value.trim(),
-        perbaikan: document.getElementById("perbaikan").value.trim(),
-        atasan: document.getElementById("namaAtasan").value.trim(),
-        hr: document.getElementById("namaHr").value.trim()
-      };
+      const record = buildRecordFromForm();
 
       spHistory.unshift(record);
       saveHistory();
@@ -1179,20 +1466,57 @@
       noSuratInput.value = generateNextLetterNumber(tingkatSelect.value);
 
       statusBanner.style.display = "block";
-      statusBanner.textContent = `Data ${record.tingkat} (${record.noSurat}) untuk ${record.nama} berhasil disimpan ke histori.`;
+      statusBanner.textContent = t().savedMsg(record.tingkat, record.noSurat, record.nama);
+    });
+
+    berhentiBtn.addEventListener("click", function() {
+      const nama = document.getElementById("namaKaryawan").value.trim();
+      const nik = document.getElementById("nikKaryawan").value.trim();
+      if (!nama || !nik) {
+        alert(currentLang === "en" ? "Please fill in Employee Name and NIK first." : "Lengkapi Nama Karyawan dan NIK terlebih dahulu.");
+        return;
+      }
+
+      if (!tanggalTerbitInput.value) {
+        tanggalTerbitInput.value = new Date().toISOString().slice(0, 10);
+      }
+
+      tingkatSelect.value = "SURAT PERNYATAAN KELUAR";
+      if (!document.getElementById("alasanPelanggaran").value) {
+        document.getElementById("alasanPelanggaran").value = "Mencapai 3 kali pelanggaran dan diproses pernyataan keluar karyawan";
+      }
+      if (!document.getElementById("perbaikan").value.trim()) {
+        document.getElementById("perbaikan").value = currentLang === "en"
+          ? "Employee declares exit/resignation after 3 recorded violations; handover of company assets and final settlement completed."
+          : "Karyawan menyatakan keluar setelah 3 kali pelanggaran tercatat; serah terima aset dan penyelesaian administrasi dilaksanakan sesuai ketentuan.";
+      }
+
+      const exitNoSurat = generateNextLetterNumber("SURAT PERNYATAAN KELUAR");
+      noSuratInput.value = exitNoSurat;
+      syncPreview();
+
+      const record = buildRecordFromForm("SURAT PERNYATAAN KELUAR", exitNoSurat);
+      spHistory.unshift(record);
+      saveHistory();
+      currentPage = 1;
+      renderHistoryTable();
+
+      noSuratInput.value = generateNextLetterNumber(tingkatSelect.value);
+      statusBanner.style.display = "block";
+      statusBanner.textContent = t().resignedMsg(record.noSurat, record.nama);
     });
 
     resetFormBtn.addEventListener("click", clearFormInputs);
 
     clearStorageBtn.addEventListener("click", function() {
-      if (!confirm("Hapus seluruh histori tersimpan di browser dan reset nomor urut ke 001?")) return;
+      if (!confirm(t().confirmClear)) return;
       localStorage.removeItem(STORAGE_KEY);
       spHistory = [];
       currentPage = 1;
       clearFormInputs();
       renderHistoryTable();
       statusBanner.style.display = "block";
-      statusBanner.textContent = "Storage berhasil dibersihkan. Nomor surat kembali ke urutan 001.";
+      statusBanner.textContent = t().clearedMsg;
     });
 
     searchInput.addEventListener("input", function() {
@@ -1223,14 +1547,14 @@
     downloadExcelBtn.addEventListener("click", function() {
       const rows = getFilteredHistory();
       if (rows.length === 0) {
-        alert("Tidak ada data histori untuk diunduh.");
+        alert(t().noExcelData);
         return;
       }
 
       const headers = [
-        "Nomor Surat", "Tingkat", "Nama Karyawan", "NIK", "Jabatan",
-        "Departemen", "Tanggal Kejadian", "Tanggal Terbit", "Alasan",
-        "Kronologi", "Rencana Perbaikan / Catatan", "Atasan Langsung", "Pejabat HR"
+        "Nomor Surat", "Tingkat SP", "Nama Karyawan", "NIK", "Jabatan",
+        "Departemen", "Tanggal Kejadian", "Tanggal Terbit", "Alasan Pelanggaran",
+        "Kronologi", "Rencana Perbaikan", "Atasan Langsung", "Pejabat HR"
       ];
 
       const tableRowsHtml = rows.map(r => `
@@ -1274,7 +1598,7 @@
       const a = document.createElement("a");
       const today = new Date().toISOString().slice(0, 10);
       a.href = url;
-      a.download = `histori-sp-termination-${today}.xls`;
+      a.download = `histori-sp-karyawan-${today}.xls`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1282,6 +1606,7 @@
     });
 
     loadHistory();
+    applyTranslations();
     noSuratInput.value = generateNextLetterNumber(tingkatSelect.value);
     syncPreview();
     renderHistoryTable();
