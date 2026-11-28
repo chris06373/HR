@@ -175,7 +175,7 @@
       min-height: 70px;
     }
 
-    .violation-alert {
+    .rule-alert {
       display: none;
       padding: 12px 14px;
       border-radius: 8px;
@@ -186,7 +186,7 @@
       margin-bottom: 12px;
     }
 
-    .violation-alert.show {
+    .rule-alert.show {
       display: block;
     }
 
@@ -283,13 +283,8 @@
     }
 
     .btn-berhenti {
-      display: none;
       background: #7f1d1d;
       color: #fff;
-    }
-
-    .btn-berhenti.visible {
-      display: inline-block;
     }
 
     .btn-pdf {
@@ -312,6 +307,12 @@
       background: #ecfdf5;
       color: var(--success);
       border: 1px solid #a7f3d0;
+    }
+
+    .status-banner.error {
+      background: #fef2f2;
+      color: var(--danger);
+      border-color: #fecaca;
     }
 
     .surat-sheet {
@@ -583,7 +584,6 @@
                 <option value="SP 1" data-i18n="optSp1">SP 1 (Pelanggaran Ringan - 6 Bulan)</option>
                 <option value="SP 2" data-i18n="optSp2">SP 2 (Pelanggaran Menengah / Ulangan SP 1 - 6 Bulan)</option>
                 <option value="SP 3" data-i18n="optSp3">SP 3 (Pelanggaran Berat / Ulangan SP 2 - 6 Bulan)</option>
-                <option value="SURAT PERNYATAAN KELUAR" data-i18n="optKeluar">SURAT PERNYATAAN KELUAR</option>
               </select>
             </div>
 
@@ -618,7 +618,7 @@
             </div>
 
             <div class="form-group full">
-              <div id="violationAlert" class="violation-alert"></div>
+              <div id="ruleAlert" class="rule-alert"></div>
             </div>
 
             <div class="form-group full">
@@ -639,9 +639,6 @@
                   <option value="Mengulangi pelanggaran saat masa berlaku SP 2 masih aktif" data-i18n="alasanSp3_1">Mengulangi pelanggaran saat SP 2 masih aktif</option>
                   <option value="Mangkir selama 5 hari kerja atau lebih tanpa keterangan sah" data-i18n="alasanSp3_2">Mangkir 5 hari kerja atau lebih tanpa keterangan</option>
                   <option value="Pelanggaran tata tertib berat, penyalahgunaan wewenang, atau kebocoran data" data-i18n="alasanSp3_3">Pelanggaran berat / penyalahgunaan wewenang / data</option>
-                </optgroup>
-                <optgroup label="Kategori Pernyataan Keluar (3x Pelanggaran)" data-i18n-label="grpKeluar">
-                  <option value="Mencapai 3 kali pelanggaran dan diproses pernyataan keluar karyawan" data-i18n="alasanKeluar">Mencapai 3 kali pelanggaran dan diproses pernyataan keluar karyawan</option>
                 </optgroup>
               </select>
             </div>
@@ -675,7 +672,6 @@
 
           <div class="btn-row">
             <button type="submit" class="btn-primary" id="saveBtn" data-i18n="btnSimpan">Simpan</button>
-            <button type="button" class="btn-berhenti" id="berhentiBtn" data-i18n="btnBerhenti">Berhenti</button>
             <button type="button" class="btn-secondary" id="resetFormBtn" data-i18n="btnReset">Reset Form</button>
             <button type="button" class="btn-danger" id="clearStorageBtn" data-i18n="btnClear">Clear Storage</button>
           </div>
@@ -735,10 +731,10 @@
             </p>
           </div>
 
-          <!-- Mode Surat Pernyataan Keluar (3x Pelanggaran -> Tombol Berhenti) -->
+          <!-- Mode Pernyataan Berhenti (dari SP 3) -->
           <div id="resignBody" style="display: none;">
             <p id="prevResignStatement">
-              Yang bertanda tangan di bawah ini, karyawan dengan data berikut, menyatakan <strong>keluar / berhenti bekerja</strong> dari perusahaan terhitung sejak tanggal terbit surat (<span id="prevResignTglTerbit">-</span>) setelah tercatat melakukan pelanggaran sebanyak 3 kali dan diproses melalui tombol Berhenti:
+              Yang bertanda tangan di bawah ini, karyawan dengan data berikut, menyatakan <strong>berhenti / keluar bekerja</strong> dari perusahaan terhitung sejak tanggal terbit (<span id="prevResignTglTerbit">-</span>) setelah tercatat melalui proses SP 3 dan tombol Berhenti:
             </p>
             <table class="info-table">
               <tr>
@@ -769,7 +765,7 @@
             <p><strong data-i18n="prevResignNotesTitle">Pernyataan &amp; Catatan Penyelesaian:</strong></p>
             <p id="prevResignPerbaikan" style="margin-bottom: 10px; font-style: italic;">-</p>
             <p id="prevResignClosing" style="font-size: 0.84rem; color: #374151;">
-              Pernyataan keluar ini dibuat dengan sebenar-benarnya dan akan ditindaklanjuti dengan penyelesaian administrasi serta serah terima tugas/aset sesuai ketentuan perusahaan.
+              Pernyataan berhenti ini dibuat dengan sebenar-benarnya dan akan ditindaklanjuti dengan penyelesaian administrasi serta serah terima tugas/aset sesuai ketentuan perusahaan.
             </p>
           </div>
 
@@ -843,6 +839,7 @@
   <script>
     const STORAGE_KEY = "hris_sp_history_v1";
     const LANG_KEY = "hris_sp_lang_v1";
+    const STATUS_BERHENTI = "BERHENTI";
 
     const i18n = {
       id: {
@@ -855,7 +852,6 @@
         optSp1: "SP 1 (Pelanggaran Ringan - 6 Bulan)",
         optSp2: "SP 2 (Pelanggaran Menengah / Ulangan SP 1 - 6 Bulan)",
         optSp3: "SP 3 (Pelanggaran Berat / Ulangan SP 2 - 6 Bulan)",
-        optKeluar: "SURAT PERNYATAAN KELUAR",
         lblNama: "Nama Karyawan",
         phNama: "Masukkan nama lengkap karyawan",
         lblNik: "NIK",
@@ -872,7 +868,6 @@
         grpSp1: "Kategori SP 1 - Kedisiplinan Ringan",
         grpSp2: "Kategori SP 2 - Pelanggaran Menengah / Pengulangan SP 1",
         grpSp3: "Kategori SP 3 - Pelanggaran Berat / Pengulangan SP 2",
-        grpKeluar: "Kategori Pernyataan Keluar (3x Pelanggaran)",
         alasanSp1_1: "Terlambat masuk kerja tanpa alasan sah (> 3x/bulan)",
         alasanSp1_2: "Mangkir tanpa keterangan selama 1–2 hari",
         alasanSp1_3: "Tidak menggunakan seragam / atribut standar",
@@ -882,7 +877,6 @@
         alasanSp3_1: "Mengulangi pelanggaran saat SP 2 masih aktif",
         alasanSp3_2: "Mangkir 5 hari kerja atau lebih tanpa keterangan",
         alasanSp3_3: "Pelanggaran berat / penyalahgunaan wewenang / data",
-        alasanKeluar: "Mencapai 3 kali pelanggaran dan diproses pernyataan keluar karyawan",
         lblKronologi: "Kronologi & Uraian Kejadian",
         phKronologi: "Tuliskan kronologi kejadian secara jelas dan objektif...",
         lblPerbaikan: "Rencana Perbaikan (Corrective Action)",
@@ -932,8 +926,11 @@
         updatedMsg: (tingkat, noSurat, nama) => `Data ${tingkat} (${noSurat}) untuk ${nama} diperbarui di local storage.`,
         viewedMsg: (noSurat, nama) => `Menampilkan arsip ${noSurat} milik ${nama} pada preview.`,
         loadedMsg: (noSurat, nama) => `Data ${noSurat} milik ${nama} dimuat ke form untuk diedit.`,
-        resignedMsg: (noSurat, nama) => `Draft Surat Pernyataan Keluar (${noSurat}) untuk ${nama} diproses dan disimpan di local storage.`,
-        violation3Msg: (count, nama) => `Karyawan <strong>${nama}</strong> sudah memiliki <strong>${count} kali pelanggaran</strong>. Tombol <strong>Berhenti</strong> aktif untuk memproses Surat Pernyataan Keluar.`,
+        berhentiMsg: (noSurat, nama) => `Status ${noSurat} milik ${nama} diubah menjadi BERHENTI (hanya tersedia Lihat & PDF).`,
+        duplicateDateErr: (nama, tgl) => `Gagal menyimpan: Karyawan (${nama}) sudah memiliki SP pada tanggal ${tgl}. 1 orang hanya bisa mendapat 1 kali SP di tanggal yang sama.`,
+        needSp2Err: (nama) => `Wajib memiliki SP 2 terlebih dahulu baru bisa di-save untuk SP 3 (${nama}).`,
+        ruleNeedSp2Notice: "Notifikasi: Untuk menerbitkan/menyimpan <strong>SP 3</strong>, karyawan wajib sudah memiliki catatan <strong>SP 2</strong>.",
+        ruleSameDateNotice: "Notifikasi: 1 orang hanya bisa mendapat <strong>1 kali SP</strong> pada tanggal terbit yang sama.",
         confirmClear: "Hapus seluruh histori tersimpan di browser dan reset nomor urut ke 001?",
         clearedMsg: "Storage berhasil dibersihkan. Nomor surat kembali ke urutan 001.",
         noExcelData: "Tidak ada data histori untuk diunduh.",
@@ -942,7 +939,7 @@
         approverSp1: "Dept. Head & HR Manager",
         approverSp2: "Div. Head & HR Manager",
         approverSp3: "Director & Head of HR",
-        approverKeluar: "HRD & Manajemen",
+        approverBerhenti: "HRD & Manajemen",
         approverDefault: "Approver",
         stepsDefault: ["Pilih <strong>Tingkat SP</strong> pada formulir untuk melihat jenjang persetujuan yang berlaku."],
         stepsSp1: [
@@ -958,16 +955,15 @@
           "<strong>Level 4 - Konfirmasi Karyawan:</strong> Karyawan menerima dan menandatangani SP 2."
         ],
         stepsSp3: [
-          "<strong>Level 1 - Pengaju (Atasan Langsung):</strong> Mengajukan rekomendasi SP 3 atas pelanggaran berat atau pengulangan SP 2.",
+          "<strong>Level 1 - Pengaju (Atasan Langsung):</strong> Mengajukan SP 3 setelah memiliki SP 2.",
           "<strong>Level 2 - Reviewer (HRBP / Industrial Relations & Legal):</strong> Memastikan kepatuhan prosedur hubungan industrial.",
           "<strong>Level 3 - Approver Final (Director Terkait & Head of HR):</strong> Menyetujui penerbitan SP 3.",
-          "<strong>Level 4 - Konfirmasi Karyawan:</strong> Penyampaian resmi kepada karyawan dengan pencatatan saksi."
+          "<strong>Level 4 - Tindak Lanjut Berhenti:</strong> Pada histori SP 3 tersedia tombol Berhenti di sebelah PDF."
         ],
-        stepsKeluar: [
-          "<strong>Level 1 - Pencatatan 3x Pelanggaran:</strong> Sistem memproses tombol Berhenti berdasarkan rekap pelanggaran karyawan.",
-          "<strong>Level 2 - Pernyataan Keluar Karyawan:</strong> Draf pernyataan keluar disiapkan dan ditandatangani oleh Karyawan.",
-          "<strong>Level 3 - Persetujuan Atasan & HRD:</strong> Ditandatangani oleh Atasan Langsung dan Pejabat HRD.",
-          "<strong>Level 4 - Arsip & PDF:</strong> Disimpan ke histori dan dapat dicetak ke PDF (1 halaman) per baris."
+        stepsBerhenti: [
+          "<strong>Level 1 - Proses Berhenti dari SP 3:</strong> Diproses langsung dari baris SP 3 tanpa membuat baris baru.",
+          "<strong>Level 2 - Pernyataan Berhenti:</strong> Menampilkan pernyataan berhenti dengan tanda tangan Karyawan, Atasan, dan HRD.",
+          "<strong>Level 3 - Arsip Histori:</strong> Hanya tersedia tombol Lihat dan PDF (tanpa Edit)."
         ]
       },
       en: {
@@ -980,7 +976,6 @@
         optSp1: "SP 1 (Minor Violation - 6 Months)",
         optSp2: "SP 2 (Moderate Violation / Repeat SP 1 - 6 Months)",
         optSp3: "SP 3 (Severe Violation / Repeat SP 2 - 6 Months)",
-        optKeluar: "EMPLOYEE EXIT STATEMENT LETTER",
         lblNama: "Employee Name",
         phNama: "Enter employee full name",
         lblNik: "Employee ID (NIK)",
@@ -997,7 +992,6 @@
         grpSp1: "Category SP 1 - Minor Discipline",
         grpSp2: "Category SP 2 - Moderate / Repeat SP 1",
         grpSp3: "Category SP 3 - Severe / Repeat SP 2",
-        grpKeluar: "Category Exit Statement (3 Violations)",
         alasanSp1_1: "Arriving late without valid reason (> 3x/month)",
         alasanSp1_2: "Unexcused absence for 1–2 days",
         alasanSp1_3: "Not wearing uniform or standard company attire",
@@ -1007,7 +1001,6 @@
         alasanSp3_1: "Repeating violation while SP 2 is active",
         alasanSp3_2: "Unexcused absence for 5 working days or more",
         alasanSp3_3: "Severe misconduct, abuse of authority, or data breach",
-        alasanKeluar: "Reached 3 violations and processed through employee exit statement",
         lblKronologi: "Chronology & Incident Description",
         phKronologi: "Write a clear and objective chronology of the incident...",
         lblPerbaikan: "Corrective Action Plan",
@@ -1018,7 +1011,7 @@
         phHr: "HR officer name & title",
         approvalTitle: "Approval Workflow",
         btnSimpan: "Save",
-        btnBerhenti: "Terminate / Exit",
+        btnBerhenti: "Exit / Stop",
         btnReset: "Reset Form",
         btnClear: "Clear Storage",
         previewTitle: "Warning Letter Draft Preview",
@@ -1057,8 +1050,11 @@
         updatedMsg: (tingkat, noSurat, nama) => `${tingkat} (${noSurat}) for ${nama} updated in local storage.`,
         viewedMsg: (noSurat, nama) => `Showing archive ${noSurat} for ${nama} in preview.`,
         loadedMsg: (noSurat, nama) => `Loaded ${noSurat} for ${nama} into the form for editing.`,
-        resignedMsg: (noSurat, nama) => `Employee Exit Statement Draft (${noSurat}) for ${nama} processed and saved to local storage.`,
-        violation3Msg: (count, nama) => `Employee <strong>${nama}</strong> has reached <strong>${count} violations</strong>. The <strong>Terminate / Exit</strong> button is active to process the Exit Statement Letter.`,
+        berhentiMsg: (noSurat, nama) => `Status ${noSurat} for ${nama} updated to BERHENTI (View & PDF only).`,
+        duplicateDateErr: (nama, tgl) => `Cannot save: Employee (${nama}) already has an SP on ${tgl}. One person can only receive 1 SP on the same date.`,
+        needSp2Err: (nama) => `SP 2 is required before saving SP 3 (${nama}).`,
+        ruleNeedSp2Notice: "Notice: To issue/save <strong>SP 3</strong>, the employee must already have an <strong>SP 2</strong> record.",
+        ruleSameDateNotice: "Notice: One person can only receive <strong>1 SP</strong> on the same issue date.",
         confirmClear: "Delete all history saved in browser and reset sequence number to 001?",
         clearedMsg: "Storage cleared. Letter sequence reset to 001.",
         noExcelData: "No history data available to download.",
@@ -1067,7 +1063,7 @@
         approverSp1: "Dept. Head & HR Manager",
         approverSp2: "Div. Head & HR Manager",
         approverSp3: "Director & Head of HR",
-        approverKeluar: "HRD & Management",
+        approverBerhenti: "HRD & Management",
         approverDefault: "Approver",
         stepsDefault: ["Select <strong>Warning Level (SP)</strong> in the form to view the applicable approval workflow."],
         stepsSp1: [
@@ -1083,16 +1079,15 @@
           "<strong>Level 4 - Employee Acknowledgment:</strong> Employee receives and signs SP 2."
         ],
         stepsSp3: [
-          "<strong>Level 1 - Requester (Direct Supervisor):</strong> Recommends SP 3 for severe violation or repeat SP 2.",
+          "<strong>Level 1 - Requester (Direct Supervisor):</strong> Submits SP 3 after having SP 2.",
           "<strong>Level 2 - Reviewer (HRBP / Industrial Relations & Legal):</strong> Ensures industrial relations compliance.",
           "<strong>Level 3 - Final Approver (Relevant Director & Head of HR):</strong> Approves issuance of SP 3.",
-          "<strong>Level 4 - Employee Acknowledgment:</strong> Official delivery to employee with witness record."
+          "<strong>Level 4 - Exit / Stop Action:</strong> SP 3 history row includes the Exit/Stop button next to PDF."
         ],
-        stepsKeluar: [
-          "<strong>Level 1 - 3 Violations Trigger:</strong> System enables the Terminate/Exit action based on recorded violations.",
-          "<strong>Level 2 - Employee Exit Statement:</strong> Exit statement draft is generated and signed by the Employee.",
-          "<strong>Level 3 - Supervisor & HRD Approval:</strong> Signed by Direct Supervisor and HRD Officer.",
-          "<strong>Level 4 - Archive & PDF:</strong> Saved to history and printable to PDF (1 page) per row."
+        stepsBerhenti: [
+          "<strong>Level 1 - Processed from SP 3:</strong> Updated directly on the SP 3 row without creating a new row.",
+          "<strong>Level 2 - Exit Statement:</strong> Displays exit statement signed by Employee, Supervisor, and HRD.",
+          "<strong>Level 3 - History Archive:</strong> Only View and PDF actions are available (no Edit)."
         ]
       }
     };
@@ -1104,8 +1099,7 @@
     const noSuratInput = document.getElementById("noSurat");
     const tingkatSelect = document.getElementById("tingkatSp");
     const tanggalTerbitInput = document.getElementById("tanggalTerbit");
-    const violationAlert = document.getElementById("violationAlert");
-    const berhentiBtn = document.getElementById("berhentiBtn");
+    const ruleAlert = document.getElementById("ruleAlert");
     const approvalStepsEl = document.getElementById("approvalSteps");
     const statusBanner = document.getElementById("statusBanner");
     const resetFormBtn = document.getElementById("resetFormBtn");
@@ -1202,12 +1196,11 @@
       };
     }
 
-    function generateNextLetterNumber(tingkat) {
+    function generateNextLetterNumber() {
       const { monthRoman, year } = getMonthYearFromDate(tanggalTerbitInput.value);
       const nextSeq = spHistory.length + 1;
       const paddedSeq = String(nextSeq).padStart(3, "0");
-      const code = tingkat === "SURAT PERNYATAAN KELUAR" ? "HRD-EXIT" : "HRD-SP";
-      return `${paddedSeq}/${code}/${monthRoman}/${year}`;
+      return `${paddedSeq}/HRD-SP/${monthRoman}/${year}`;
     }
 
     function formatDateObj(d) {
@@ -1247,37 +1240,61 @@
       return formatDateObj(endDate);
     }
 
-    function getEmployeeViolationCount(nik, nama, excludeId) {
+    function isSameEmployee(item, nik, nama) {
       const cleanNik = (nik || "").trim().toLowerCase();
       const cleanNama = (nama || "").trim().toLowerCase();
-      if (!cleanNik && !cleanNama) return 0;
+      const itemNik = (item.nik || "").trim().toLowerCase();
+      const itemNama = (item.nama || "").trim().toLowerCase();
 
-      return spHistory.filter(item => {
-        if (excludeId && item.id === excludeId) return false;
-        if (item.tingkat === "SURAT PERNYATAAN KELUAR") return false;
-        const itemNik = (item.nik || "").trim().toLowerCase();
-        const itemNama = (item.nama || "").trim().toLowerCase();
-        if (cleanNik && itemNik === cleanNik) return true;
-        if (!cleanNik && cleanNama && itemNama === cleanNama) return true;
-        return false;
-      }).length;
+      if (cleanNik && itemNik && cleanNik === itemNik) return true;
+      if (cleanNama && itemNama && cleanNama === itemNama) return true;
+      return false;
     }
 
-    function evaluateViolationRule() {
+    function hasSp2Record(nik, nama, excludeId) {
+      if (!nik.trim() && !nama.trim()) return false;
+      return spHistory.some(item => {
+        if (excludeId && item.id === excludeId) return false;
+        return isSameEmployee(item, nik, nama) && item.tingkat === "SP 2";
+      });
+    }
+
+    function hasSameDateSpRecord(nik, nama, tanggalTerbit, excludeId) {
+      if (!tanggalTerbit) return false;
+      if (!nik.trim() && !nama.trim()) return false;
+      return spHistory.some(item => {
+        if (excludeId && item.id === excludeId) return false;
+        return isSameEmployee(item, nik, nama) && item.tanggalTerbit === tanggalTerbit;
+      });
+    }
+
+    function showBanner(message, isError) {
+      statusBanner.style.display = "block";
+      statusBanner.classList.toggle("error", Boolean(isError));
+      statusBanner.textContent = message;
+    }
+
+    function evaluateFormRules() {
+      const tingkat = tingkatSelect.value;
       const nama = document.getElementById("namaKaryawan").value.trim();
       const nik = document.getElementById("nikKaryawan").value.trim();
+      const tglTerbit = tanggalTerbitInput.value;
       const excludeId = editRecordIdInput.value.trim();
-      const count = getEmployeeViolationCount(nik, nama, excludeId);
-      const isReachedThree = count >= 3;
 
-      berhentiBtn.classList.toggle("visible", isReachedThree);
+      const notices = [];
+      if (tingkat === "SP 3" && (nama || nik) && !hasSp2Record(nik, nama, excludeId)) {
+        notices.push(t().ruleNeedSp2Notice);
+      }
+      if ((nama || nik) && tglTerbit && hasSameDateSpRecord(nik, nama, tglTerbit, excludeId)) {
+        notices.push(t().ruleSameDateNotice);
+      }
 
-      if (isReachedThree) {
-        violationAlert.classList.add("show");
-        violationAlert.innerHTML = t().violation3Msg(count, escapeHtml(nama || nik));
+      if (notices.length > 0) {
+        ruleAlert.classList.add("show");
+        ruleAlert.innerHTML = notices.join("<br>");
       } else {
-        violationAlert.classList.remove("show");
-        violationAlert.innerHTML = "";
+        ruleAlert.classList.remove("show");
+        ruleAlert.innerHTML = "";
       }
     }
 
@@ -1286,7 +1303,7 @@
       if (tingkat === "SP 1") steps = t().stepsSp1;
       else if (tingkat === "SP 2") steps = t().stepsSp2;
       else if (tingkat === "SP 3") steps = t().stepsSp3;
-      else if (tingkat === "SURAT PERNYATAAN KELUAR") steps = t().stepsKeluar;
+      else if (tingkat === STATUS_BERHENTI) steps = t().stepsBerhenti;
 
       approvalStepsEl.innerHTML = steps.map(step => `<li>${step}</li>`).join("");
 
@@ -1294,13 +1311,13 @@
       if (tingkat === "SP 1") roleApprover.textContent = t().approverSp1;
       else if (tingkat === "SP 2") roleApprover.textContent = t().approverSp2;
       else if (tingkat === "SP 3") roleApprover.textContent = t().approverSp3;
-      else if (tingkat === "SURAT PERNYATAAN KELUAR") roleApprover.textContent = t().approverKeluar;
+      else if (tingkat === STATUS_BERHENTI) roleApprover.textContent = t().approverBerhenti;
       else roleApprover.textContent = t().approverDefault;
     }
 
     function syncPreview() {
       const tingkat = tingkatSelect.value;
-      const isResign = tingkat === "SURAT PERNYATAAN KELUAR";
+      const isBerhenti = tingkat === STATUS_BERHENTI;
       const noSurat = noSuratInput.value.trim() || "-";
       const nama = document.getElementById("namaKaryawan").value.trim() || "-";
       const nik = document.getElementById("nikKaryawan").value.trim() || "-";
@@ -1316,8 +1333,8 @@
       const atasan = document.getElementById("namaAtasan").value.trim() || "-";
       const hr = document.getElementById("namaHr").value.trim() || "-";
 
-      document.getElementById("prevJudulSp").textContent = isResign
-        ? (currentLang === "en" ? "EMPLOYEE EXIT STATEMENT LETTER" : "SURAT PERNYATAAN KELUAR KARYAWAN")
+      document.getElementById("prevJudulSp").textContent = isBerhenti
+        ? (currentLang === "en" ? "EMPLOYEE EXIT STATEMENT LETTER" : "SURAT PERNYATAAN BERHENTI KARYAWAN")
         : tingkat
           ? (currentLang === "en" ? `WARNING LETTER (${tingkat})` : `SURAT PERINGATAN (${tingkat})`)
           : (currentLang === "en" ? "WARNING LETTER" : "SURAT PERINGATAN");
@@ -1325,8 +1342,8 @@
       document.getElementById("prevNoSurat").textContent = noSurat;
 
       const badge = document.getElementById("prevBadge");
-      if (isResign) {
-        badge.textContent = currentLang === "en" ? "EXIT STATEMENT" : "PERNYATAAN KELUAR";
+      if (isBerhenti) {
+        badge.textContent = STATUS_BERHENTI;
         badge.className = "badge badge-keluar";
       } else if (!tingkat) {
         badge.textContent = "DRAFT";
@@ -1339,8 +1356,8 @@
         );
       }
 
-      document.getElementById("spBody").style.display = isResign ? "none" : "block";
-      document.getElementById("resignBody").style.display = isResign ? "block" : "none";
+      document.getElementById("spBody").style.display = isBerhenti ? "none" : "block";
+      document.getElementById("resignBody").style.display = isBerhenti ? "block" : "none";
 
       if (currentLang === "en") {
         document.getElementById("prevSpClauseText").innerHTML =
@@ -1348,7 +1365,7 @@
         document.getElementById("prevSpFooterNote").textContent =
           "If another violation occurs during the validity period or no improvement is made, the company may impose further disciplinary action in accordance with company regulations.";
         document.getElementById("prevResignStatement").innerHTML =
-          `The undersigned employee, with the details below, hereby declares <strong>resignation / exit</strong> from the company effective from the issue date (<strong>${escapeHtml(tglTerbit)}</strong>) after recording 3 violations and being processed via the Terminate/Exit action:`;
+          `The undersigned employee, with the details below, hereby declares <strong>exit / stopping work</strong> from the company effective from the issue date (<strong>${escapeHtml(tglTerbit)}</strong>) after being processed through SP 3 and the Exit/Stop button:`;
         document.getElementById("prevResignClosing").textContent =
           "This exit statement is made truthfully and will be followed up with administrative settlement and handover of duties/assets according to company policy.";
       } else {
@@ -1357,9 +1374,9 @@
         document.getElementById("prevSpFooterNote").textContent =
           "Apabila dalam masa berlaku terjadi pelanggaran kembali atau tidak ada perbaikan, perusahaan dapat menjatuhkan sanksi lanjutan sesuai peraturan perusahaan yang berlaku.";
         document.getElementById("prevResignStatement").innerHTML =
-          `Yang bertanda tangan di bawah ini, karyawan dengan data berikut, menyatakan <strong>keluar / berhenti bekerja</strong> dari perusahaan terhitung sejak tanggal terbit surat (<strong>${escapeHtml(tglTerbit)}</strong>) setelah tercatat melakukan pelanggaran sebanyak 3 kali dan diproses melalui tombol Berhenti:`;
+          `Yang bertanda tangan di bawah ini, karyawan dengan data berikut, menyatakan <strong>berhenti / keluar bekerja</strong> dari perusahaan terhitung sejak tanggal terbit (<strong>${escapeHtml(tglTerbit)}</strong>) setelah tercatat melalui proses SP 3 dan tombol Berhenti:`;
         document.getElementById("prevResignClosing").textContent =
-          "Pernyataan keluar ini dibuat dengan sebenar-benarnya dan akan ditindaklanjuti dengan penyelesaian administrasi serta serah terima tugas/aset sesuai ketentuan perusahaan.";
+          "Pernyataan berhenti ini dibuat dengan sebenar-benarnya dan akan ditindaklanjuti dengan penyelesaian administrasi serta serah terima tugas/aset sesuai ketentuan perusahaan.";
       }
 
       document.getElementById("prevNama").textContent = nama;
@@ -1385,7 +1402,7 @@
       document.getElementById("prevTtdKaryawan").textContent = nama;
 
       renderApprovalSteps(tingkat);
-      evaluateViolationRule();
+      evaluateFormRules();
     }
 
     function getFilteredHistory() {
@@ -1431,10 +1448,21 @@
         `;
       } else {
         historyTbody.innerHTML = pageItems.map(item => {
+          const isBerhenti = item.tingkat === STATUS_BERHENTI;
+          const isSp3 = item.tingkat === "SP 3";
           const badgeClass =
-            item.tingkat === "SURAT PERNYATAAN KELUAR" ? "badge-keluar" :
+            isBerhenti ? "badge-keluar" :
             item.tingkat === "SP 1" ? "badge-sp1" :
             item.tingkat === "SP 2" ? "badge-sp2" : "badge-sp3";
+
+          const editBtnHtml = isBerhenti
+            ? ""
+            : `<button type="button" class="btn-primary" style="padding:6px 10px; font-size:0.78rem;" onclick="editRecord('${escapeHtml(item.id)}')">${t().btnEdit}</button>`;
+
+          const berhentiBtnHtml = isSp3
+            ? `<button type="button" class="btn-berhenti" style="padding:6px 10px; font-size:0.78rem;" onclick="setRecordBerhenti('${escapeHtml(item.id)}')">${t().btnBerhenti}</button>`
+            : "";
+
           return `
             <tr>
               <td><strong>${escapeHtml(item.noSurat)}</strong></td>
@@ -1446,8 +1474,9 @@
               <td>
                 <div class="action-group">
                   <button type="button" class="btn-secondary" style="padding:6px 10px; font-size:0.78rem;" onclick="viewRecord('${escapeHtml(item.id)}')">${t().btnLihat}</button>
-                  <button type="button" class="btn-primary" style="padding:6px 10px; font-size:0.78rem;" onclick="editRecord('${escapeHtml(item.id)}')">${t().btnEdit}</button>
+                  ${editBtnHtml}
                   <button type="button" class="btn-pdf" style="padding:6px 10px; font-size:0.78rem;" onclick="printRowPdf('${escapeHtml(item.id)}')">${t().btnRowPdf}</button>
+                  ${berhentiBtnHtml}
                 </div>
               </td>
             </tr>
@@ -1466,7 +1495,7 @@
     function populateFormFromRecord(found, isEditMode) {
       editRecordIdInput.value = isEditMode ? found.id : "";
       noSuratInput.value = found.noSurat;
-      tingkatSelect.value = found.tingkat;
+      tingkatSelect.value = found.tingkat === STATUS_BERHENTI ? "" : found.tingkat;
       document.getElementById("namaKaryawan").value = found.nama;
       document.getElementById("nikKaryawan").value = found.nik;
       document.getElementById("jabatan").value = found.jabatan;
@@ -1478,6 +1507,11 @@
       document.getElementById("perbaikan").value = found.perbaikan;
       document.getElementById("namaAtasan").value = found.atasan;
       document.getElementById("namaHr").value = found.hr;
+
+      // Khusus mode lihat pada record BERHENTI, tampilkan preview BERHENTI
+      if (!isEditMode && found.tingkat === STATUS_BERHENTI) {
+        tingkatSelect.value = STATUS_BERHENTI;
+      }
       syncPreview();
     }
 
@@ -1485,17 +1519,15 @@
       const found = spHistory.find(item => item.id === id);
       if (!found) return;
       populateFormFromRecord(found, false);
-      statusBanner.style.display = "block";
-      statusBanner.textContent = t().viewedMsg(found.noSurat, found.nama);
+      showBanner(t().viewedMsg(found.noSurat, found.nama), false);
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     window.editRecord = function(id) {
       const found = spHistory.find(item => item.id === id);
-      if (!found) return;
+      if (!found || found.tingkat === STATUS_BERHENTI) return;
       populateFormFromRecord(found, true);
-      statusBanner.style.display = "block";
-      statusBanner.textContent = t().loadedMsg(found.noSurat, found.nama);
+      showBanner(t().loadedMsg(found.noSurat, found.nama), false);
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
@@ -1506,13 +1538,34 @@
       setTimeout(() => window.print(), 120);
     };
 
-    function buildRecordFromForm(overrideTingkat, overrideNoSurat, existingId) {
-      const tingkat = overrideTingkat || tingkatSelect.value;
-      const noSurat = overrideNoSurat || noSuratInput.value.trim();
+    window.setRecordBerhenti = function(id) {
+      const idx = spHistory.findIndex(item => item.id === id);
+      if (idx === -1) return;
+      const target = spHistory[idx];
+      if (target.tingkat !== "SP 3") return;
+
+      const updated = {
+        ...target,
+        tingkat: STATUS_BERHENTI,
+        perbaikan: target.perbaikan || (
+          currentLang === "en"
+            ? "Processed directly from SP 3; asset handover and final administrative settlement completed."
+            : "Diproses langsung dari SP 3; serah terima aset dan penyelesaian administrasi dilaksanakan sesuai ketentuan."
+        )
+      };
+
+      spHistory[idx] = updated;
+      saveHistory();
+      renderHistoryTable();
+      populateFormFromRecord(updated, false);
+      showBanner(t().berhentiMsg(updated.noSurat, updated.nama), false);
+    };
+
+    function buildRecordFromForm(existingId) {
       return {
         id: existingId || ("SP-" + Date.now()),
-        noSurat,
-        tingkat,
+        noSurat: noSuratInput.value.trim(),
+        tingkat: tingkatSelect.value,
         nama: document.getElementById("namaKaryawan").value.trim(),
         nik: document.getElementById("nikKaryawan").value.trim(),
         jabatan: document.getElementById("jabatan").value.trim(),
@@ -1530,25 +1583,43 @@
     function clearFormInputs(keepBanner) {
       editRecordIdInput.value = "";
       form.reset();
-      noSuratInput.value = generateNextLetterNumber("");
+      noSuratInput.value = generateNextLetterNumber();
       if (!keepBanner) {
         statusBanner.style.display = "none";
+        statusBanner.classList.remove("error");
       }
       syncPreview();
     }
 
     form.addEventListener("input", syncPreview);
     form.addEventListener("change", function(e) {
-      if ((e.target === tanggalTerbitInput || e.target === tingkatSelect) && !editRecordIdInput.value) {
-        noSuratInput.value = generateNextLetterNumber(tingkatSelect.value);
+      if (e.target === tanggalTerbitInput && !editRecordIdInput.value) {
+        noSuratInput.value = generateNextLetterNumber();
       }
       syncPreview();
     });
 
     form.addEventListener("submit", function(e) {
       e.preventDefault();
-      const existingId = editRecordIdInput.value.trim();
-      const record = buildRecordFromForm(null, null, existingId || null);
+      const existingId = editRecordIdInput.value.trim() || null;
+      const tingkat = tingkatSelect.value;
+      const nama = document.getElementById("namaKaryawan").value.trim();
+      const nik = document.getElementById("nikKaryawan").value.trim();
+      const tglTerbit = tanggalTerbitInput.value;
+
+      if (hasSameDateSpRecord(nik, nama, tglTerbit, existingId)) {
+        evaluateFormRules();
+        showBanner(t().duplicateDateErr(nama || nik, formatTanggal(tglTerbit)), true);
+        return;
+      }
+
+      if (tingkat === "SP 3" && !hasSp2Record(nik, nama, existingId)) {
+        evaluateFormRules();
+        showBanner(t().needSp2Err(nama || nik), true);
+        return;
+      }
+
+      const record = buildRecordFromForm(existingId);
 
       if (existingId) {
         const idx = spHistory.findIndex(item => item.id === existingId);
@@ -1560,63 +1631,15 @@
         saveHistory();
         renderHistoryTable();
         clearFormInputs(true);
-        statusBanner.style.display = "block";
-        statusBanner.textContent = t().updatedMsg(record.tingkat, record.noSurat, record.nama);
+        showBanner(t().updatedMsg(record.tingkat, record.noSurat, record.nama), false);
       } else {
         spHistory.unshift(record);
         saveHistory();
         currentPage = 1;
         renderHistoryTable();
         clearFormInputs(true);
-        statusBanner.style.display = "block";
-        statusBanner.textContent = t().savedMsg(record.tingkat, record.noSurat, record.nama);
+        showBanner(t().savedMsg(record.tingkat, record.noSurat, record.nama), false);
       }
-    });
-
-    berhentiBtn.addEventListener("click", function() {
-      const nama = document.getElementById("namaKaryawan").value.trim();
-      const nik = document.getElementById("nikKaryawan").value.trim();
-      if (!nama || !nik) {
-        alert(currentLang === "en" ? "Please fill in Employee Name and NIK first." : "Lengkapi Nama Karyawan dan NIK terlebih dahulu.");
-        return;
-      }
-
-      if (!tanggalTerbitInput.value) {
-        tanggalTerbitInput.value = new Date().toISOString().slice(0, 10);
-      }
-
-      const exitTingkat = "SURAT PERNYATAAN KELUAR";
-      const exitNoSurat = generateNextLetterNumber(exitTingkat);
-      const alasan = document.getElementById("alasanPelanggaran").value || "Mencapai 3 kali pelanggaran dan diproses pernyataan keluar karyawan";
-      const perbaikan = document.getElementById("perbaikan").value.trim() || (
-        currentLang === "en"
-          ? "Employee declares exit/resignation after 3 recorded violations; handover of company assets and final settlement completed."
-          : "Karyawan menyatakan keluar setelah 3 kali pelanggaran tercatat; serah terima aset dan penyelesaian administrasi dilaksanakan sesuai ketentuan."
-      );
-
-      document.getElementById("alasanPelanggaran").value = alasan;
-      document.getElementById("perbaikan").value = perbaikan;
-      tingkatSelect.value = exitTingkat;
-      noSuratInput.value = exitNoSurat;
-
-      const existingId = editRecordIdInput.value.trim() || null;
-      const record = buildRecordFromForm(exitTingkat, exitNoSurat, existingId);
-
-      if (existingId) {
-        const idx = spHistory.findIndex(item => item.id === existingId);
-        if (idx !== -1) spHistory[idx] = record;
-        else spHistory.unshift(record);
-      } else {
-        spHistory.unshift(record);
-      }
-
-      saveHistory();
-      currentPage = 1;
-      renderHistoryTable();
-      clearFormInputs(true);
-
-      statusBanner.style.display = "block";
-      statusBanner.textContent = t().resignedMsg(record.noSurat, record.nama);
     });
 
     resetFormBtn.addEventListener("click", function() {
@@ -1630,8 +1653,7 @@
       currentPage = 1;
       clearFormInputs(true);
       renderHistoryTable();
-      statusBanner.style.display = "block";
-      statusBanner.textContent = t().clearedMsg;
+      showBanner(t().clearedMsg, false);
     });
 
     searchInput.addEventListener("input", function() {
@@ -1722,7 +1744,7 @@
 
     loadHistory();
     applyTranslations();
-    noSuratInput.value = generateNextLetterNumber("");
+    noSuratInput.value = generateNextLetterNumber();
     syncPreview();
     renderHistoryTable();
   </script>
