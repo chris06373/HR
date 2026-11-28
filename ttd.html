@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>e-Sign Workspace</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f4f6f9;
+      font-size: 0.95rem;
+    }
+
+    /* Kanvas TTD aman untuk sentuhan jari / stylus di HP & Tablet */
+    #sigCanvas {
+      width: 100%;
+      height: 200px;
+      border: 2px dashed #adb5bd;
+      border-radius: 0.5rem;
+      background-color: #ffffff;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    /* Kertas Preview Dokumen / Template */
+    .doc-paper {
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      min-height: 360px;
+    }
+
+    .sig-box-preview {
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
+      padding: 0.5rem;
+      min-height: 90px;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sig-box-preview img {
+      max-height: 60px;
+      max-width: 100%;
+    }
+
+    /* Mode Cetak (Print-Ready CSS) */
+    @media print {
+      .no-print, .navbar, .nav-tabs, .modal-header, .modal-footer, .btn {
+        display: none !important;
+      }
+      body {
+        background: #ffffff !important;
+      }
+      .doc-paper {
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar Atas -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">
+        <i class="bi bi-vector-pen me-2 text-warning"></i>e-Sign Suite
+      </a>
+
+      <!-- Switcher Mode: Usaha vs Perkantoran -->
+      <div class="d-flex align-items-center gap-2 ms-auto">
+        <span class="text-light small d-none d-md-inline">Mode Kerja:</span>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Mode Kerja">
+          <input type="radio" class="btn-check" name="modeKerja" id="modeUsaha" value="Usaha" checked />
+          <label class="btn btn-outline-warning" for="modeUsaha">
+            <i class="bi bi-shop me-1"></i>Usaha
+          </label>
+
+          <input type="radio" class="btn-check" name="modeKerja" id="modeKantor" value="Perkantoran" />
+          <label class="btn btn-outline-info" for="modeKantor">
+            <i class="bi bi-building me-1"></i>Perkantoran
+          </label>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Kontainer Utama 1 Halaman -->
+  <main class="container py-3 py-md-4">
+
+    <!-- Banner Info Mode Aktif (Tanpa Listener, Update On-Click) -->
+    <div class="alert alert-light border d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <div>
+        <span class="badge bg-primary me-1" id="badgeModeAktif">Mode Usaha</span>
+        <span id="deskripsiModeAktif" class="text-muted small">
+          Alur cepat untuk transaksi langsung (PO & Invoice) dengan 1 penanda tangan.
+        </span>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline-secondary no-print" onclick="sinkronManual()">
+        <i class="bi bi-arrow-clockwise me-1"></i>Sinkronkan Data
+      </button>
+    </div>
+
+    <!-- Navigasi Tab Utama (Single Page) -->
+    <ul class="nav nav-tabs nav-fill mb-3 bg-white rounded-top shadow-sm pt-1 px-1" id="mainTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active fw-semibold" id="tab-ttd-btn" data-bs-toggle="tab" data-bs-target="#tab-ttd" type="button" role="tab">
+          <i class="bi bi-pen me-1"></i>1. Buat & TTD
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fw-semibold" id="tab-template-btn" data-bs-toggle="tab" data-bs-target="#tab-template" type="button" role="tab">
+          <i class="bi bi-file-earmark-text me-1"></i>2. Template Surat
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fw-semibold" id="tab-histori-btn" data-bs-toggle="tab" data-bs-target="#tab-histori" type="button" role="tab">
+          <i class="bi bi-clock-history me-1"></i>3. Histori Arsip
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="mainTabsContent">
+
+      <!-- ==================== TAB 1: BUAT & TTD DOKUMEN ==================== -->
+      <div class="tab-pane fade show active" id="tab-ttd" role="tabpanel">
+        <div class="row g-3">
+          <!-- Form Dokumen & Kanvas TTD -->
+          <div class="col-12 col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-header bg-white fw-bold">
+                <i class="bi bi-pencil-square me-1 text-primary"></i>Data Dokumen & Tanda Tangan
+              </div>
+              <div class="card-body">
+                <form id="formTTD" onsubmit="simpanDokumenTTD(event)">
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold">Judul / Nomor Dokumen</label>
+                    <input type="text" class="form-control" id="docJudul" placeholder="Contoh: PO-2026-088 / Kontrak Kerja" required />
+                  </div>
+
+                  <div class="row g-2 mb-2">
+                    <div class="col-12 col-sm-6">
+                      <label class="form-label small fw-semibold">Kategori</label>
+                      <select class="form-select" id="docKategori">
+                        <option value="PO">Purchase Order (PO)</option>
+                        <option value="Invoice">Invoice</option>
+                        <option value="PKWT">Surat Perjanjian Kerja</option>
+                        <option value="Internal">Memo / Persetujuan Kantor</option>
+                      </select>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                      <label class="form-label small fw-semibold">Pihak Terkait / Klien / Karyawan</label>
+                      <input type="text" class="form-control" id="docPihak" placeholder="Nama Klien / Karyawan" required />
+                    </div>
+                  </div>
+
+                  <!-- Opsi Alur Perkantoran -->
+                  <div class="mb-2" id="boxApprovalKantor" style="display: none;">
+                    <label class="form-label small fw-semibold">Tahap Persetujuan Perkantoran</label>
+                    <select class="form-select" id="docTahap">
+                      <option value="Selesai (Final)">Tahap Akhir — Langsung Selesai</option>
+                      <option value="Menunggu Manajer">Tahap 1 — Menunggu Persetujuan Manajer</option>
+                      <option value="Menunggu HRD/Legal">Tahap 2 — Menunggu Review HRD / Legal</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold">Nama Penanda Tangan</label>
+                    <input type="text" class="form-control" id="docPenandatangan" placeholder="Nama lengkap & jabatan" required />
+                  </div>
+
+                  <!-- Kanvas Tanda Tangan -->
+                  <div class="mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="form-label small fw-semibold mb-0">Area Tanda Tangan (Jari / Stylus / Mouse)</label>
+                      <button type="button" class="btn btn-sm btn-outline-danger py-0" onclick="bersihkanKanvas()">
+                        <i class="bi bi-eraser me-1"></i>Hapus
+                      </button>
+                    </div>
+                    <canvas id="sigCanvas"></canvas>
+                  </div>
+
+                  <div class="d-grid gap-2 d-sm-flex justify-content-sm-end mt-3">
+                    <button type="submit" class="btn btn-primary">
+                      <i class="bi bi-check2-circle me-1"></i>Simpan & Arsipkan TTD
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ringkasan Standar Audit Trail -->
+          <div class="col-12 col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-header bg-white fw-bold">
+                <i class="bi bi-shield-check me-1 text-success"></i>Standar Audit Trail & Panduan
+              </div>
+              <div class="card-body">
+                <p class="text-muted small mb-3">
+                  Setiap dokumen yang disimpan mencatat jejak audit standar internasional (<em>timestamp</em>, ID dokumen, dan peran pengguna) secara lokal di browser/server tanpa <em>real-time listener</em>.
+                </p>
+                <ul class="list-group list-group-flush small mb-3">
+                  <li class="list-group-item px-0">
+                    <strong>1. Mobile & Tablet Ready:</strong> Kanvas menggunakan <code>touch-action: none</code> agar goresan TTD mulus tanpa menggeser halaman.
+                  </li>
+                  <li class="list-group-item px-0">
+                    <strong>2. Mode Usaha:</strong> Fokus pada kecepatan transaksi (PO &amp; Invoice) dengan alur langsung.
+                  </li>
+                  <li class="list-group-item px-0">
+                    <strong>3. Mode Perkantoran:</strong> Mendukung penandaan tahap persetujuan internal sebelum final.
+                  </li>
+                </ul>
+                <div class="alert alert-info small mb-0">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Setelah disimpan, dokumen otomatis masuk ke tab <strong>3. Histori Arsip</strong> dan dapat dilihat kembali kapan saja.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 2: TEMPLATE SURAT (PO, INVOICE, PKWT) ==================== -->
+      <div class="tab-pane fade" id="tab-template" role="tabpanel">
+        <div class="row g-3">
+          <!-- Editor Variabel Template -->
+          <div class="col-12 col-lg-5 no-print">
+            <div class="card shadow-sm border-0">
+              <div class="card-header bg-white fw-bold">
+                <i class="bi bi-sliders me-1 text-primary"></i>Modifikasi Template Surat
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold">Pilih Jenis Template</label>
+                  <select class="form-select" id="jenisTemplate" onchange="renderTemplate()">
+                    <option value="PO">Surat Purchase Order (PO)</option>
+                    <option value="Invoice">Surat Tagihan (Invoice)</option>
+                    <option value="PKWT">Surat Perjanjian Kerja Karyawan</option>
+                  </select>
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold">Nomor Dokumen</label>
+                  <input type="text" class="form-control form-control-sm" id="tplNomor" value="DOC-2026-001" oninput="renderTemplate()" />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold">Nama Perusahaan / Pembuat</label>
+                  <input type="text" class="form-control form-control-sm" id="tplPerusahaan" value="PT Maju Jaya Sejahtera" oninput="renderTemplate()" />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold">Nama Pihak Kedua (Vendor / Klien / Karyawan)</label>
+                  <input type="text" class="form-control form-control-sm" id="tplPihakKedua" value="Budi Santoso" oninput="renderTemplate()" />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold">Detail Utama (Item / Jabatan / Gaji)</label>
+                  <input type="text" class="form-control form-control-sm" id="tplDetail" value="20 Unit Printer Kasir — Rp 24.000.000" oninput="renderTemplate()" />
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold">Isi / Klausul Tambahan (Bisa Diedit)</label>
+                  <textarea class="form-control form-control-sm" id="tplCatatan" rows="4" oninput="renderTemplate()">Pembayaran dilakukan maksimal 14 hari kerja setelah dokumen disetujui. Dokumen ini sah ditandatangani secara elektronik.</textarea>
+                </div>
+
+                <!-- Tombol Aksi Template -->
+                <div class="d-grid gap-2">
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-dark btn-sm" onclick="window.print()">
+                      <i class="bi bi-printer me-1"></i>Print Surat
+                    </button>
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="bagikanTemplate()">
+                      <i class="bi bi-share me-1"></i>Bagikan
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="simpanDariTemplate()">
+                      <i class="bi bi-journal-check me-1"></i>Simpan ke Histori
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pratinjau Surat Siap Cetak -->
+          <div class="col-12 col-lg-7">
+            <div class="doc-paper shadow-sm" id="areaPreviewSurat">
+              <!-- Diisi otomatis via JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 3: HISTORI ARSIP (SEARCH, FILTER, PAGINATION) ==================== -->
+      <div class="tab-pane fade" id="tab-histori" role="tabpanel">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white fw-bold">
+            <i class="bi bi-archive me-1 text-primary"></i>Histori Hasil TTD &amp; Dokumen Tersimpan
+          </div>
+          <div class="card-body">
+
+            <!-- Toolbar Pencarian & Filter -->
+            <div class="row g-2 mb-3">
+              <div class="col-12 col-md-4">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" id="searchHistori" placeholder="Cari judul, nomor, atau pihak..." oninput="resetHalamanDanRender()" />
+                </div>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <select class="form-select form-select-sm" id="filterKategori" onchange="resetHalamanDanRender()">
+                  <option value="">Semua Kategori</option>
+                  <option value="PO">PO</option>
+                  <option value="Invoice">Invoice</option>
+                  <option value="PKWT">Perjanjian Kerja</option>
+                  <option value="Internal">Internal</option>
+                </select>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <select class="form-select form-select-sm" id="filterMode" onchange="resetHalamanDanRender()">
+                  <option value="">Semua Mode</option>
+                  <option value="Usaha">Mode Usaha</option>
+                  <option value="Perkantoran">Mode Perkantoran</option>
+                </select>
+              </div>
+
+              <div class="col-12 col-md-2">
+                <select class="form-select form-select-sm" id="perPageSelect" onchange="resetHalamanDanRender()">
+                  <option value="5" selected>5 / hal</option>
+                  <option value="10">10 / hal</option>
+                  <option value="20">20 / hal</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Tabel Responsif Histori -->
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small">
+                  <tr>
+                    <th>ID / Judul</th>
+                    <th>Kategori</th>
+                    <th>Mode</th>
+                    <th>Pihak Terkait</th>
+                    <th>Status</th>
+                    <th>Tanggal</th>
+                    <th class="text-end">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyHistori" class="small">
+                  <!-- Diisi otomatis via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Footer Pagination -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3 pt-2 border-top">
+              <div class="text-muted small" id="infoPagination">Menampilkan 0 data</div>
+              <nav aria-label="Navigasi halaman histori">
+                <ul class="pagination pagination-sm mb-0" id="paginationList"></ul>
+              </nav>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Modal Lihat Detail Dokumen Tersimpan -->
+  <div class="modal fade" id="modalDetailDok" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="modalJudulDok">Detail Dokumen</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+        </div>
+        <div class="modal-body" id="modalIsiDok">
+          <!-- Diisi otomatis -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-success btn-sm" onclick="bagikanModalAktif()">
+            <i class="bi bi-share me-1"></i>Bagikan
+          </button>
+          <button type="button" class="btn btn-outline-dark btn-sm" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ==================== STATE LOKAL (TANPA LISTENER) ====================
+    let modeAktif = "Usaha";
+    let halamanSaatIni = 1;
+    let dokumenModalAktif = null;
+
+    let arsipDokumen = [
+      {
+        id: "SIG-2026-101",
+        judul: "PO-2026-012 — Pengadaan ATK",
+        kategori: "PO",
+        mode: "Usaha",
+        pihak: "CV Sumber Makmur",
+        penandatangan: "Rina Wijaya (Owner)",
+        status: "Selesai",
+        tanggal: "2026-11-28 09:15",
+        detail: "10 Rim Kertas A4, 20 Box Pulpen — Rp 1.850.000",
+        catatan: "Pengiriman dijadwalkan hari ini sebelum pukul 16.00 WIB.",
+        ttdData: ""
+      },
+      {
+        id: "SIG-2026-102",
+        judul: "INV-2026-045 — Jasa Desain Sistem",
+        kategori: "Invoice",
+        mode: "Usaha",
+        pihak: "Toko Kopi Nusantara",
+        penandatangan: "Rina Wijaya (Owner)",
+        status: "Selesai",
+        tanggal: "2026-11-27 14:40",
+        detail: "Paket Website & POS Kasir — Rp 7.500.000",
+        catatan: "Pembayaran lunas via transfer bank perusahaan.",
+        ttdData: ""
+      },
+      {
+        id: "SIG-2026-103",
+        judul: "PKWT-2026-019 — Kontrak Staf Operasional",
+        kategori: "PKWT",
+        mode: "Perkantoran",
+        pihak: "Andi Pratama",
+        penandatangan: "Hendra Kusuma (HR Manager)",
+        status: "Menunggu HRD/Legal",
+        tanggal: "2026-11-26 11:20",
+        detail: "Jabatan: Staf Operasional | Masa Kontrak: 12 Bulan",
+        catatan: "Gaji pokok dan tunjangan sesuai kebijakan internal perusahaan.",
+        ttdData: ""
+      },
+      {
+        id: "SIG-2026-104",
+        judul: "MEMO-2026-008 — Persetujuan Lembur",
+        kategori: "Internal",
+        mode: "Perkantoran",
+        pihak: "Divisi Keuangan",
+        penandatangan: "Dian Pertiwi (Finance Lead)",
+        status: "Selesai",
+        tanggal: "2026-11-25 17:05",
+        detail: "Rekap lembur akhir bulan tim administrasi",
+        catatan: "Disetujui untuk diproses pada siklus penggajian bulan ini.",
+        ttdData: ""
+      },
+      {
+        id: "SIG-2026-105",
+        judul: "PO-2026-013 — Kemasan Produk",
+        kategori: "PO",
+        mode: "Usaha",
+        pihak: "Pabrik Kemasan Jaya",
+        penandatangan: "Rina Wijaya (Owner)",
+        status: "Selesai",
+        tanggal: "2026-11-24 08:50",
+        detail: "500 Box Packaging Custom — Rp 4.250.000",
+        catatan: "Quality control dilakukan saat barang tiba di gudang.",
+        ttdData: ""
+      },
+      {
+        id: "SIG-2026-106",
+        judul: "PKWT-2026-020 — Kontrak Admin Gudang",
+        kategori: "PKWT",
+        mode: "Perkantoran",
+        pihak: "Siti Rahmawati",
+        penandatangan: "Hendra Kusuma (HR Manager)",
+        status: "Selesai",
+        tanggal: "2026-11-22 10:10",
+        detail: "Jabatan: Admin Gudang | Masa Kontrak: 6 Bulan",
+        catatan: "Wajib mematuhi SOP keselamatan dan kerahasiaan data.",
+        ttdData: ""
+      }
+    ];
+
+    // ==================== SWITCHER MODE USAHA / PERKANTORAN ====================
+    document.querySelectorAll('input[name="modeKerja"]').forEach((radio) => {
+      radio.addEventListener("change", (e) => {
+        modeAktif = e.target.value;
+        const badge = document.getElementById("badgeModeAktif");
+        const desc = document.getElementById("deskripsiModeAktif");
+        const boxApproval = document.getElementById("boxApprovalKantor");
+
+        if (modeAktif === "Usaha") {
+          badge.className = "badge bg-primary me-1";
+          badge.textContent = "Mode Usaha";
+          desc.textContent = "Alur cepat untuk transaksi langsung (PO & Invoice) dengan 1 penanda tangan.";
+          boxApproval.style.display = "none";
+        } else {
+          badge.className = "badge bg-info text-dark me-1";
+          badge.textContent = "Mode Perkantoran";
+          desc.textContent = "Mendukung alur tahap persetujuan internal, kontrak karyawan (PKWT), dan arsip divisi.";
+          boxApproval.style.display = "block";
+        }
+        renderTemplate();
+      });
+    });
+
+    function sinkronManual() {
+      renderHistori();
+      renderTemplate();
+      alert("Data lokal berhasil disinkronkan (mode tanpa listener aktif).");
+    }
+
+    // ==================== KANVAS TANDA TANGAN (MOBILE & TABLET) ====================
+    const canvas = document.getElementById("sigCanvas");
+    const ctx = canvas.getContext("2d");
+    let sedangMenggambar = false;
+    let adaGoresan = false;
+
+    function sesuaikanUkuranKanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const tempImage = adaGoresan ? canvas.toDataURL() : null;
+      canvas.width = rect.width || 400;
+      canvas.height = 200;
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#0d6efd";
+      if (tempImage) {
+        const img = new Image();
+        img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        img.src = tempImage;
+      }
+    }
+
+    function ambilKoordinat(evt) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+      const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    function mulaiGambar(evt) {
+      evt.preventDefault();
+      sedangMenggambar = true;
+      adaGoresan = true;
+      const pos = ambilKoordinat(evt);
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+    }
+
+    function lanjutGambar(evt) {
+      if (!sedangMenggambar) return;
+      evt.preventDefault();
+      const pos = ambilKoordinat(evt);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    }
+
+    function selesaiGambar() {
+      sedangMenggambar = false;
+      ctx.closePath();
+    }
+
+    function bersihkanKanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      adaGoresan = false;
+    }
+
+    canvas.addEventListener("mousedown", mulaiGambar);
+    canvas.addEventListener("mousemove", lanjutGambar);
+    window.addEventListener("mouseup", selesaiGambar);
+
+    canvas.addEventListener("touchstart", mulaiGambar, { passive: false });
+    canvas.addEventListener("touchmove", lanjutGambar, { passive: false });
+    window.addEventListener("touchend", selesaiGambar);
+    window.addEventListener("resize", sesuaikanUkuranKanvas);
+
+    function simpanDokumenTTD(event) {
+      event.preventDefault();
+      if (!adaGoresan) {
+        alert("Silakan bubuhkan tanda tangan terlebih dahulu pada area kanvas.");
+        return;
+      }
+
+      const judul = document.getElementById("docJudul").value.trim();
+      const kategori = document.getElementById("docKategori").value;
+      const pihak = document.getElementById("docPihak").value.trim();
+      const penandatangan = document.getElementById("docPenandatangan").value.trim();
+      const status = modeAktif === "Perkantoran"
+        ? document.getElementById("docTahap").value
+        : "Selesai";
+
+      const dataURL = canvas.toDataURL("image/png");
+      const sekarang = new Date().toISOString().slice(0, 16).replace("T", " ");
+      const idBaru = "SIG-2026-" + Math.floor(110 + Math.random() * 890);
+
+      arsipDokumen.unshift({
+        id: idBaru,
+        judul,
+        kategori,
+        mode: modeAktif,
+        pihak,
+        penandatangan,
+        status,
+        tanggal: sekarang,
+        detail: "Dokumen ditandatangani langsung melalui kanvas digital.",
+        catatan: "Tersimpan dalam arsip lokal standar audit trail.",
+        ttdData: dataURL
+      });
+
+      event.target.reset();
+      bersihkanKanvas();
+      renderHistori();
+      alert("Dokumen " + idBaru + " berhasil disimpan ke Histori Arsip.");
+
+      // Pindah ke tab Histori agar langsung terlihat
+      const tabHistori = new bootstrap.Tab(document.getElementById("tab-histori-btn"));
+      tabHistori.show();
+    }
+
+    // ==================== TEMPLATE SURAT (PO, INVOICE, PKWT) ====================
+    function renderTemplate() {
+      const jenis = document.getElementById("jenisTemplate").value;
+      const nomor = document.getElementById("tplNomor").value;
+      const perusahaan = document.getElementById("tplPerusahaan").value;
+      const pihakKedua = document.getElementById("tplPihakKedua").value;
+      const detail = document.getElementById("tplDetail").value;
+      const catatan = document.getElementById("tplCatatan").value;
+
+      let judulSurat = "PURCHASE ORDER (PO)";
+      let labelPihak = "Kepada Vendor / Pemasok";
+      let labelDetail = "Rincian Barang / Jasa & Total";
+
+      if (jenis === "Invoice") {
+        judulSurat = "INVOICE / TAGIHAN RESMI";
+        labelPihak = "Ditagihkan Kepada";
+        labelDetail = "Rincian Tagihan & Nominal";
+      } else if (jenis === "PKWT") {
+        judulSurat = "SURAT PERJANJIAN KERJA KARYAWAN";
+        labelPihak = "Pihak Kedua (Karyawan)";
+        labelDetail = "Jabatan, Penempatan & Kompensasi";
+      }
+
+      const ttdAktifImg = adaGoresan
+        ? `<img src="${canvas.toDataURL("image/png")}" alt="Tanda Tangan" />`
+        : `<span class="text-muted small">Belum ada goresan TTD di Tab 1</span>`;
+
+      document.getElementById("areaPreviewSurat").innerHTML = `
+        <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-3">
+          <div>
+            <h5 class="fw-bold mb-0">${judulSurat}</h5>
+            <small class="text-muted">${perusahaan} • Mode: ${modeAktif}</small>
+          </div>
+          <span class="badge bg-secondary">${nomor}</span>
+        </div>
+
+        <div class="row g-2 mb-3 small">
+          <div class="col-12 col-sm-6">
+            <div class="text-muted">${labelPihak}:</div>
+            <div class="fw-bold">${pihakKedua || "-"}</div>
+          </div>
+          <div class="col-12 col-sm-6">
+            <div class="text-muted">${labelDetail}:</div>
+            <div class="fw-bold">${detail || "-"}</div>
+          </div>
+        </div>
+
+        <p class="small mb-4" style="white-space: pre-line;">${catatan}</p>
+
+        <div class="row g-3 pt-2 border-top small">
+          <div class="col-6">
+            <div class="text-muted mb-1">Disetujui / Dibuat Oleh:</div>
+            <div class="sig-box-preview">${ttdAktifImg}</div>
+            <div class="fw-semibold mt-1">${perusahaan}</div>
+          </div>
+          <div class="col-6">
+            <div class="text-muted mb-1">Diterima / Disepakati Oleh:</div>
+            <div class="sig-box-preview">
+              <span class="text-muted small">Area TTD Pihak Kedua</span>
+            </div>
+            <div class="fw-semibold mt-1">${pihakKedua || "Pihak Kedua"}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function simpanDariTemplate() {
+      const jenis = document.getElementById("jenisTemplate").value;
+      const nomor = document.getElementById("tplNomor").value;
+      const perusahaan = document.getElementById("tplPerusahaan").value;
+      const pihakKedua = document.getElementById("tplPihakKedua").value;
+      const detail = document.getElementById("tplDetail").value;
+      const catatan = document.getElementById("tplCatatan").value;
+      const sekarang = new Date().toISOString().slice(0, 16).replace("T", " ");
+
+      arsipDokumen.unshift({
+        id: nomor || ("TPL-" + Date.now().toString().slice(-4)),
+        judul: `${jenis} — ${pihakKedua}`,
+        kategori: jenis,
+        mode: modeAktif,
+        pihak: pihakKedua,
+        penandatangan: perusahaan,
+        status: "Selesai",
+        tanggal: sekarang,
+        detail,
+        catatan,
+        ttdData: adaGoresan ? canvas.toDataURL("image/png") : ""
+      });
+
+      renderHistori();
+      alert("Surat template berhasil disimpan ke Histori Arsip.");
+    }
+
+    function bagikanTemplate() {
+      const nomor = document.getElementById("tplNomor").value;
+      const pihak = document.getElementById("tplPihakKedua").value;
+      const teksBagikan = `Dokumen ${nomor} untuk ${pihak} siap ditinjau.`;
+
+      if (navigator.share) {
+        navigator.share({ title: nomor, text: teksBagikan }).catch(() => {});
+      } else {
+        navigator.clipboard?.writeText(teksBagikan);
+        alert("Ringkasan dokumen disalin ke clipboard untuk dibagikan:\n" + teksBagikan);
+      }
+    }
+
+    // ==================== HISTORI: SEARCH, FILTER & PAGINATION ====================
+    function ambilDataTerfilter() {
+      const kataKunci = document.getElementById("searchHistori").value.toLowerCase().trim();
+      const kategori = document.getElementById("filterKategori").value;
+      const mode = document.getElementById("filterMode").value;
+
+      return arsipDokumen.filter((item) => {
+        const cocokKata =
+          !kataKunci ||
+          item.judul.toLowerCase().includes(kataKunci) ||
+          item.id.toLowerCase().includes(kataKunci) ||
+          item.pihak.toLowerCase().includes(kataKunci);
+        const cocokKat = !kategori || item.kategori === kategori;
+        const cocokMode = !mode || item.mode === mode;
+        return cocokKata && cocokKat && cocokMode;
+      });
+    }
+
+    function resetHalamanDanRender() {
+      halamanSaatIni = 1;
+      renderHistori();
+    }
+
+    function renderHistori() {
+      const hasil = ambilDataTerfilter();
+      const perPage = parseInt(document.getElementById("perPageSelect").value, 10) || 5;
+      const totalHalaman = Math.max(1, Math.ceil(hasil.length / perPage));
+      if (halamanSaatIni > totalHalaman) halamanSaatIni = totalHalaman;
+
+      const mulai = (halamanSaatIni - 1) * perPage;
+      const potong = hasil.slice(mulai, mulai + perPage);
+
+      const tbody = document.getElementById("tbodyHistori");
+      if (potong.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">
+              Tidak ada dokumen yang sesuai dengan pencarian atau filter.
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = potong.map((dok) => {
+          const badgeStatus = dok.status === "Selesai"
+            ? `<span class="badge bg-success">${dok.status}</span>`
+            : `<span class="badge bg-warning text-dark">${dok.status}</span>`;
+
+          return `
+            <tr>
+              <td>
+                <div class="fw-bold">${dok.judul}</div>
+                <div class="text-muted" style="font-size: 0.78rem;">${dok.id}</div>
+              </td>
+              <td><span class="badge bg-light text-dark border">${dok.kategori}</span></td>
+              <td>${dok.mode}</td>
+              <td>${dok.pihak}</td>
+              <td>${badgeStatus}</td>
+              <td class="text-nowrap">${dok.tanggal}</td>
+              <td class="text-end text-nowrap">
+                <button class="btn btn-sm btn-outline-primary" onclick="bukaModalDetail('${dok.id}')" title="Lihat Dokumen">
+                  <i class="bi bi-eye"></i> Lihat
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      // Info & Tombol Pagination
+      const info = document.getElementById("infoPagination");
+      info.textContent = hasil.length === 0
+        ? "Menampilkan 0 data"
+        : `Menampilkan ${mulai + 1}–${Math.min(mulai + perPage, hasil.length)} dari ${hasil.length} dokumen (Hal ${halamanSaatIni}/${totalHalaman})`;
+
+      const pagList = document.getElementById("paginationList");
+      let htmlPag = `
+        <li class="page-item ${halamanSaatIni === 1 ? "disabled" : ""}">
+          <button class="page-link" onclick="pindahHalaman(${halamanSaatIni - 1})">&laquo;</button>
+        </li>
+      `;
+      for (let i = 1; i <= totalHalaman; i++) {
+        htmlPag += `
+          <li class="page-item ${i === halamanSaatIni ? "active" : ""}">
+            <button class="page-link" onclick="pindahHalaman(${i})">${i}</button>
+          </li>
+        `;
+      }
+      htmlPag += `
+        <li class="page-item ${halamanSaatIni === totalHalaman ? "disabled" : ""}">
+          <button class="page-link" onclick="pindahHalaman(${halamanSaatIni + 1})">&raquo;</button>
+        </li>
+      `;
+      pagList.innerHTML = htmlPag;
+    }
+
+    function pindahHalaman(hal) {
+      halamanSaatIni = hal;
+      renderHistori();
+    }
+
+    function bukaModalDetail(idDok) {
+      const dok = arsipDokumen.find((d) => d.id === idDok);
+      if (!dok) return;
+      dokumenModalAktif = dok;
+
+      document.getElementById("modalJudulDok").textContent = dok.judul;
+      const imgTTD = dok.ttdData
+        ? `<img src="${dok.ttdData}" alt="TTD" style="max-height: 75px;" />`
+        : `<span class="text-muted small">TTD Terverifikasi (${dok.penandatangan})</span>`;
+
+      document.getElementById("modalIsiDok").innerHTML = `
+        <div class="doc-paper">
+          <div class="d-flex justify-content-between border-bottom pb-2 mb-3">
+            <div>
+              <div class="fw-bold">${dok.judul}</div>
+              <small class="text-muted">ID Audit: ${dok.id} • Tanggal: ${dok.tanggal}</small>
+            </div>
+            <span class="badge bg-primary align-self-start">${dok.mode} — ${dok.kategori}</span>
+          </div>
+          <p class="small mb-2"><strong>Pihak Terkait:</strong> ${dok.pihak}</p>
+          <p class="small mb-2"><strong>Status:</strong> ${dok.status}</p>
+          <p class="small mb-2"><strong>Detail:</strong> ${dok.detail}</p>
+          <p class="small mb-3"><strong>Catatan / Klausul:</strong> ${dok.catatan}</p>
+          <div class="sig-box-preview">
+            ${imgTTD}
+            <div class="small fw-semibold mt-1">${dok.penandatangan}</div>
+          </div>
+        </div>
+      `;
+
+      const modal = new bootstrap.Modal(document.getElementById("modalDetailDok"));
+      modal.show();
+    }
+
+    function bagikanModalAktif() {
+      if (!dokumenModalAktif) return;
+      const info = `Dokumen: ${dokumenModalAktif.judul} (${dokumenModalAktif.id}) - Status: ${dokumenModalAktif.status}`;
+      if (navigator.share) {
+        navigator.share({ title: dokumenModalAktif.judul, text: info }).catch(() => {});
+      } else {
+        navigator.clipboard?.writeText(info);
+        alert("Info dokumen disalin ke clipboard:\n" + info);
+      }
+    }
+
+    // Inisialisasi awal saat halaman dimuat
+    sesuaikanUkuranKanvas();
+    renderTemplate();
+    renderHistori();
+  </script>
+</body>
+</html>
