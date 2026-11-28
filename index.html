@@ -74,6 +74,7 @@
         .nav-link i {
             width: 18px;
             text-align: center;
+            font-style: normal;
         }
 
         .nav-section {
@@ -147,6 +148,7 @@
         .lang-switcher button.active {
             background: #2563eb;
             color: white;
+            border-color: #2563eb;
         }
 
         /* =========================
@@ -168,6 +170,13 @@
         .module-description {
             color: #64748b;
             line-height: 1.6;
+        }
+
+        .hr-summary-list {
+            margin-top: 16px;
+            padding-left: 20px;
+            color: #334155;
+            line-height: 1.7;
         }
 
         /* =========================
@@ -219,131 +228,105 @@
 
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
-
-        <div class="sidebar-header">
-            ENTERPRISE APP
-        </div>
+        <div class="sidebar-header" data-i18n="appName">ENTERPRISE APP</div>
 
         <nav id="sidebar-nav">
-
             <a class="nav-link active" data-mod="dashboard">
                 <i>▦</i>
-                <span>Dashboard</span>
+                <span data-i18n="mod_dashboard">Dashboard</span>
             </a>
 
             <div class="menu-search">
-                <input
-                    type="text"
-                    id="menuSearch"
-                    placeholder="Search menu..."
-                >
+                <input type="text" id="menuSearch" placeholder="Search menu...">
             </div>
 
             <!-- R&D -->
-            <div class="nav-section">Research & Development</div>
-
-            <a class="nav-link" data-mod="resedev">R&D</a>
-            <a class="nav-link" data-mod="esignature">✎ E-Signature</a>
-            <a class="nav-link" data-mod="taxm">▣ Multi Tax</a>
+            <div class="nav-section" data-i18n="sec_rnd">Research & Development</div>
+            <a class="nav-link" data-mod="resedev"><span data-i18n="mod_resedev">R&D</span></a>
+            <a class="nav-link" data-mod="esignature"><i>✎</i><span data-i18n="mod_esignature">E-Signature</span></a>
+            <a class="nav-link" data-mod="taxm"><i>▣</i><span data-i18n="mod_taxm">Multi Tax</span></a>
 
             <!-- HR -->
-            <div class="nav-section">Human Resources</div>
-            
-            <a class="nav-link" data-mod="database">▤ Employee Database</a>
-            <a class="nav-link" data-mod="attendance">◷ Attendance</a>
-            <a class="nav-link" data-mod="recruitment">♙ Recruitment</a>
-            <a class="nav-link" data-mod="leave">Permission & Leave</a>
-            <a class="nav-link" data-mod="payroll">▣ Payroll</a>
-            <a class="nav-link" data-mod="tckp">Training Center</a>
-            <a class="nav-link" data-mod="kpi">KPI</a>
-            <a class="nav-link" data-mod="sp">Pengajuan SP</a>
+            <div class="nav-section" data-i18n="sec_hr">Human Resources</div>
+            <a class="nav-link" data-mod="hr"><i>👥</i><span data-i18n="mod_hr">HR System Overview</span></a>
+            <a class="nav-link" data-mod="database"><i>▤</i><span data-i18n="mod_database">Employee Database</span></a>
+            <a class="nav-link" data-mod="attendance"><i>◷</i><span data-i18n="mod_attendance">Attendance</span></a>
+            <a class="nav-link" data-mod="recruitment"><i>♙</i><span data-i18n="mod_recruitment">Recruitment</span></a>
+            <a class="nav-link" data-mod="leave"><span data-i18n="mod_leave">Permission & Leave</span></a>
+            <a class="nav-link" data-mod="payroll"><i>▣</i><span data-i18n="mod_payroll">Payroll</span></a>
+            <a class="nav-link" data-mod="tckp"><span data-i18n="mod_tckp">Training Center</span></a>
+            <a class="nav-link" data-mod="kpi"><span data-i18n="mod_kpi">KPI</span></a>
+            <a class="nav-link" data-mod="sp"><span data-i18n="mod_sp">Pengajuan SP</span></a>
 
             <!-- SELF SERVICES -->
-            <div class="nav-section">Self Services</div>
-
-            <a class="nav-link" data-mod="self">Self Services</a>
-            <a class="nav-link" data-mod="ess">ESS</a>
-            <a class="nav-link" data-mod="empeng">Employee Engagement</a>
-            <a class="nav-link" data-mod="kgame">Hiburan</a>
+            <div class="nav-section" data-i18n="sec_self">Self Services</div>
+            <a class="nav-link" data-mod="self"><span data-i18n="mod_self">Self Services</span></a>
+            <a class="nav-link" data-mod="ess"><span data-i18n="mod_ess">ESS</span></a>
+            <a class="nav-link" data-mod="empeng"><span data-i18n="mod_empeng">Employee Engagement</span></a>
+            <a class="nav-link" data-mod="kgame"><span data-i18n="mod_kgame">Hiburan</span></a>
 
             <!-- AUDIT -->
-            <div class="nav-section">Audit & Consultation</div>
-
-            <a class="nav-link" data-mod="iaudit">Internal Audit</a>
-            <a class="nav-link" data-mod="white">System Konsultasi</a>
+            <div class="nav-section" data-i18n="sec_audit">Audit & Consultation</div>
+            <a class="nav-link" data-mod="iaudit"><span data-i18n="mod_iaudit">Internal Audit</span></a>
+            <a class="nav-link" data-mod="white"><span data-i18n="mod_white">System Konsultasi</span></a>
 
             <!-- PROCUREMENT -->
-            <div class="nav-section">Procurement & Asset</div>
-
-            <a class="nav-link" data-mod="proc">Procurement & Asset</a>
-            <a class="nav-link" data-mod="fifo">Procurement</a>
-            <a class="nav-link" data-mod="aset">Asset Management</a>
-            <a class="nav-link" data-mod="vendorm">Vendor Management</a>
+            <div class="nav-section" data-i18n="sec_proc">Procurement & Asset</div>
+            <a class="nav-link" data-mod="proc"><span data-i18n="mod_proc">Procurement & Asset</span></a>
+            <a class="nav-link" data-mod="fifo"><span data-i18n="mod_fifo">Procurement</span></a>
+            <a class="nav-link" data-mod="aset"><span data-i18n="mod_aset">Asset Management</span></a>
+            <a class="nav-link" data-mod="vendorm"><span data-i18n="mod_vendorm">Vendor Management</span></a>
 
             <!-- ANALYTICS -->
-            <div class="nav-section">Data Analyst</div>
-
-            <a class="nav-link" data-mod="dtanalys">Data Analyst</a>
-            <a class="nav-link" data-mod="execdas">Laporan Management (HPM)</a>
-            <a class="nav-link" data-mod="hranalys">HR Analyst</a>
-            <a class="nav-link" data-mod="itsdlc">IT SDLC Project, Budget & Performance</a>
+            <div class="nav-section" data-i18n="sec_analytics">Data Analyst</div>
+            <a class="nav-link" data-mod="dtanalys"><span data-i18n="mod_dtanalys">Data Analyst</span></a>
+            <a class="nav-link" data-mod="execdas"><span data-i18n="mod_execdas">Laporan Management (HPM)</span></a>
+            <a class="nav-link" data-mod="hranalys"><span data-i18n="mod_hranalys">HR Analyst</span></a>
+            <a class="nav-link" data-mod="itsdlc"><span data-i18n="mod_itsdlc">IT SDLC Project, Budget & Performance</span></a>
 
             <!-- IT -->
-            <div class="nav-section">Information Technology</div>
-
-            <a class="nav-link" data-mod="tech">IT</a>
-            <a class="nav-link" data-mod="projectm">Project Management</a>
-            <a class="nav-link" data-mod="ticket">Ticketing</a>
+            <div class="nav-section" data-i18n="sec_it">Information Technology</div>
+            <a class="nav-link" data-mod="tech"><span data-i18n="mod_tech">IT</span></a>
+            <a class="nav-link" data-mod="projectm"><span data-i18n="mod_projectm">Project Management</span></a>
+            <a class="nav-link" data-mod="ticket"><span data-i18n="mod_ticket">Ticketing</span></a>
 
             <!-- SALES -->
-            <div class="nav-section">Sales</div>
-
-            <a class="nav-link" data-mod="sales">Sales</a>
-            <a class="nav-link" data-mod="visitsales">Visit Sales</a>
-            <a class="nav-link" data-mod="customer">Customer</a>
-            <a class="nav-link" data-mod="nawar">Bid</a>
-            <a class="nav-link" data-mod="order">Order Customer</a>
-            <a class="nav-link" data-mod="way">Waybill Customer</a>
-            <a class="nav-link" data-mod="cm">Credit Memo Customer</a>
-            <a class="nav-link" data-mod="acbil">Account Bill Customer</a>
+            <div class="nav-section" data-i18n="sec_sales">Sales</div>
+            <a class="nav-link" data-mod="sales"><span data-i18n="mod_sales">Sales</span></a>
+            <a class="nav-link" data-mod="visitsales"><span data-i18n="mod_visitsales">Visit Sales</span></a>
+            <a class="nav-link" data-mod="customer"><span data-i18n="mod_customer">Customer</span></a>
+            <a class="nav-link" data-mod="nawar"><span data-i18n="mod_nawar">Bid</span></a>
+            <a class="nav-link" data-mod="order"><span data-i18n="mod_order">Order Customer</span></a>
+            <a class="nav-link" data-mod="way"><span data-i18n="mod_way">Waybill Customer</span></a>
+            <a class="nav-link" data-mod="cm"><span data-i18n="mod_cm">Credit Memo Customer</span></a>
+            <a class="nav-link" data-mod="acbil"><span data-i18n="mod_acbil">Account Bill Customer</span></a>
 
             <!-- MARKETING -->
-            <div class="nav-section">Marketing</div>
-
-            <a class="nav-link" data-mod="market">Marketing</a>
-            <a class="nav-link" data-mod="cmsmkt">Tools CMS Marketing</a>
+            <div class="nav-section" data-i18n="sec_mkt">Marketing</div>
+            <a class="nav-link" data-mod="market"><span data-i18n="mod_market">Marketing</span></a>
+            <a class="nav-link" data-mod="cmsmkt"><span data-i18n="mod_cmsmkt">Tools CMS Marketing</span></a>
 
             <!-- EXTERNAL COMPANY -->
-            <div class="nav-section">External Company</div>
-
-            <a class="nav-link" data-mod="inv">External Company</a>
-            <a class="nav-link" data-mod="stock">Stock</a>
-            <a class="nav-link" data-mod="penjualan">Point of Sale</a>
+            <div class="nav-section" data-i18n="sec_ext">External Company</div>
+            <a class="nav-link" data-mod="inv"><span data-i18n="mod_inv">External Company</span></a>
+            <a class="nav-link" data-mod="stock"><span data-i18n="mod_stock">Stock</span></a>
+            <a class="nav-link" data-mod="penjualan"><span data-i18n="mod_penjualan">Point of Sale</span></a>
 
             <!-- FINANCE -->
-            <div class="nav-section">Finance</div>
-
-            <a class="nav-link" data-mod="fin">Finance</a>
-            <a class="nav-link" data-mod="cashreq">Cash Request</a>
-            <a class="nav-link" data-mod="forcas">Laporan Forecasting Sales</a>
-            <a class="nav-link" data-mod="laplabrg">Laporan Laba Rugi</a>
-            <a class="nav-link" data-mod="cmo">Cost & Monitoring Operasional</a>
-
+            <div class="nav-section" data-i18n="sec_fin">Finance</div>
+            <a class="nav-link" data-mod="fin"><span data-i18n="mod_fin">Finance</span></a>
+            <a class="nav-link" data-mod="cashreq"><span data-i18n="mod_cashreq">Cash Request</span></a>
+            <a class="nav-link" data-mod="forcas"><span data-i18n="mod_forcas">Laporan Forecasting Sales</span></a>
+            <a class="nav-link" data-mod="laplabrg"><span data-i18n="mod_laplabrg">Laporan Laba Rugi</span></a>
+            <a class="nav-link" data-mod="cmo"><span data-i18n="mod_cmo">Cost & Monitoring Operasional</span></a>
         </nav>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="content-area">
-
         <div class="topbar">
-
-            <button class="menu-toggle" id="menuToggle">
-                ☰ Menu
-            </button>
-
-            <div class="page-title" id="pageTitle">
-                Dashboard
-            </div>
+            <button class="menu-toggle" id="menuToggle">☰ Menu</button>
+            <div class="page-title" id="pageTitle">Dashboard</div>
 
             <div class="lang-switcher">
                 <button data-lang="en" class="active">EN</button>
@@ -351,478 +334,638 @@
                 <button data-lang="de">DE</button>
                 <button data-lang="zh">ZH</button>
             </div>
-
         </div>
 
-        <div id="module-container">
-            <h2 class="module-heading">Welcome to Dashboard</h2>
-            <p class="module-description">
-                Select a module from the sidebar to get started.
-            </p>
-        </div>
-
+        <div id="module-container"></div>
     </main>
 
 </div>
 
 <script>
-
-/* =================================
-   MODULE CONFIGURATION
-================================= */
-
-const modules = {
-
-    dashboard: {
-        title: "Dashboard",
-        description: "Welcome to Enterprise Dashboard."
+const translations = {
+    en: {
+        docTitle: "Enterprise Dashboard",
+        appName: "ENTERPRISE APP",
+        menuBtn: "☰ Menu",
+        searchPlaceholder: "Search menu...",
+        sec_rnd: "Research & Development",
+        sec_hr: "Human Resources",
+        sec_self: "Self Services",
+        sec_audit: "Audit & Consultation",
+        sec_proc: "Procurement & Asset",
+        sec_analytics: "Data Analyst",
+        sec_it: "Information Technology",
+        sec_sales: "Sales",
+        sec_mkt: "Marketing",
+        sec_ext: "External Company",
+        sec_fin: "Finance",
+        mod_dashboard: "Dashboard",
+        desc_dashboard: "Welcome to Enterprise Dashboard. Select a module from the sidebar to get started.",
+        mod_resedev: "R&D",
+        desc_resedev: "Research and Development Management.",
+        mod_esignature: "E-Signature",
+        desc_esignature: "Electronic document signing management.",
+        mod_taxm: "Multi Tax",
+        desc_taxm: "Tax management system.",
+        mod_hr: "HR System",
+        desc_hr: "Integrated HR system covering attendance, workforce data, payroll, performance appraisal, recruitment, warning letters (SP), and training.",
+        hr_points: [
+            "Attendance: Daily check-in/out, overtime, and shift tracking.",
+            "SDM (Employee Database): Master employee profiles, contracts, and job history.",
+            "Payroll: Salary, allowances, deductions, tax, and payslip processing.",
+            "Performance (KPI): Target tracking and employee performance evaluations.",
+            "Recruitment: Job postings, candidate screening, interviews, and onboarding.",
+            "SP (Warning Letter): Disciplinary notice and warning letter workflows.",
+            "Training: Skill development programs and training records."
+        ],
+        mod_database: "Employee Database",
+        desc_database: "Employee master data management.",
+        mod_attendance: "Attendance",
+        desc_attendance: "Employee attendance management.",
+        mod_recruitment: "Recruitment",
+        desc_recruitment: "Recruitment and applicant management.",
+        mod_leave: "Permission & Leave",
+        desc_leave: "Employee leave and permission management.",
+        mod_payroll: "Payroll",
+        desc_payroll: "Payroll and salary management.",
+        mod_tckp: "Training Center",
+        desc_tckp: "Employee training management.",
+        mod_kpi: "KPI",
+        desc_kpi: "Key Performance Indicator.",
+        mod_sp: "Warning Letter (SP)",
+        desc_sp: "Employee warning letter submission.",
+        mod_self: "Self Services",
+        desc_self: "Employee self service portal.",
+        mod_ess: "ESS",
+        desc_ess: "Employee Self Service.",
+        mod_empeng: "Employee Engagement",
+        desc_empeng: "Employee engagement management.",
+        mod_kgame: "Entertainment",
+        desc_kgame: "Entertainment and games.",
+        mod_iaudit: "Internal Audit",
+        desc_iaudit: "Internal audit management.",
+        mod_white: "Consultation System",
+        desc_white: "Consultation system.",
+        mod_proc: "Procurement & Asset",
+        desc_proc: "Procurement and asset management.",
+        mod_fifo: "Procurement",
+        desc_fifo: "Procurement management.",
+        mod_aset: "Asset Management",
+        desc_aset: "Company asset management.",
+        mod_vendorm: "Vendor Management",
+        desc_vendorm: "Vendor database and management.",
+        mod_dtanalys: "Data Analyst",
+        desc_dtanalys: "Data analysis and reporting.",
+        mod_execdas: "Management Report (HPM)",
+        desc_execdas: "Executive management reporting.",
+        mod_hranalys: "HR Analyst",
+        desc_hranalys: "Human resources analytics.",
+        mod_itsdlc: "IT SDLC Project, Budget & Performance",
+        desc_itsdlc: "IT project, budget and performance management.",
+        mod_tech: "IT",
+        desc_tech: "Information Technology.",
+        mod_projectm: "Project Management",
+        desc_projectm: "Project tracking and management.",
+        mod_ticket: "Ticketing",
+        desc_ticket: "IT ticket management.",
+        mod_sales: "Sales",
+        desc_sales: "Sales management.",
+        mod_visitsales: "Visit Sales",
+        desc_visitsales: "Sales visit management.",
+        mod_customer: "Customer",
+        desc_customer: "Customer database management.",
+        mod_nawar: "Bid",
+        desc_nawar: "Bid and quotation management.",
+        mod_order: "Customer Order",
+        desc_order: "Customer order management.",
+        mod_way: "Customer Waybill",
+        desc_way: "Customer waybill management.",
+        mod_cm: "Customer Credit Memo",
+        desc_cm: "Customer credit memo management.",
+        mod_acbil: "Customer Account Bill",
+        desc_acbil: "Customer billing management.",
+        mod_market: "Marketing",
+        desc_market: "Marketing management.",
+        mod_cmsmkt: "Marketing CMS Tools",
+        desc_cmsmkt: "Marketing CMS tools.",
+        mod_inv: "External Company",
+        desc_inv: "External company management.",
+        mod_stock: "Stock",
+        desc_stock: "Inventory and stock management.",
+        mod_penjualan: "Point of Sale",
+        desc_penjualan: "Sales transaction management.",
+        mod_fin: "Finance",
+        desc_fin: "Financial management.",
+        mod_cashreq: "Cash Request",
+        desc_cashreq: "Cash request management.",
+        mod_forcas: "Sales Forecasting Report",
+        desc_forcas: "Sales forecasting reports.",
+        mod_laplabrg: "Profit & Loss Report",
+        desc_laplabrg: "Profit and loss reporting.",
+        mod_cmo: "Operational Cost & Monitoring",
+        desc_cmo: "Operational cost monitoring."
     },
-
-    resedev: {
-        title: "R&D",
-        description: "Research and Development Management."
+    id: {
+        docTitle: "Dasbor Perusahaan",
+        appName: "APLIKASI ENTERPRISE",
+        menuBtn: "☰ Menu",
+        searchPlaceholder: "Cari menu...",
+        sec_rnd: "Riset & Pengembangan",
+        sec_hr: "Sumber Daya Manusia",
+        sec_self: "Layanan Mandiri",
+        sec_audit: "Audit & Konsultasi",
+        sec_proc: "Pengadaan & Aset",
+        sec_analytics: "Analis Data",
+        sec_it: "Teknologi Informasi",
+        sec_sales: "Penjualan",
+        sec_mkt: "Pemasaran",
+        sec_ext: "Perusahaan Eksternal",
+        sec_fin: "Keuangan",
+        mod_dashboard: "Dasbor",
+        desc_dashboard: "Selamat datang di Dasbor Perusahaan. Pilih modul di sidebar untuk memulai.",
+        mod_resedev: "R&D",
+        desc_resedev: "Manajemen Riset dan Pengembangan.",
+        mod_esignature: "Tanda Tangan Elektronik",
+        desc_esignature: "Manajemen penandatanganan dokumen elektronik.",
+        mod_taxm: "Multi Pajak",
+        desc_taxm: "Sistem manajemen perpajakan.",
+        mod_hr: "Sistem HR",
+        desc_hr: "Sistem HR terpadu yang mencakup absensi, data SDM, payroll, penilaian kinerja, rekrutmen, surat peringatan (SP), dan pelatihan.",
+        hr_points: [
+            "Absensi: Pencatatan masuk/pulang, lembur, dan jadwal kerja.",
+            "SDM: Data induk karyawan, riwayat jabatan, dan kontrak kerja.",
+            "Payroll: Perhitungan gaji, tunjangan, potongan, pajak, dan slip gaji.",
+            "Penilaian (KPI): Pemantauan target dan evaluasi kinerja karyawan.",
+            "Recruitment: Lowongan kerja, seleksi kandidat, wawancara, dan orientasi.",
+            "SP: Pengajuan dan pencatatan surat peringatan kedisiplinan.",
+            "Training: Program pelatihan dan pengembangan kompetensi karyawan."
+        ],
+        mod_database: "Database Karyawan",
+        desc_database: "Manajemen data induk karyawan.",
+        mod_attendance: "Absensi",
+        desc_attendance: "Manajemen kehadiran karyawan.",
+        mod_recruitment: "Rekrutmen",
+        desc_recruitment: "Manajemen rekrutmen dan pelamar.",
+        mod_leave: "Izin & Cuti",
+        desc_leave: "Manajemen izin dan cuti karyawan.",
+        mod_payroll: "Penggajian (Payroll)",
+        desc_payroll: "Manajemen penggajian dan upah.",
+        mod_tckp: "Pusat Pelatihan",
+        desc_tckp: "Manajemen pelatihan karyawan.",
+        mod_kpi: "KPI",
+        desc_kpi: "Indikator Kinerja Utama.",
+        mod_sp: "Pengajuan SP",
+        desc_sp: "Pengajuan surat peringatan karyawan.",
+        mod_self: "Layanan Mandiri",
+        desc_self: "Portal layanan mandiri karyawan.",
+        mod_ess: "ESS",
+        desc_ess: "Layanan Mandiri Karyawan.",
+        mod_empeng: "Keterlibatan Karyawan",
+        desc_empeng: "Manajemen keterlibatan karyawan.",
+        mod_kgame: "Hiburan",
+        desc_kgame: "Hiburan dan permainan.",
+        mod_iaudit: "Audit Internal",
+        desc_iaudit: "Manajemen audit internal.",
+        mod_white: "Sistem Konsultasi",
+        desc_white: "Sistem konsultasi.",
+        mod_proc: "Pengadaan & Aset",
+        desc_proc: "Manajemen pengadaan dan aset.",
+        mod_fifo: "Pengadaan",
+        desc_fifo: "Manajemen pengadaan barang.",
+        mod_aset: "Manajemen Aset",
+        desc_aset: "Manajemen aset perusahaan.",
+        mod_vendorm: "Manajemen Vendor",
+        desc_vendorm: "Database dan manajemen vendor.",
+        mod_dtanalys: "Analis Data",
+        desc_dtanalys: "Analisis data dan pelaporan.",
+        mod_execdas: "Laporan Manajemen (HPM)",
+        desc_execdas: "Pelaporan manajemen eksekutif.",
+        mod_hranalys: "Analis HR",
+        desc_hranalys: "Analitik sumber daya manusia.",
+        mod_itsdlc: "IT SDLC Proyek, Anggaran & Kinerja",
+        desc_itsdlc: "Manajemen proyek, anggaran, dan kinerja IT.",
+        mod_tech: "IT",
+        desc_tech: "Teknologi Informasi.",
+        mod_projectm: "Manajemen Proyek",
+        desc_projectm: "Pelacakan dan manajemen proyek.",
+        mod_ticket: "Tiket Bantuan",
+        desc_ticket: "Manajemen tiket IT.",
+        mod_sales: "Penjualan",
+        desc_sales: "Manajemen penjualan.",
+        mod_visitsales: "Kunjungan Sales",
+        desc_visitsales: "Manajemen kunjungan sales.",
+        mod_customer: "Pelanggan",
+        desc_customer: "Manajemen database pelanggan.",
+        mod_nawar: "Penawaran",
+        desc_nawar: "Manajemen penawaran dan tender.",
+        mod_order: "Pesanan Pelanggan",
+        desc_order: "Manajemen pesanan pelanggan.",
+        mod_way: "Surat Jalan Pelanggan",
+        desc_way: "Manajemen surat jalan pelanggan.",
+        mod_cm: "Nota Kredit Pelanggan",
+        desc_cm: "Manajemen nota kredit pelanggan.",
+        mod_acbil: "Tagihan Akun Pelanggan",
+        desc_acbil: "Manajemen penagihan pelanggan.",
+        mod_market: "Pemasaran",
+        desc_market: "Manajemen pemasaran.",
+        mod_cmsmkt: "Alat CMS Pemasaran",
+        desc_cmsmkt: "Perangkat CMS pemasaran.",
+        mod_inv: "Perusahaan Eksternal",
+        desc_inv: "Manajemen perusahaan eksternal.",
+        mod_stock: "Stok",
+        desc_stock: "Manajemen inventori dan stok.",
+        mod_penjualan: "Kasir (POS)",
+        desc_penjualan: "Manajemen transaksi penjualan.",
+        mod_fin: "Keuangan",
+        desc_fin: "Manajemen keuangan.",
+        mod_cashreq: "Permintaan Kas",
+        desc_cashreq: "Manajemen permintaan kas.",
+        mod_forcas: "Laporan Prakiraan Penjualan",
+        desc_forcas: "Laporan prakiraan penjualan.",
+        mod_laplabrg: "Laporan Laba Rugi",
+        desc_laplabrg: "Laporan laba dan rugi.",
+        mod_cmo: "Biaya & Pemantauan Operasional",
+        desc_cmo: "Pemantauan biaya operasional."
     },
-
-    esignature: {
-        title: "E-Signature",
-        description: "Electronic document signing management."
+    de: {
+        docTitle: "Enterprise-Dashboard",
+        appName: "ENTERPRISE APP",
+        menuBtn: "☰ Menü",
+        searchPlaceholder: "Menü suchen...",
+        sec_rnd: "Forschung & Entwicklung",
+        sec_hr: "Personalwesen (HR)",
+        sec_self: "Self-Service",
+        sec_audit: "Audit & Beratung",
+        sec_proc: "Beschaffung & Anlagen",
+        sec_analytics: "Datenanalyse",
+        sec_it: "Informationstechnologie",
+        sec_sales: "Vertrieb",
+        sec_mkt: "Marketing",
+        sec_ext: "Externe Unternehmen",
+        sec_fin: "Finanzen",
+        mod_dashboard: "Dashboard",
+        desc_dashboard: "Willkommen im Enterprise-Dashboard. Wählen Sie ein Modul aus der Seitenleiste.",
+        mod_resedev: "F&E",
+        desc_resedev: "Forschungs- und Entwicklungsmanagement.",
+        mod_esignature: "E-Signatur",
+        desc_esignature: "Elektronische Dokumentensignatur.",
+        mod_taxm: "Multi-Steuern",
+        desc_taxm: "Steuerverwaltungssystem.",
+        mod_hr: "HR-System",
+        desc_hr: "Integriertes HR-System für Anwesenheit, Personaldaten, Gehaltsabrechnung, Leistungsbewertung, Recruiting, Abmahnungen (SP) und Schulungen.",
+        hr_points: [
+            "Anwesenheit: Zeiterfassung, Überstunden und Schichtpläne.",
+            "Personaldaten (SDM): Mitarbeiterstammdaten, Verträge und Laufbahn.",
+            "Gehaltsabrechnung (Payroll): Löhne, Zulagen, Abzüge, Steuern und Abrechnungen.",
+            "Leistungsbewertung (KPI): Zielverfolgung und Mitarbeitergespräche.",
+            "Recruiting: Stellenausschreibungen, Bewerberauswahl, Interviews und Onboarding.",
+            "Abmahnung (SP): Verwaltung von Verwarnungen und Disziplinarmaßnahmen.",
+            "Schulung (Training): Weiterbildungsprogramme und Trainingsnachweise."
+        ],
+        mod_database: "Mitarbeiterdatenbank",
+        desc_database: "Verwaltung der Mitarbeiterstammdaten.",
+        mod_attendance: "Anwesenheit",
+        desc_attendance: "Mitarbeiteranwesenheitsverwaltung.",
+        mod_recruitment: "Recruiting",
+        desc_recruitment: "Bewerber- und Einstellungsmanagement.",
+        mod_leave: "Urlaub & Abwesenheit",
+        desc_leave: "Verwaltung von Urlaub und Genehmigungen.",
+        mod_payroll: "Gehaltsabrechnung",
+        desc_payroll: "Lohn- und Gehaltsverwaltung.",
+        mod_tckp: "Trainingszentrum",
+        desc_tckp: "Verwaltung von Mitarbeiterschulungen.",
+        mod_kpi: "KPI",
+        desc_kpi: "Leistungskennzahlen.",
+        mod_sp: "Abmahnung (SP)",
+        desc_sp: "Einreichung von Verwarnungen und Abmahnungen.",
+        mod_self: "Self-Service",
+        desc_self: "Mitarbeiter-Self-Service-Portal.",
+        mod_ess: "ESS",
+        desc_ess: "Employee Self Service.",
+        mod_empeng: "Mitarbeiterbindung",
+        desc_empeng: "Management der Mitarbeiterbindung.",
+        mod_kgame: "Unterhaltung",
+        desc_kgame: "Unterhaltung und Spiele.",
+        mod_iaudit: "Interne Revision",
+        desc_iaudit: "Management interner Audits.",
+        mod_white: "Beratungssystem",
+        desc_white: "System für Beratung und Hinweise.",
+        mod_proc: "Beschaffung & Anlagen",
+        desc_proc: "Beschaffungs- und Anlagenmanagement.",
+        mod_fifo: "Beschaffung",
+        desc_fifo: "Einkaufs- und Beschaffungsmanagement.",
+        mod_aset: "Anlagenmanagement",
+        desc_aset: "Verwaltung von Firmenanlagen.",
+        mod_vendorm: "Lieferantenmanagement",
+        desc_vendorm: "Lieferantendatenbank und -verwaltung.",
+        mod_dtanalys: "Datenanalyse",
+        desc_dtanalys: "Datenanalyse und Berichtswesen.",
+        mod_execdas: "Managementbericht (HPM)",
+        desc_execdas: "Berichtswesen für die Geschäftsführung.",
+        mod_hranalys: "HR-Analyse",
+        desc_hranalys: "Personalanalytik.",
+        mod_itsdlc: "IT-SDLC Projekt, Budget & Leistung",
+        desc_itsdlc: "IT-Projekt-, Budget- und Leistungsmanagement.",
+        mod_tech: "IT",
+        desc_tech: "Informationstechnologie.",
+        mod_projectm: "Projektmanagement",
+        desc_projectm: "Projektverfolgung und -steuerung.",
+        mod_ticket: "Ticket-System",
+        desc_ticket: "Verwaltung von IT-Tickets.",
+        mod_sales: "Vertrieb",
+        desc_sales: "Vertriebsmanagement.",
+        mod_visitsales: "Vertriebsbesuche",
+        desc_visitsales: "Verwaltung von Kundenbesuchen.",
+        mod_customer: "Kunden",
+        desc_customer: "Kundendatenbankverwaltung.",
+        mod_nawar: "Angebote",
+        desc_nawar: "Angebots- und Ausschreibungsmanagement.",
+        mod_order: "Kundenbestellung",
+        desc_order: "Verwaltung von Kundenaufträgen.",
+        mod_way: "Lieferschein Kunde",
+        desc_way: "Verwaltung von Lieferscheinen.",
+        mod_cm: "Gutschrift Kunde",
+        desc_cm: "Verwaltung von Gutschriften.",
+        mod_acbil: "Kundenabrechnung",
+        desc_acbil: "Kundenrechnungsstellung.",
+        mod_market: "Marketing",
+        desc_market: "Marketingmanagement.",
+        mod_cmsmkt: "Marketing-CMS-Tools",
+        desc_cmsmkt: "Werkzeuge für Marketing-CMS.",
+        mod_inv: "Externes Unternehmen",
+        desc_inv: "Verwaltung externer Unternehmen.",
+        mod_stock: "Lagerbestand",
+        desc_stock: "Bestands- und Lagerverwaltung.",
+        mod_penjualan: "Kassensystem (POS)",
+        desc_penjualan: "Verkaufstransaktionsverwaltung.",
+        mod_fin: "Finanzen",
+        desc_fin: "Finanzverwaltung.",
+        mod_cashreq: "Barmittelanforderung",
+        desc_cashreq: "Verwaltung von Baranträgen.",
+        mod_forcas: "Umsatzprognosebericht",
+        desc_forcas: "Berichte zur Vertriebsprognose.",
+        mod_laplabrg: "Gewinn- und Verlustrechnung",
+        desc_laplabrg: "GuV-Berichterstattung.",
+        mod_cmo: "Betriebskosten & Überwachung",
+        desc_cmo: "Überwachung der Betriebskosten."
     },
-
-    taxm: {
-        title: "Multi Tax",
-        description: "Tax management system."
-    },
-
-    hr: {
-        title: "Human Resources",
-        description: "Human Resources Management."
-    },
-
-    database: {
-        title: "Employee Database",
-        description: "Employee master data management."
-    },
-
-    attendance: {
-        title: "Attendance",
-        description: "Employee attendance management."
-    },
-
-    recruitment: {
-        title: "Recruitment",
-        description: "Recruitment and applicant management."
-    },
-
-    leave: {
-        title: "Permission & Leave",
-        description: "Employee leave and permission management."
-    },
-
-    benefit: {
-        title: "Benefit",
-        description: "Employee benefits management."
-    },
-
-    payroll: {
-        title: "Payroll",
-        description: "Payroll and salary management."
-    },
-
-    tckp: {
-        title: "Training Center",
-        description: "Employee training management."
-    },
-
-    kpi: {
-        title: "KPI",
-        description: "Key Performance Indicator."
-    },
-
-    sp: {
-        title: "Pengajuan SP",
-        description: "Employee warning letter submission."
-    },
-
-    exitc: {
-        title: "Pengajuan Resign",
-        description: "Employee resignation management."
-    },
-
-    self: {
-        title: "Self Services",
-        description: "Employee self service portal."
-    },
-
-    ess: {
-        title: "ESS",
-        description: "Employee Self Service."
-    },
-
-    empeng: {
-        title: "Employee Engagement",
-        description: "Employee engagement management."
-    },
-
-    kgame: {
-        title: "Hiburan",
-        description: "Entertainment and games."
-    },
-
-    iaudit: {
-        title: "Internal Audit",
-        description: "Internal audit management."
-    },
-
-    white: {
-        title: "System Konsultasi",
-        description: "Consultation system."
-    },
-
-    proc: {
-        title: "Procurement & Asset",
-        description: "Procurement and asset management."
-    },
-
-    fifo: {
-        title: "Procurement",
-        description: "Procurement management."
-    },
-
-    aset: {
-        title: "Asset Management",
-        description: "Company asset management."
-    },
-
-    vendorm: {
-        title: "Vendor Management",
-        description: "Vendor database and management."
-    },
-
-    dtanalys: {
-        title: "Data Analyst",
-        description: "Data analysis and reporting."
-    },
-
-    execdas: {
-        title: "Laporan Management (HPM)",
-        description: "Executive management reporting."
-    },
-
-    hranalys: {
-        title: "HR Analyst",
-        description: "Human resources analytics."
-    },
-
-    itsdlc: {
-        title: "IT SDLC Project, Budget & Performance",
-        description: "IT project, budget and performance management."
-    },
-
-    tech: {
-        title: "IT",
-        description: "Information Technology."
-    },
-
-    projectm: {
-        title: "Project Management",
-        description: "Project tracking and management."
-    },
-
-    ticket: {
-        title: "Ticketing",
-        description: "IT ticket management."
-    },
-
-    sales: {
-        title: "Sales",
-        description: "Sales management."
-    },
-
-    visitsales: {
-        title: "Visit Sales",
-        description: "Sales visit management."
-    },
-
-    customer: {
-        title: "Customer",
-        description: "Customer database management."
-    },
-
-    nawar: {
-        title: "Bid",
-        description: "Bid and quotation management."
-    },
-
-    order: {
-        title: "Order Customer",
-        description: "Customer order management."
-    },
-
-    way: {
-        title: "Waybill Customer",
-        description: "Customer waybill management."
-    },
-
-    cm: {
-        title: "Credit Memo Customer",
-        description: "Customer credit memo management."
-    },
-
-    acbil: {
-        title: "Account Bill Customer",
-        description: "Customer billing management."
-    },
-
-    market: {
-        title: "Marketing",
-        description: "Marketing management."
-    },
-
-    cmsmkt: {
-        title: "Tools CMS Marketing",
-        description: "Marketing CMS tools."
-    },
-
-    inv: {
-        title: "External Company",
-        description: "External company management."
-    },
-
-    stock: {
-        title: "Stock",
-        description: "Inventory and stock management."
-    },
-
-    penjualan: {
-        title: "Point of Sale",
-        description: "Sales transaction management."
-    },
-
-    fin: {
-        title: "Finance",
-        description: "Financial management."
-    },
-
-    cashreq: {
-        title: "Cash Request",
-        description: "Cash request management."
-    },
-
-    forcas: {
-        title: "Laporan Forecasting Sales",
-        description: "Sales forecasting reports."
-    },
-
-    laplabrg: {
-        title: "Laporan Laba Rugi",
-        description: "Profit and loss reporting."
-    },
-
-    cmo: {
-        title: "Cost & Monitoring Operasional",
-        description: "Operational cost monitoring."
+    zh: {
+        docTitle: "企业仪表盘",
+        appName: "企业应用系统",
+        menuBtn: "☰ 菜单",
+        searchPlaceholder: "搜索菜单...",
+        sec_rnd: "研发中心",
+        sec_hr: "人力资源",
+        sec_self: "自助服务",
+        sec_audit: "审计与咨询",
+        sec_proc: "采购与资产",
+        sec_analytics: "数据分析",
+        sec_it: "信息技术",
+        sec_sales: "销售管理",
+        sec_mkt: "市场营销",
+        sec_ext: "外部企业",
+        sec_fin: "财务管理",
+        mod_dashboard: "仪表盘",
+        desc_dashboard: "欢迎使用企业仪表盘。请从侧边栏选择模块开始。",
+        mod_resedev: "研发 (R&D)",
+        desc_resedev: "研发项目管理与流程。",
+        mod_esignature: "电子签名",
+        desc_esignature: "电子文件签署管理。",
+        mod_taxm: "多税制管理",
+        desc_taxm: "税务管理系统。",
+        mod_hr: "HR 系统",
+        desc_hr: "集成式人力资源系统，涵盖考勤、人事档案、薪资、绩效评估、招聘、处分/警告信（SP）及培训。",
+        hr_points: [
+            "考勤管理：上下班打卡、加班与排班记录。",
+            "人事档案（SDM）：员工主数据、劳动合同与任职履历。",
+            "薪资核算（Payroll）：基本薪资、津贴、扣款、个税及工资条。",
+            "绩效考核（KPI）：目标追踪与员工绩效评估。",
+            "招聘管理（Recruitment）：职位发布、简历筛选、面试与入职。",
+            "警告处分（SP）：纪律处分与警告信申请记录。",
+            "培训发展（Training）：员工技能培训计划与学习记录。"
+        ],
+        mod_database: "员工数据库",
+        desc_database: "员工主数据管理。",
+        mod_attendance: "考勤管理",
+        desc_attendance: "员工出勤管理。",
+        mod_recruitment: "招聘管理",
+        desc_recruitment: "招聘与求职者管理。",
+        mod_leave: "请假与审批",
+        desc_leave: "员工请假与外出审批管理。",
+        mod_payroll: "薪资管理",
+        desc_payroll: "薪酬与薪资发放管理。",
+        mod_tckp: "培训中心",
+        desc_tckp: "员工培训管理。",
+        mod_kpi: "绩效指标 (KPI)",
+        desc_kpi: "关键绩效指标管理。",
+        mod_sp: "警告处分申请 (SP)",
+        desc_sp: "员工警告信提报管理。",
+        mod_self: "自助服务",
+        desc_self: "员工自助服务门户。",
+        mod_ess: "员工自助 (ESS)",
+        desc_ess: "员工自助服务。",
+        mod_empeng: "员工敬业度",
+        desc_empeng: "员工敬业度管理。",
+        mod_kgame: "娱乐中心",
+        desc_kgame: "休闲娱乐与小游戏。",
+        mod_iaudit: "内部审计",
+        desc_iaudit: "内部审计管理。",
+        mod_white: "咨询系统",
+        desc_white: "咨询与沟通系统。",
+        mod_proc: "采购与资产",
+        desc_proc: "采购与资产管理。",
+        mod_fifo: "采购管理",
+        desc_fifo: "采购业务管理。",
+        mod_aset: "资产管理",
+        desc_aset: "公司固定资产管理。",
+        mod_vendorm: "供应商管理",
+        desc_vendorm: "供应商档案与管理。",
+        mod_dtanalys: "数据分析",
+        desc_dtanalys: "数据分析与报表。",
+        mod_execdas: "管理报告 (HPM)",
+        desc_execdas: "高管经营管理报表。",
+        mod_hranalys: "HR 数据分析",
+        desc_hranalys: "人力资源数据分析。",
+        mod_itsdlc: "IT SDLC 项目、预算与绩效",
+        desc_itsdlc: "IT 项目、预算与绩效管理。",
+        mod_tech: "信息技术",
+        desc_tech: "信息技术支持。",
+        mod_projectm: "项目管理",
+        desc_projectm: "项目进度跟踪与管理。",
+        mod_ticket: "工单系统",
+        desc_ticket: "IT 运维工单管理。",
+        mod_sales: "销售管理",
+        desc_sales: "销售业务管理。",
+        mod_visitsales: "销售拜访",
+        desc_visitsales: "销售客户拜访管理。",
+        mod_customer: "客户管理",
+        desc_customer: "客户资料库管理。",
+        mod_nawar: "报价与投标",
+        desc_nawar: "报价与投标管理。",
+        mod_order: "客户订单",
+        desc_order: "客户订单处理。",
+        mod_way: "客户运单",
+        desc_way: "客户发货运单管理。",
+        mod_cm: "客户贷项通知单",
+        desc_cm: "客户贷项凭证管理。",
+        mod_acbil: "客户账单",
+        desc_acbil: "客户账单与结算管理。",
+        mod_market: "市场营销",
+        desc_market: "市场营销管理。",
+        mod_cmsmkt: "营销 CMS 工具",
+        desc_cmsmkt: "市场内容管理工具。",
+        mod_inv: "外部企业",
+        desc_inv: "外部企业管理。",
+        mod_stock: "库存管理",
+        desc_stock: "库存与仓储管理。",
+        mod_penjualan: "销售终端 (POS)",
+        desc_penjualan: "门店销售交易管理。",
+        mod_fin: "财务管理",
+        desc_fin: "企业财务管理。",
+        mod_cashreq: "资金申请",
+        desc_cashreq: "现金与资金申请管理。",
+        mod_forcas: "销售预测报表",
+        desc_forcas: "销售业绩预测报告。",
+        mod_laplabrg: "损益表",
+        desc_laplabrg: "利润与损益报表。",
+        mod_cmo: "运营成本与监控",
+        desc_cmo: "运营成本监控管理。"
     }
-
 };
 
+const redirectMap = {
+    database: "database.html",
+    attendance: "absensi.html",
+    payroll: "payroll.html",
+    recruitment: "recruit.html",
+    tckp: "trainer.html",
+    sp: "sp.html",
+    kpi: "kpi.html",
+    leave: "leave.html"
+};
 
-/* =================================
-   SHOW MODULE
-================================= */
+let currentLang = localStorage.getItem("app_lang") || "en";
+let currentModule = "dashboard";
+
+function getDict(lang = currentLang) {
+    return translations[lang] || translations.en;
+}
+
+function renderStaticTranslations(lang) {
+    const dict = getDict(lang);
+    document.documentElement.lang = lang;
+    document.title = dict.docTitle;
+    document.getElementById("menuToggle").textContent = dict.menuBtn;
+    document.getElementById("menuSearch").placeholder = dict.searchPlaceholder;
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.dataset.i18n;
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+}
+
+function renderModuleContent(moduleName, lang = currentLang) {
+    const dict = getDict(lang);
+    const title = dict[`mod_${moduleName}`] || moduleName;
+    const desc = dict[`desc_${moduleName}`] || "";
+
+    document.getElementById("pageTitle").textContent = title;
+
+    let extraHtml = "";
+    if (moduleName === "hr" && Array.isArray(dict.hr_points)) {
+        const items = dict.hr_points.map(pt => `<li>${pt}</li>`).join("");
+        extraHtml = `<ul class="hr-summary-list">${items}</ul>`;
+    }
+
+    document.getElementById("module-container").innerHTML = `
+        <h2 class="module-heading">${title}</h2>
+        <p class="module-description">${desc}</p>
+        ${extraHtml}
+    `;
+}
 
 function showModule(moduleName) {
-
-     // Redirect ke halaman database.html
-    if (moduleName === "database") {
-        window.location.href = "database.html";
+    if (redirectMap[moduleName]) {
+        window.location.href = redirectMap[moduleName];
         return;
     }
 
-    // Redirect ke halaman absensi.html
-     if (moduleName === "attendance") {
-        window.location.href = "absensi.html";
-        return;
-    }
-
-    // Redirect ke halaman payroll.html
-    if (moduleName === "payroll") {
-        window.location.href = "payroll.html";
-        return;
-    }
-
-    // Redirect ke halaman recruit.html
-    if (moduleName === "recruitment") {
-        window.location.href = "recruit.html";
-        return;
-    }
-
-    // Redirect ke halaman trainer.html
-    if (moduleName === "tckp") {
-        window.location.href = "trainer.html";
-        return;
-    }
-
-    // Redirect ke halaman sp.html
-    if (moduleName === "sp") {
-        window.location.href = "sp.html";
-        return;
-    }
-
-    // Redirect ke halaman kpi.html
-    if (moduleName === "kpi") {
-        window.location.href = "kpi.html";
-        return;
-    }
-
-    // Redirect ke halaman leave.html
-    if (moduleName === "leave") {
-        window.location.href = "leave.html";
-        return;
-    }
-    
-    const module = modules[moduleName];
-
-    if (!module) {
+    if (!getDict()[`mod_${moduleName}`]) {
         console.error("Module not found:", moduleName);
         return;
     }
 
-    // Update active menu
+    currentModule = moduleName;
+
     document.querySelectorAll(".nav-link").forEach(link => {
-        link.classList.remove("active");
+        link.classList.toggle("active", link.dataset.mod === moduleName);
     });
 
-    const activeLink = document.querySelector(
-        `.nav-link[data-mod="${moduleName}"]`
-    );
-
-    if (activeLink) {
-        activeLink.classList.add("active");
-    }
-
-    // Update page title
-    document.getElementById("pageTitle").textContent =
-        module.title;
-
-    // Update content
-    document.getElementById("module-container").innerHTML = `
-        <h2 class="module-heading">${module.title}</h2>
-        <p class="module-description">
-            ${module.description}
-        </p>
-    `;
-
-    // Close mobile sidebar
+    renderModuleContent(moduleName, currentLang);
     document.getElementById("sidebar").classList.remove("show");
 }
 
+function changeLang(lang) {
+    if (!translations[lang]) return;
+    currentLang = lang;
+    localStorage.setItem("app_lang", lang);
 
-/* =================================
-   MENU CLICK
-================================= */
-
-document.querySelectorAll(".nav-link").forEach(link => {
-
-    link.addEventListener("click", function () {
-
-        const moduleName = this.dataset.mod;
-
-        showModule(moduleName);
-
+    document.querySelectorAll(".lang-switcher button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.lang === lang);
     });
 
+    renderStaticTranslations(lang);
+    renderModuleContent(currentModule, lang);
+}
+
+// Menu click
+document.querySelectorAll(".nav-link").forEach(link => {
+    link.addEventListener("click", function () {
+        showModule(this.dataset.mod);
+    });
 });
 
-
-/* =================================
-   MENU SEARCH
-================================= */
-
-document.getElementById("menuSearch")
-.addEventListener("input", function () {
-
+// Menu search
+document.getElementById("menuSearch").addEventListener("input", function () {
     const keyword = this.value.toLowerCase();
 
-    document.querySelectorAll("#sidebar-nav .nav-link")
-    .forEach(link => {
-
+    document.querySelectorAll("#sidebar-nav .nav-link").forEach(link => {
         const text = link.textContent.toLowerCase();
-
-        link.style.display =
-            text.includes(keyword) ? "flex" : "none";
-
+        link.style.display = text.includes(keyword) ? "flex" : "none";
     });
 
-    // Hide section headings when no matching items exist
     document.querySelectorAll(".nav-section").forEach(section => {
-
         let next = section.nextElementSibling;
         let hasVisible = false;
 
         while (next && !next.classList.contains("nav-section")) {
-
-            if (
-                next.classList.contains("nav-link") &&
-                next.style.display !== "none"
-            ) {
+            if (next.classList.contains("nav-link") && next.style.display !== "none") {
                 hasVisible = true;
             }
-
             next = next.nextElementSibling;
         }
 
         section.style.display = hasVisible ? "block" : "none";
-
     });
-
 });
 
-
-/* =================================
-   MOBILE MENU
-================================= */
-
-document.getElementById("menuToggle")
-.addEventListener("click", function () {
-
-    document.getElementById("sidebar")
-    .classList.toggle("show");
-
+// Mobile menu
+document.getElementById("menuToggle").addEventListener("click", function () {
+    document.getElementById("sidebar").classList.toggle("show");
 });
 
-
-/* =================================
-   LANGUAGE SWITCHER
-================================= */
-
-document.querySelectorAll(".lang-switcher button")
-.forEach(button => {
-
+// Language switcher
+document.querySelectorAll(".lang-switcher button").forEach(button => {
     button.addEventListener("click", function () {
-
-        document.querySelectorAll(".lang-switcher button")
-        .forEach(btn => btn.classList.remove("active"));
-
-        this.classList.add("active");
-
-        const lang = this.dataset.lang;
-
-        changeLang(lang);
-
+        changeLang(this.dataset.lang);
     });
-
 });
 
-
-function changeLang(lang) {
-
-    console.log("Selected language:", lang);
-
-    // Tambahkan konfigurasi terjemahan di sini.
-    // Contoh: EN, ID, DE, ZH.
-
-}
-
+// Initial load
+changeLang(currentLang);
+showModule(currentModule);
 </script>
 
 </body>
