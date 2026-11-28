@@ -423,7 +423,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 0.85rem;
-      min-width: 860px;
+      min-width: 880px;
     }
 
     table.history-table th {
@@ -520,36 +520,36 @@
       }
       .surat-sheet {
         border: 1px solid #cbd5e1 !important;
-        padding: 14px 16px !important;
-        font-size: 0.8rem !important;
-        line-height: 1.38 !important;
+        padding: 12px 14px !important;
+        font-size: 0.78rem !important;
+        line-height: 1.35 !important;
         page-break-inside: avoid;
         break-inside: avoid;
       }
       .surat-header {
         padding-bottom: 6px !important;
-        margin-bottom: 10px !important;
+        margin-bottom: 8px !important;
       }
       .surat-header h3 {
-        font-size: 1rem !important;
+        font-size: 0.98rem !important;
       }
       .info-table {
         margin: 6px 0 8px !important;
-        font-size: 0.8rem !important;
+        font-size: 0.78rem !important;
       }
       .info-table td {
         padding: 2px 4px !important;
       }
       .ttd-grid {
-        margin-top: 12px !important;
+        margin-top: 10px !important;
         gap: 8px !important;
-        font-size: 0.78rem !important;
+        font-size: 0.76rem !important;
       }
       .ttd-box {
         padding: 6px !important;
       }
       .ttd-role {
-        margin-bottom: 24px !important;
+        margin-bottom: 22px !important;
       }
     }
   </style>
@@ -923,14 +923,16 @@
         thAksi: "Aksi",
         btnPrev: "Sebelumnya",
         btnNext: "Berikutnya",
+        btnLihat: "Lihat",
         btnEdit: "Edit",
         btnRowPdf: "PDF",
         emptyNoData: "Belum ada data histori Surat Peringatan tersimpan.",
         emptyNoMatch: "Tidak ada data yang cocok dengan kata kunci pencarian.",
-        savedMsg: (tingkat, noSurat, nama) => `Data ${tingkat} (${noSurat}) untuk ${nama} tersimpan di storage.`,
-        updatedMsg: (tingkat, noSurat, nama) => `Data ${tingkat} (${noSurat}) untuk ${nama} diperbarui di storage.`,
+        savedMsg: (tingkat, noSurat, nama) => `Data ${tingkat} (${noSurat}) untuk ${nama} tersimpan di local storage.`,
+        updatedMsg: (tingkat, noSurat, nama) => `Data ${tingkat} (${noSurat}) untuk ${nama} diperbarui di local storage.`,
+        viewedMsg: (noSurat, nama) => `Menampilkan arsip ${noSurat} milik ${nama} pada preview.`,
         loadedMsg: (noSurat, nama) => `Data ${noSurat} milik ${nama} dimuat ke form untuk diedit.`,
-        resignedMsg: (noSurat, nama) => `Draft Surat Pernyataan Keluar (${noSurat}) untuk ${nama} diproses dan disimpan di storage.`,
+        resignedMsg: (noSurat, nama) => `Draft Surat Pernyataan Keluar (${noSurat}) untuk ${nama} diproses dan disimpan di local storage.`,
         violation3Msg: (count, nama) => `Karyawan <strong>${nama}</strong> sudah memiliki <strong>${count} kali pelanggaran</strong>. Tombol <strong>Berhenti</strong> aktif untuk memproses Surat Pernyataan Keluar.`,
         confirmClear: "Hapus seluruh histori tersimpan di browser dan reset nomor urut ke 001?",
         clearedMsg: "Storage berhasil dibersihkan. Nomor surat kembali ke urutan 001.",
@@ -965,7 +967,7 @@
           "<strong>Level 1 - Pencatatan 3x Pelanggaran:</strong> Sistem memproses tombol Berhenti berdasarkan rekap pelanggaran karyawan.",
           "<strong>Level 2 - Pernyataan Keluar Karyawan:</strong> Draf pernyataan keluar disiapkan dan ditandatangani oleh Karyawan.",
           "<strong>Level 3 - Persetujuan Atasan & HRD:</strong> Ditandatangani oleh Atasan Langsung dan Pejabat HRD.",
-          "<strong>Level 4 - Arsip & PDF:</strong> Disimpan ke histori dan dapat dicetak ke PDF per baris."
+          "<strong>Level 4 - Arsip & PDF:</strong> Disimpan ke histori dan dapat dicetak ke PDF (1 halaman) per baris."
         ]
       },
       en: {
@@ -1046,14 +1048,16 @@
         thAksi: "Actions",
         btnPrev: "Previous",
         btnNext: "Next",
+        btnLihat: "View",
         btnEdit: "Edit",
         btnRowPdf: "PDF",
         emptyNoData: "No warning letter history records saved yet.",
         emptyNoMatch: "No records match your search keyword.",
-        savedMsg: (tingkat, noSurat, nama) => `${tingkat} (${noSurat}) for ${nama} saved to storage.`,
-        updatedMsg: (tingkat, noSurat, nama) => `${tingkat} (${noSurat}) for ${nama} updated in storage.`,
+        savedMsg: (tingkat, noSurat, nama) => `${tingkat} (${noSurat}) for ${nama} saved to local storage.`,
+        updatedMsg: (tingkat, noSurat, nama) => `${tingkat} (${noSurat}) for ${nama} updated in local storage.`,
+        viewedMsg: (noSurat, nama) => `Showing archive ${noSurat} for ${nama} in preview.`,
         loadedMsg: (noSurat, nama) => `Loaded ${noSurat} for ${nama} into the form for editing.`,
-        resignedMsg: (noSurat, nama) => `Employee Exit Statement Draft (${noSurat}) for ${nama} processed and saved to storage.`,
+        resignedMsg: (noSurat, nama) => `Employee Exit Statement Draft (${noSurat}) for ${nama} processed and saved to local storage.`,
         violation3Msg: (count, nama) => `Employee <strong>${nama}</strong> has reached <strong>${count} violations</strong>. The <strong>Terminate / Exit</strong> button is active to process the Exit Statement Letter.`,
         confirmClear: "Delete all history saved in browser and reset sequence number to 001?",
         clearedMsg: "Storage cleared. Letter sequence reset to 001.",
@@ -1088,7 +1092,7 @@
           "<strong>Level 1 - 3 Violations Trigger:</strong> System enables the Terminate/Exit action based on recorded violations.",
           "<strong>Level 2 - Employee Exit Statement:</strong> Exit statement draft is generated and signed by the Employee.",
           "<strong>Level 3 - Supervisor & HRD Approval:</strong> Signed by Direct Supervisor and HRD Officer.",
-          "<strong>Level 4 - Archive & PDF:</strong> Saved to history and printable to PDF per row."
+          "<strong>Level 4 - Archive & PDF:</strong> Saved to history and printable to PDF (1 page) per row."
         ]
       }
     };
@@ -1237,7 +1241,6 @@
 
       const targetMonth = month + 6;
       const endDate = new Date(year, targetMonth, day);
-      // Jika tanggal hari bergeser karena jumlah hari di bulan tujuan lebih sedikit, clamp ke akhir bulan tujuan
       if (endDate.getMonth() !== ((targetMonth % 12) + 12) % 12) {
         endDate.setDate(0);
       }
@@ -1442,7 +1445,8 @@
               <td>${escapeHtml(item.alasan)}</td>
               <td>
                 <div class="action-group">
-                  <button type="button" class="btn-secondary" style="padding:6px 10px; font-size:0.78rem;" onclick="editRecord('${escapeHtml(item.id)}')">${t().btnEdit}</button>
+                  <button type="button" class="btn-secondary" style="padding:6px 10px; font-size:0.78rem;" onclick="viewRecord('${escapeHtml(item.id)}')">${t().btnLihat}</button>
+                  <button type="button" class="btn-primary" style="padding:6px 10px; font-size:0.78rem;" onclick="editRecord('${escapeHtml(item.id)}')">${t().btnEdit}</button>
                   <button type="button" class="btn-pdf" style="padding:6px 10px; font-size:0.78rem;" onclick="printRowPdf('${escapeHtml(item.id)}')">${t().btnRowPdf}</button>
                 </div>
               </td>
@@ -1476,6 +1480,15 @@
       document.getElementById("namaHr").value = found.hr;
       syncPreview();
     }
+
+    window.viewRecord = function(id) {
+      const found = spHistory.find(item => item.id === id);
+      if (!found) return;
+      populateFormFromRecord(found, false);
+      statusBanner.style.display = "block";
+      statusBanner.textContent = t().viewedMsg(found.noSurat, found.nama);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
     window.editRecord = function(id) {
       const found = spHistory.find(item => item.id === id);
