@@ -89,6 +89,16 @@
             padding: 8px 12px;
         }
 
+        .staff-name-link {
+            cursor: pointer;
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .staff-name-link:hover {
+            text-decoration: underline;
+        }
+
         .table td {
             vertical-align: middle;
         }
@@ -104,7 +114,7 @@
             }
 
             .table {
-                min-width: 520px;
+                min-width: 580px;
             }
         }
     </style>
@@ -263,9 +273,13 @@
 
                     </div>
 
-                    <!-- GPS STATUS -->
+                    <!-- GPS & IP STATUS -->
                     <div id="statusInfo" class="mt-3 small fw-bold text-secondary">
                         Waiting for GPS...
+                    </div>
+                    <div id="ipStatusInfo" class="mt-1 small fw-semibold text-secondary">
+                        <i class="bi bi-globe me-1"></i>
+                        <span id="labelIpRead">IP Address: Checking...</span>
                     </div>
 
                 </form>
@@ -277,7 +291,7 @@
         <!-- RIWAYAT ABSENSI -->
         <div class="col-lg-7">
 
-            <div class="card card-custom p-4 h-100 bg-white">
+            <div class="card card-custom p-4 h-100 bg-white d-flex flex-column">
 
                 <h6 class="fw-bold mb-3">
                     <i class="bi bi-journal-text me-2 text-primary"></i>
@@ -293,13 +307,13 @@
                         type="text"
                         id="fuzzySearch"
                         class="search-input"
-                        placeholder="Search name or status..."
+                        placeholder="Search name, shift, IP, or status..."
                     >
 
                 </div>
 
                 <!-- TABLE -->
-                <div class="table-responsive">
+                <div class="table-responsive flex-grow-1">
 
                     <table class="table table-hover align-middle">
 
@@ -309,6 +323,8 @@
                                 <th id="labelStaff">Staff</th>
 
                                 <th id="labelTime">Time</th>
+
+                                <th id="labelIpCol">IP Address</th>
 
                                 <th class="text-center" id="labelMap">Map</th>
 
@@ -321,6 +337,14 @@
 
                     </table>
 
+                </div>
+
+                <!-- PAGINATION -->
+                <div id="paginationContainer" class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3 pt-2 border-top small">
+                    <div id="paginationInfo" class="text-muted"></div>
+                    <nav aria-label="Attendance pagination">
+                        <ul id="paginationList" class="pagination pagination-sm mb-0"></ul>
+                    </nav>
                 </div>
 
             </div>
@@ -385,6 +409,8 @@ const SHIFT_CONFIG = {
     }
 };
 
+const PAGE_SIZE = 5;
+
 
 // ========================================
 // TRANSLATION CONFIGURATION
@@ -406,12 +432,15 @@ const translations = {
         gps_wait: 'Menunggu GPS...',
         gps_active: 'GPS Aktif',
         gps_denied: 'Akses GPS Ditolak!',
+        ip_checking: 'Membaca IP Address...',
+        ip_unavailable: 'IP Tidak Tersedia',
         log_attendance: 'Riwayat Absensi Hari Ini',
         staff: 'Karyawan',
         time: 'Waktu',
+        ip_col: 'IP Address',
         photo: 'Foto',
         map: 'Peta',
-        search_placeholder: 'Cari nama, shift, atau status...',
+        search_placeholder: 'Cari nama, shift, IP, atau status...',
         clear_data: 'Hapus Data',
         confirm_clear: 'Hapus semua data absensi di perangkat ini?',
         success_msg: 'Berhasil Absen',
@@ -428,7 +457,10 @@ const translations = {
         already_completed: 'Sudah Check-In 1x dan Check-Out 1x pada periode ini',
         ready_in: 'Siap Check-In (1x)',
         ready_out: 'Sudah Check-In — Siap Check-Out (1x)',
-        completed_badge: 'Selesai (1x Masuk & 1x Pulang)'
+        name_selected: 'Nama dimuat ke form karyawan',
+        prev_page: 'Sebelumnya',
+        next_page: 'Berikutnya',
+        page_info: 'Menampilkan {start}-{end} dari {total} data'
     },
 
     en: {
@@ -445,12 +477,15 @@ const translations = {
         gps_wait: 'Waiting for GPS...',
         gps_active: 'GPS Active',
         gps_denied: 'GPS Access Denied!',
+        ip_checking: 'Detecting IP Address...',
+        ip_unavailable: 'IP Unavailable',
         log_attendance: "Today's Attendance Log",
         staff: 'Staff',
         time: 'Time',
+        ip_col: 'IP Address',
         photo: 'Photo',
         map: 'Map',
-        search_placeholder: 'Search name, shift, or status...',
+        search_placeholder: 'Search name, shift, IP, or status...',
         clear_data: 'Clear Data',
         confirm_clear: 'Delete all attendance data on this device?',
         success_msg: 'Attendance Success',
@@ -467,7 +502,10 @@ const translations = {
         already_completed: 'Already Clocked In once and Clocked Out once for this period',
         ready_in: 'Ready to Clock In (1x)',
         ready_out: 'Clocked In — Ready to Clock Out (1x)',
-        completed_badge: 'Completed (1x In & 1x Out)'
+        name_selected: 'Name loaded into employee field',
+        prev_page: 'Previous',
+        next_page: 'Next',
+        page_info: 'Showing {start}-{end} of {total} records'
     },
 
     zh: {
@@ -484,12 +522,15 @@ const translations = {
         gps_wait: '等待 GPS...',
         gps_active: 'GPS 已激活',
         gps_denied: 'GPS 访问被拒绝！',
+        ip_checking: '正在获取 IP 地址...',
+        ip_unavailable: '无法获取 IP',
         log_attendance: '今日考勤记录',
         staff: '员工',
         time: '时间',
+        ip_col: 'IP 地址',
         photo: '照片',
         map: '地图',
-        search_placeholder: '搜索姓名、班次或状态...',
+        search_placeholder: '搜索姓名、班次、IP 或状态...',
         clear_data: '清除数据',
         confirm_clear: '删除此设备上的所有考勤数据？',
         success_msg: '签到成功',
@@ -506,7 +547,10 @@ const translations = {
         already_completed: '本周期已完成 1 次签到和 1 次签退',
         ready_in: '可签到 (限1次)',
         ready_out: '已签到 — 可签退 (限1次)',
-        completed_badge: '已完成 (1次签到 & 1次签退)'
+        name_selected: '已将姓名填入员工输入框',
+        prev_page: '上一页',
+        next_page: '下一页',
+        page_info: '显示第 {start}-{end} 条，共 {total} 条'
     }
 
 };
@@ -543,7 +587,7 @@ function changeLanguage(lang) {
 
     applyTranslations();
 
-    renderTable(document.getElementById('fuzzySearch').value);
+    renderTable(document.getElementById('fuzzySearch').value, currentPage);
 }
 
 
@@ -566,6 +610,7 @@ function applyTranslations() {
     document.getElementById('labelLog').textContent = uiLabels.log_attendance;
     document.getElementById('labelStaff').textContent = uiLabels.staff;
     document.getElementById('labelTime').textContent = uiLabels.time;
+    document.getElementById('labelIpCol').textContent = uiLabels.ip_col;
     document.getElementById('labelMap').textContent = uiLabels.map;
     document.getElementById('labelPhoto').textContent = uiLabels.photo;
     document.getElementById('fuzzySearch').placeholder = uiLabels.search_placeholder;
@@ -574,6 +619,7 @@ function applyTranslations() {
     updateShiftOptionLabels();
     updateScheduleInfo();
     updateEmployeeQuotaInfo();
+    updateIpDisplay();
     checkReady();
 
     document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -613,10 +659,62 @@ let userCoords = {
     lng: null
 };
 
+let clientIpAddress = null;
+let ipLookupFailed = false;
+
 let userManuallySelectedShift = false;
 let lastAutoShift = null;
+let currentPage = 1;
 
 const video = document.getElementById('video');
+
+
+// ========================================
+// IP ADDRESS READER
+// ========================================
+
+function updateIpDisplay() {
+    const el = document.getElementById('labelIpRead');
+    if (clientIpAddress) {
+        el.textContent = `${uiLabels.ip_col}: ${clientIpAddress}`;
+    } else if (ipLookupFailed) {
+        el.textContent = `${uiLabels.ip_col}: ${uiLabels.ip_unavailable}`;
+    } else {
+        el.textContent = uiLabels.ip_checking;
+    }
+}
+
+async function fetchClientIpAddress() {
+    const endpoints = [
+        { url: 'https://api.ipify.org?format=json', parse: async r => (await r.json()).ip },
+        { url: 'https://api64.ipify.org?format=json', parse: async r => (await r.json()).ip },
+        { url: 'https://ipinfo.io/json', parse: async r => (await r.json()).ip }
+    ];
+
+    for (const ep of endpoints) {
+        try {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 5000);
+            const res = await fetch(ep.url, { signal: controller.signal, cache: 'no-store' });
+            clearTimeout(timer);
+
+            if (!res.ok) continue;
+            const ip = await ep.parse(res);
+            if (ip && typeof ip === 'string' && ip.trim()) {
+                clientIpAddress = ip.trim();
+                ipLookupFailed = false;
+                updateIpDisplay();
+                return clientIpAddress;
+            }
+        } catch (err) {
+            // Coba endpoint berikutnya
+        }
+    }
+
+    ipLookupFailed = true;
+    updateIpDisplay();
+    return null;
+}
 
 
 // ========================================
@@ -668,11 +766,8 @@ function getWorkMode() {
 
 function detectRecommendedShift(jakartaParts) {
     const mins = jakartaParts.hour * 60 + jakartaParts.minute;
-    // 05:00 - 13:59 -> Shift Pagi
     if (mins >= 5 * 60 && mins < 14 * 60) return 'morning';
-    // 14:00 - 21:59 -> Shift Siang
     if (mins >= 14 * 60 && mins < 22 * 60) return 'afternoon';
-    // 22:00 - 04:59 -> Shift Malam
     return 'night';
 }
 
@@ -683,7 +778,6 @@ function getActivePeriodKey(workMode, shiftId, jakartaParts) {
 
     const shift = SHIFT_CONFIG[shiftId] || SHIFT_CONFIG.morning;
     if (shift.overnight && jakartaParts.hour < 12) {
-        // Jam dini hari untuk shift malam milik tanggal mulai shift kemarin
         const startDate = shiftDateKey(jakartaParts.dateKey, -1);
         return `shift:${shift.id}:${startDate}`;
     }
@@ -951,6 +1045,21 @@ function takeSnapshot() {
 
 
 // ========================================
+// SELECT NAME FROM HISTORY
+// ========================================
+
+function selectNameFromHistory(nama) {
+    const input = document.getElementById('namaKaryawan');
+    input.value = nama;
+    input.focus();
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    updateEmployeeQuotaInfo();
+    checkReady();
+    showNotif(`${uiLabels.name_selected}: ${nama}`, 'info');
+}
+
+
+// ========================================
 // ONCE-PER-PERIOD CHECK-IN / CHECK-OUT STATE
 // ========================================
 
@@ -1016,10 +1125,7 @@ function checkReady() {
     const periodKey = getActivePeriodKey(workMode, shiftId, getJakartaParts());
     const { hasIn, hasOut } = getEmployeePeriodRecords(nama, periodKey);
 
-    // Masuk hanya 1 kali per periode
     const canIn = baseFormReady && !hasIn;
-
-    // Pulang hanya 1 kali per periode dan setelah Masuk
     const canOut = baseFormReady && hasIn && !hasOut;
 
     document.getElementById('btnMasuk').disabled = !canIn;
@@ -1037,7 +1143,7 @@ document.getElementById('namaKaryawan').addEventListener('input', () => {
 // SUBMIT ATTENDANCE
 // ========================================
 
-function submitAbsen(tipe) {
+async function submitAbsen(tipe) {
 
     const nama = document.getElementById('namaKaryawan').value.trim();
 
@@ -1076,6 +1182,11 @@ function submitAbsen(tipe) {
         return;
     }
 
+    if (!clientIpAddress && !ipLookupFailed) {
+        await fetchClientIpAddress();
+    }
+
+    const ipToSave = clientIpAddress || uiLabels.ip_unavailable;
     const tipeLabel = uiLabels[tipe];
     const modeLabel = workMode === 'daily'
         ? uiLabels.daily_work
@@ -1092,6 +1203,7 @@ function submitAbsen(tipe) {
         mode_label: modeLabel,
         punctuality_label: punctualityLabel,
         period_key: periodKey,
+        ip_address: ipToSave,
         waktu: now.toISOString(),
         lat: userCoords.lat,
         lng: userCoords.lng,
@@ -1107,9 +1219,10 @@ function submitAbsen(tipe) {
     // RESET FORM
     selfieBase64 = null;
     document.getElementById('namaKaryawan').value = '';
+    currentPage = 1;
     updateEmployeeQuotaInfo();
     checkReady();
-    renderTable(document.getElementById('fuzzySearch').value);
+    renderTable(document.getElementById('fuzzySearch').value, currentPage);
 
     showNotif(
         `${uiLabels.success_msg}: ${tipeLabel} (${modeLabel} • ${punctualityLabel})`,
@@ -1120,10 +1233,84 @@ function submitAbsen(tipe) {
 
 
 // ========================================
+// PAGINATION RENDERER
+// ========================================
+
+function renderPagination(totalItems, page, pageSize) {
+    const infoEl = document.getElementById('paginationInfo');
+    const listEl = document.getElementById('paginationList');
+    listEl.innerHTML = '';
+
+    if (totalItems === 0) {
+        infoEl.textContent = '';
+        return;
+    }
+
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    const safePage = Math.min(Math.max(1, page), totalPages);
+    const start = (safePage - 1) * pageSize + 1;
+    const end = Math.min(totalItems, safePage * pageSize);
+
+    infoEl.textContent = uiLabels.page_info
+        .replace('{start}', start)
+        .replace('{end}', end)
+        .replace('{total}', totalItems);
+
+    if (totalPages <= 1) return;
+
+    // Prev button
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${safePage === 1 ? 'disabled' : ''}`;
+    const prevBtn = document.createElement('button');
+    prevBtn.type = 'button';
+    prevBtn.className = 'page-link';
+    prevBtn.textContent = uiLabels.prev_page;
+    prevBtn.disabled = safePage === 1;
+    prevBtn.addEventListener('click', () => {
+        currentPage = safePage - 1;
+        renderTable(document.getElementById('fuzzySearch').value, currentPage);
+    });
+    prevLi.appendChild(prevBtn);
+    listEl.appendChild(prevLi);
+
+    // Page numbers
+    for (let p = 1; p <= totalPages; p++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${p === safePage ? 'active' : ''}`;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'page-link';
+        btn.textContent = String(p);
+        btn.addEventListener('click', () => {
+            currentPage = p;
+            renderTable(document.getElementById('fuzzySearch').value, currentPage);
+        });
+        li.appendChild(btn);
+        listEl.appendChild(li);
+    }
+
+    // Next button
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${safePage === totalPages ? 'disabled' : ''}`;
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.className = 'page-link';
+    nextBtn.textContent = uiLabels.next_page;
+    nextBtn.disabled = safePage === totalPages;
+    nextBtn.addEventListener('click', () => {
+        currentPage = safePage + 1;
+        renderTable(document.getElementById('fuzzySearch').value, currentPage);
+    });
+    nextLi.appendChild(nextBtn);
+    listEl.appendChild(nextLi);
+}
+
+
+// ========================================
 // RENDER ATTENDANCE TABLE
 // ========================================
 
-function renderTable(filter = '') {
+function renderTable(filter = '', page = 1) {
 
     const tbody = document.getElementById('attendanceTableBody');
 
@@ -1137,7 +1324,8 @@ function renderTable(filter = '') {
             item.nama_karyawan,
             item.tipe_absen,
             item.mode_label,
-            item.punctuality_label
+            item.punctuality_label,
+            item.ip_address
         ].filter(Boolean).join(' ').toLowerCase();
 
         return haystack.includes(filter.toLowerCase());
@@ -1149,18 +1337,25 @@ function renderTable(filter = '') {
 
         tbody.innerHTML = `
             <tr>
-                <td colspan="4" class="text-center text-muted py-4">
+                <td colspan="5" class="text-center text-muted py-4">
                     ${uiLabels.no_data}
                 </td>
             </tr>
         `;
-
+        renderPagination(0, 1, PAGE_SIZE);
         return;
 
     }
 
+    const totalPages = Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE));
+    currentPage = Math.min(Math.max(1, page), totalPages);
+    const startIdx = (currentPage - 1) * PAGE_SIZE;
+    const pageItems = filteredData.slice(startIdx, startIdx + PAGE_SIZE);
 
-    filteredData.forEach(item => {
+    renderPagination(filteredData.length, currentPage, PAGE_SIZE);
+
+
+    pageItems.forEach(item => {
 
         const jam = new Date(item.waktu).toLocaleTimeString(
             currentLang === 'zh' ? 'zh-CN' :
@@ -1187,9 +1382,13 @@ function renderTable(filter = '') {
 
         const tdNama = document.createElement('td');
 
-        const namaDiv = document.createElement('div');
-        namaDiv.className = 'fw-bold';
-        namaDiv.textContent = item.nama_karyawan;
+        const namaBtn = document.createElement('button');
+        namaBtn.type = 'button';
+        namaBtn.className = 'btn btn-link p-0 fw-bold staff-name-link text-start';
+        namaBtn.textContent = item.nama_karyawan;
+        namaBtn.addEventListener('click', () => {
+            selectNameFromHistory(item.nama_karyawan);
+        });
 
         const badgeGroup = document.createElement('div');
         badgeGroup.className = 'd-flex flex-wrap gap-1 mt-1';
@@ -1216,12 +1415,16 @@ function renderTable(filter = '') {
             badgeGroup.appendChild(badgeStatus);
         }
 
-        tdNama.appendChild(namaDiv);
+        tdNama.appendChild(namaBtn);
         tdNama.appendChild(badgeGroup);
 
         const tdWaktu = document.createElement('td');
         tdWaktu.className = 'fw-bold';
         tdWaktu.textContent = jam;
+
+        const tdIp = document.createElement('td');
+        tdIp.className = 'text-monospace text-secondary';
+        tdIp.textContent = item.ip_address || uiLabels.ip_unavailable;
 
         const tdMap = document.createElement('td');
         tdMap.className = 'text-center';
@@ -1247,6 +1450,7 @@ function renderTable(filter = '') {
 
         tr.appendChild(tdNama);
         tr.appendChild(tdWaktu);
+        tr.appendChild(tdIp);
         tr.appendChild(tdMap);
         tr.appendChild(tdFoto);
 
@@ -1265,7 +1469,8 @@ document.getElementById('fuzzySearch').addEventListener(
     'input',
     (e) => {
 
-        renderTable(e.target.value);
+        currentPage = 1;
+        renderTable(e.target.value, currentPage);
 
     }
 );
@@ -1280,10 +1485,11 @@ function clearAllData() {
     if (confirm(uiLabels.confirm_clear)) {
 
         localStorage.removeItem('absensi_data');
+        currentPage = 1;
 
         updateEmployeeQuotaInfo();
         checkReady();
-        renderTable(document.getElementById('fuzzySearch').value);
+        renderTable(document.getElementById('fuzzySearch').value, currentPage);
 
     }
 
@@ -1319,7 +1525,8 @@ function showNotif(msg, type) {
 
 syncShiftWithCurrentTime();
 applyTranslations();
-renderTable();
+renderTable('', 1);
+fetchClientIpAddress();
 
 </script>
 
