@@ -292,7 +292,7 @@
       display: inline-block;
     }
 
-    .btn-print {
+    .btn-pdf {
       background: var(--success);
       color: #fff;
     }
@@ -481,30 +481,75 @@
       padding: 0 6px;
     }
 
+    /* Cetak 1 halaman */
+    @page {
+      size: A4 portrait;
+      margin: 10mm;
+    }
+
     @media print {
-      body {
-        background: #fff;
+      html, body {
+        width: 100%;
+        height: auto;
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
       .page-header,
       .form-panel,
       .history-section {
         display: none !important;
       }
+      .container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
       .top-grid {
-        display: block;
-        margin: 0;
+        display: block !important;
+        margin: 0 !important;
       }
       .card {
-        box-shadow: none;
-        border: none;
-        padding: 0;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
       }
       .card > h2 {
-        display: none;
+        display: none !important;
       }
       .surat-sheet {
-        border: none;
-        padding: 0;
+        border: 1px solid #cbd5e1 !important;
+        padding: 14px 16px !important;
+        font-size: 0.8rem !important;
+        line-height: 1.38 !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .surat-header {
+        padding-bottom: 6px !important;
+        margin-bottom: 10px !important;
+      }
+      .surat-header h3 {
+        font-size: 1rem !important;
+      }
+      .info-table {
+        margin: 6px 0 8px !important;
+        font-size: 0.8rem !important;
+      }
+      .info-table td {
+        padding: 2px 4px !important;
+      }
+      .ttd-grid {
+        margin-top: 12px !important;
+        gap: 8px !important;
+        font-size: 0.78rem !important;
+      }
+      .ttd-box {
+        padding: 6px !important;
+      }
+      .ttd-role {
+        margin-bottom: 24px !important;
       }
     }
   </style>
@@ -524,6 +569,7 @@
       <section class="card form-panel">
         <h2 data-i18n="formTitle">Form Pengajuan Surat Peringatan</h2>
         <form id="spForm">
+          <input type="hidden" id="editRecordId" />
           <div class="form-grid">
             <div class="form-group">
               <label for="noSurat" data-i18n="lblNoSurat">Nomor Surat (Otomatis)</label>
@@ -632,7 +678,6 @@
             <button type="button" class="btn-berhenti" id="berhentiBtn" data-i18n="btnBerhenti">Berhenti</button>
             <button type="button" class="btn-secondary" id="resetFormBtn" data-i18n="btnReset">Reset Form</button>
             <button type="button" class="btn-danger" id="clearStorageBtn" data-i18n="btnClear">Clear Storage</button>
-            <button type="button" class="btn-print" onclick="window.print()" data-i18n="btnPrint">PDF</button>
           </div>
 
           <div class="status-banner" id="statusBanner"></div>
@@ -682,7 +727,7 @@
 
             <p><strong data-i18n="prevPerbaikanTitle">Ketentuan &amp; Rencana Perbaikan:</strong></p>
             <p id="prevSpClauseText" style="margin-bottom: 8px;">
-              Surat Peringatan ini berlaku selama <strong>6 (enam) bulan</strong> sejak tanggal terbit (<span id="prevTglTerbit">-</span>). Selama masa berlaku, karyawan wajib menjalankan tindakan perbaikan berikut:
+              Surat Peringatan ini berlaku selama <strong>6 (enam) bulan</strong> sejak tanggal terbit (<span id="prevTglTerbit">-</span>) sampai dengan tanggal <strong id="prevTglBerakhir">-</strong>. Selama masa berlaku, karyawan wajib menjalankan tindakan perbaikan berikut:
             </p>
             <p id="prevPerbaikan" style="margin-bottom: 10px; font-style: italic;">-</p>
             <p id="prevSpFooterNote" style="font-size: 0.84rem; color: #374151;">
@@ -851,7 +896,6 @@
         btnBerhenti: "Berhenti",
         btnReset: "Reset Form",
         btnClear: "Clear Storage",
-        btnPrint: "PDF",
         previewTitle: "Preview Draft Surat Peringatan",
         prevNoLabel: "Nomor",
         prevStatusLabel: "Status",
@@ -879,13 +923,14 @@
         thAksi: "Aksi",
         btnPrev: "Sebelumnya",
         btnNext: "Berikutnya",
-        btnLihat: "Lihat",
-        btnRowPdf: "Cetak PDF",
+        btnEdit: "Edit",
+        btnRowPdf: "PDF",
         emptyNoData: "Belum ada data histori Surat Peringatan tersimpan.",
         emptyNoMatch: "Tidak ada data yang cocok dengan kata kunci pencarian.",
-        savedMsg: (tingkat, noSurat, nama) => `Data ${tingkat} (${noSurat}) untuk ${nama} berhasil disimpan.`,
-        loadedMsg: (noSurat, nama) => `Menampilkan arsip ${noSurat} milik ${nama} pada preview.`,
-        resignedMsg: (noSurat, nama) => `Draft Surat Pernyataan Keluar (${noSurat}) untuk ${nama} diproses dan disimpan.`,
+        savedMsg: (tingkat, noSurat, nama) => `Data ${tingkat} (${noSurat}) untuk ${nama} tersimpan di storage.`,
+        updatedMsg: (tingkat, noSurat, nama) => `Data ${tingkat} (${noSurat}) untuk ${nama} diperbarui di storage.`,
+        loadedMsg: (noSurat, nama) => `Data ${noSurat} milik ${nama} dimuat ke form untuk diedit.`,
+        resignedMsg: (noSurat, nama) => `Draft Surat Pernyataan Keluar (${noSurat}) untuk ${nama} diproses dan disimpan di storage.`,
         violation3Msg: (count, nama) => `Karyawan <strong>${nama}</strong> sudah memiliki <strong>${count} kali pelanggaran</strong>. Tombol <strong>Berhenti</strong> aktif untuk memproses Surat Pernyataan Keluar.`,
         confirmClear: "Hapus seluruh histori tersimpan di browser dan reset nomor urut ke 001?",
         clearedMsg: "Storage berhasil dibersihkan. Nomor surat kembali ke urutan 001.",
@@ -920,7 +965,7 @@
           "<strong>Level 1 - Pencatatan 3x Pelanggaran:</strong> Sistem memproses tombol Berhenti berdasarkan rekap pelanggaran karyawan.",
           "<strong>Level 2 - Pernyataan Keluar Karyawan:</strong> Draf pernyataan keluar disiapkan dan ditandatangani oleh Karyawan.",
           "<strong>Level 3 - Persetujuan Atasan & HRD:</strong> Ditandatangani oleh Atasan Langsung dan Pejabat HRD.",
-          "<strong>Level 4 - Arsip & Cetak PDF:</strong> Disimpan ke histori dan dapat dicetak ke PDF per baris."
+          "<strong>Level 4 - Arsip & PDF:</strong> Disimpan ke histori dan dapat dicetak ke PDF per baris."
         ]
       },
       en: {
@@ -974,7 +1019,6 @@
         btnBerhenti: "Terminate / Exit",
         btnReset: "Reset Form",
         btnClear: "Clear Storage",
-        btnPrint: "Print / PDF",
         previewTitle: "Warning Letter Draft Preview",
         prevNoLabel: "Number",
         prevStatusLabel: "Status",
@@ -1002,13 +1046,14 @@
         thAksi: "Actions",
         btnPrev: "Previous",
         btnNext: "Next",
-        btnLihat: "View",
-        btnRowPdf: "Print PDF",
+        btnEdit: "Edit",
+        btnRowPdf: "PDF",
         emptyNoData: "No warning letter history records saved yet.",
         emptyNoMatch: "No records match your search keyword.",
-        savedMsg: (tingkat, noSurat, nama) => `${tingkat} (${noSurat}) for ${nama} has been saved.`,
-        loadedMsg: (noSurat, nama) => `Showing archive ${noSurat} for ${nama} in preview.`,
-        resignedMsg: (noSurat, nama) => `Employee Exit Statement Draft (${noSurat}) for ${nama} processed and saved.`,
+        savedMsg: (tingkat, noSurat, nama) => `${tingkat} (${noSurat}) for ${nama} saved to storage.`,
+        updatedMsg: (tingkat, noSurat, nama) => `${tingkat} (${noSurat}) for ${nama} updated in storage.`,
+        loadedMsg: (noSurat, nama) => `Loaded ${noSurat} for ${nama} into the form for editing.`,
+        resignedMsg: (noSurat, nama) => `Employee Exit Statement Draft (${noSurat}) for ${nama} processed and saved to storage.`,
         violation3Msg: (count, nama) => `Employee <strong>${nama}</strong> has reached <strong>${count} violations</strong>. The <strong>Terminate / Exit</strong> button is active to process the Exit Statement Letter.`,
         confirmClear: "Delete all history saved in browser and reset sequence number to 001?",
         clearedMsg: "Storage cleared. Letter sequence reset to 001.",
@@ -1043,7 +1088,7 @@
           "<strong>Level 1 - 3 Violations Trigger:</strong> System enables the Terminate/Exit action based on recorded violations.",
           "<strong>Level 2 - Employee Exit Statement:</strong> Exit statement draft is generated and signed by the Employee.",
           "<strong>Level 3 - Supervisor & HRD Approval:</strong> Signed by Direct Supervisor and HRD Officer.",
-          "<strong>Level 4 - Archive & Row PDF:</strong> Saved to history and printable to PDF per row."
+          "<strong>Level 4 - Archive & PDF:</strong> Saved to history and printable to PDF per row."
         ]
       }
     };
@@ -1051,6 +1096,7 @@
     let currentLang = localStorage.getItem(LANG_KEY) || "id";
 
     const form = document.getElementById("spForm");
+    const editRecordIdInput = document.getElementById("editRecordId");
     const noSuratInput = document.getElementById("noSurat");
     const tingkatSelect = document.getElementById("tingkatSp");
     const tanggalTerbitInput = document.getElementById("tanggalTerbit");
@@ -1160,25 +1206,51 @@
       return `${paddedSeq}/${code}/${monthRoman}/${year}`;
     }
 
-    function formatTanggal(dateStr) {
-      if (!dateStr) return "-";
-      const parts = dateStr.split("-");
-      if (parts.length !== 3) return dateStr;
-      const year = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const day = parseInt(parts[2], 10);
+    function formatDateObj(d) {
+      const year = d.getFullYear();
+      const month = d.getMonth();
+      const day = d.getDate();
       const months = currentLang === "en" ? engMonths : indoMonths;
       return currentLang === "en"
         ? `${months[month] || ""} ${day}, ${year}`
         : `${day} ${months[month] || ""} ${year}`;
     }
 
-    function getEmployeeViolationCount(nik, nama) {
+    function formatTanggal(dateStr) {
+      if (!dateStr) return "-";
+      const parts = dateStr.split("-");
+      if (parts.length !== 3) return dateStr;
+      const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      if (isNaN(d.getTime())) return dateStr;
+      return formatDateObj(d);
+    }
+
+    function getSixMonthsEndDateFormatted(dateStr) {
+      if (!dateStr) return "-";
+      const parts = dateStr.split("-");
+      if (parts.length !== 3) return "-";
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const baseDate = new Date(year, month, day);
+      if (isNaN(baseDate.getTime())) return "-";
+
+      const targetMonth = month + 6;
+      const endDate = new Date(year, targetMonth, day);
+      // Jika tanggal hari bergeser karena jumlah hari di bulan tujuan lebih sedikit, clamp ke akhir bulan tujuan
+      if (endDate.getMonth() !== ((targetMonth % 12) + 12) % 12) {
+        endDate.setDate(0);
+      }
+      return formatDateObj(endDate);
+    }
+
+    function getEmployeeViolationCount(nik, nama, excludeId) {
       const cleanNik = (nik || "").trim().toLowerCase();
       const cleanNama = (nama || "").trim().toLowerCase();
       if (!cleanNik && !cleanNama) return 0;
 
       return spHistory.filter(item => {
+        if (excludeId && item.id === excludeId) return false;
         if (item.tingkat === "SURAT PERNYATAAN KELUAR") return false;
         const itemNik = (item.nik || "").trim().toLowerCase();
         const itemNama = (item.nama || "").trim().toLowerCase();
@@ -1191,7 +1263,8 @@
     function evaluateViolationRule() {
       const nama = document.getElementById("namaKaryawan").value.trim();
       const nik = document.getElementById("nikKaryawan").value.trim();
-      const count = getEmployeeViolationCount(nik, nama);
+      const excludeId = editRecordIdInput.value.trim();
+      const count = getEmployeeViolationCount(nik, nama, excludeId);
       const isReachedThree = count >= 3;
 
       berhentiBtn.classList.toggle("visible", isReachedThree);
@@ -1231,7 +1304,9 @@
       const jabatan = document.getElementById("jabatan").value.trim() || "-";
       const dept = document.getElementById("departemen").value.trim() || "-";
       const tglKejadian = formatTanggal(document.getElementById("tanggalKejadian").value);
-      const tglTerbit = formatTanggal(tanggalTerbitInput.value);
+      const tglTerbitRaw = tanggalTerbitInput.value;
+      const tglTerbit = formatTanggal(tglTerbitRaw);
+      const tglBerakhir6Bln = getSixMonthsEndDateFormatted(tglTerbitRaw);
       const alasan = document.getElementById("alasanPelanggaran").value || "-";
       const kronologi = document.getElementById("kronologi").value.trim() || "-";
       const perbaikan = document.getElementById("perbaikan").value.trim() || "-";
@@ -1266,20 +1341,20 @@
 
       if (currentLang === "en") {
         document.getElementById("prevSpClauseText").innerHTML =
-          `This Warning Letter is valid for <strong>6 (six) months</strong> from the issue date (<span id="prevTglTerbit">${escapeHtml(tglTerbit)}</span>). During the validity period, the employee must complete the following corrective actions:`;
+          `This Warning Letter is valid for <strong>6 (six) months</strong> from the issue date (<strong>${escapeHtml(tglTerbit)}</strong>) until <strong>${escapeHtml(tglBerakhir6Bln)}</strong>. During the validity period, the employee must complete the following corrective actions:`;
         document.getElementById("prevSpFooterNote").textContent =
           "If another violation occurs during the validity period or no improvement is made, the company may impose further disciplinary action in accordance with company regulations.";
         document.getElementById("prevResignStatement").innerHTML =
-          `The undersigned employee, with the details below, hereby declares <strong>resignation / exit</strong> from the company effective from the issue date (<span id="prevResignTglTerbit">${escapeHtml(tglTerbit)}</span>) after recording 3 violations and being processed via the Terminate/Exit action:`;
+          `The undersigned employee, with the details below, hereby declares <strong>resignation / exit</strong> from the company effective from the issue date (<strong>${escapeHtml(tglTerbit)}</strong>) after recording 3 violations and being processed via the Terminate/Exit action:`;
         document.getElementById("prevResignClosing").textContent =
           "This exit statement is made truthfully and will be followed up with administrative settlement and handover of duties/assets according to company policy.";
       } else {
         document.getElementById("prevSpClauseText").innerHTML =
-          `Surat Peringatan ini berlaku selama <strong>6 (enam) bulan</strong> sejak tanggal terbit (<span id="prevTglTerbit">${escapeHtml(tglTerbit)}</span>). Selama masa berlaku, karyawan wajib menjalankan tindakan perbaikan berikut:`;
+          `Surat Peringatan ini berlaku selama <strong>6 (enam) bulan</strong> sejak tanggal terbit (<strong>${escapeHtml(tglTerbit)}</strong>) sampai dengan tanggal <strong>${escapeHtml(tglBerakhir6Bln)}</strong>. Selama masa berlaku, karyawan wajib menjalankan tindakan perbaikan berikut:`;
         document.getElementById("prevSpFooterNote").textContent =
           "Apabila dalam masa berlaku terjadi pelanggaran kembali atau tidak ada perbaikan, perusahaan dapat menjatuhkan sanksi lanjutan sesuai peraturan perusahaan yang berlaku.";
         document.getElementById("prevResignStatement").innerHTML =
-          `Yang bertanda tangan di bawah ini, karyawan dengan data berikut, menyatakan <strong>keluar / berhenti bekerja</strong> dari perusahaan terhitung sejak tanggal terbit surat (<span id="prevResignTglTerbit">${escapeHtml(tglTerbit)}</span>) setelah tercatat melakukan pelanggaran sebanyak 3 kali dan diproses melalui tombol Berhenti:`;
+          `Yang bertanda tangan di bawah ini, karyawan dengan data berikut, menyatakan <strong>keluar / berhenti bekerja</strong> dari perusahaan terhitung sejak tanggal terbit surat (<strong>${escapeHtml(tglTerbit)}</strong>) setelah tercatat melakukan pelanggaran sebanyak 3 kali dan diproses melalui tombol Berhenti:`;
         document.getElementById("prevResignClosing").textContent =
           "Pernyataan keluar ini dibuat dengan sebenar-benarnya dan akan ditindaklanjuti dengan penyelesaian administrasi serta serah terima tugas/aset sesuai ketentuan perusahaan.";
       }
@@ -1367,8 +1442,8 @@
               <td>${escapeHtml(item.alasan)}</td>
               <td>
                 <div class="action-group">
-                  <button type="button" class="btn-secondary" style="padding:6px 10px; font-size:0.78rem;" onclick="loadRecordToForm('${escapeHtml(item.id)}')">${t().btnLihat}</button>
-                  <button type="button" class="btn-print" style="padding:6px 10px; font-size:0.78rem;" onclick="printRowPdf('${escapeHtml(item.id)}')">${t().btnRowPdf}</button>
+                  <button type="button" class="btn-secondary" style="padding:6px 10px; font-size:0.78rem;" onclick="editRecord('${escapeHtml(item.id)}')">${t().btnEdit}</button>
+                  <button type="button" class="btn-pdf" style="padding:6px 10px; font-size:0.78rem;" onclick="printRowPdf('${escapeHtml(item.id)}')">${t().btnRowPdf}</button>
                 </div>
               </td>
             </tr>
@@ -1384,7 +1459,8 @@
       nextPageBtn.disabled = currentPage >= totalPages;
     }
 
-    function populateFormFromRecord(found) {
+    function populateFormFromRecord(found, isEditMode) {
+      editRecordIdInput.value = isEditMode ? found.id : "";
       noSuratInput.value = found.noSurat;
       tingkatSelect.value = found.tingkat;
       document.getElementById("namaKaryawan").value = found.nama;
@@ -1401,10 +1477,10 @@
       syncPreview();
     }
 
-    window.loadRecordToForm = function(id) {
+    window.editRecord = function(id) {
       const found = spHistory.find(item => item.id === id);
       if (!found) return;
-      populateFormFromRecord(found);
+      populateFormFromRecord(found, true);
       statusBanner.style.display = "block";
       statusBanner.textContent = t().loadedMsg(found.noSurat, found.nama);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1413,15 +1489,15 @@
     window.printRowPdf = function(id) {
       const found = spHistory.find(item => item.id === id);
       if (!found) return;
-      populateFormFromRecord(found);
+      populateFormFromRecord(found, false);
       setTimeout(() => window.print(), 120);
     };
 
-    function buildRecordFromForm(overrideTingkat, overrideNoSurat) {
+    function buildRecordFromForm(overrideTingkat, overrideNoSurat, existingId) {
       const tingkat = overrideTingkat || tingkatSelect.value;
       const noSurat = overrideNoSurat || noSuratInput.value.trim();
       return {
-        id: "SP-" + Date.now(),
+        id: existingId || ("SP-" + Date.now()),
         noSurat,
         tingkat,
         nama: document.getElementById("namaKaryawan").value.trim(),
@@ -1438,16 +1514,19 @@
       };
     }
 
-    function clearFormInputs() {
+    function clearFormInputs(keepBanner) {
+      editRecordIdInput.value = "";
       form.reset();
-      noSuratInput.value = generateNextLetterNumber(tingkatSelect.value);
-      statusBanner.style.display = "none";
+      noSuratInput.value = generateNextLetterNumber("");
+      if (!keepBanner) {
+        statusBanner.style.display = "none";
+      }
       syncPreview();
     }
 
     form.addEventListener("input", syncPreview);
     form.addEventListener("change", function(e) {
-      if (e.target === tanggalTerbitInput || e.target === tingkatSelect) {
+      if ((e.target === tanggalTerbitInput || e.target === tingkatSelect) && !editRecordIdInput.value) {
         noSuratInput.value = generateNextLetterNumber(tingkatSelect.value);
       }
       syncPreview();
@@ -1455,18 +1534,30 @@
 
     form.addEventListener("submit", function(e) {
       e.preventDefault();
-      const record = buildRecordFromForm();
+      const existingId = editRecordIdInput.value.trim();
+      const record = buildRecordFromForm(null, null, existingId || null);
 
-      spHistory.unshift(record);
-      saveHistory();
-      currentPage = 1;
-      renderHistoryTable();
-      syncPreview();
-
-      noSuratInput.value = generateNextLetterNumber(tingkatSelect.value);
-
-      statusBanner.style.display = "block";
-      statusBanner.textContent = t().savedMsg(record.tingkat, record.noSurat, record.nama);
+      if (existingId) {
+        const idx = spHistory.findIndex(item => item.id === existingId);
+        if (idx !== -1) {
+          spHistory[idx] = record;
+        } else {
+          spHistory.unshift(record);
+        }
+        saveHistory();
+        renderHistoryTable();
+        clearFormInputs(true);
+        statusBanner.style.display = "block";
+        statusBanner.textContent = t().updatedMsg(record.tingkat, record.noSurat, record.nama);
+      } else {
+        spHistory.unshift(record);
+        saveHistory();
+        currentPage = 1;
+        renderHistoryTable();
+        clearFormInputs(true);
+        statusBanner.style.display = "block";
+        statusBanner.textContent = t().savedMsg(record.tingkat, record.noSurat, record.nama);
+      }
     });
 
     berhentiBtn.addEventListener("click", function() {
@@ -1481,39 +1572,50 @@
         tanggalTerbitInput.value = new Date().toISOString().slice(0, 10);
       }
 
-      tingkatSelect.value = "SURAT PERNYATAAN KELUAR";
-      if (!document.getElementById("alasanPelanggaran").value) {
-        document.getElementById("alasanPelanggaran").value = "Mencapai 3 kali pelanggaran dan diproses pernyataan keluar karyawan";
-      }
-      if (!document.getElementById("perbaikan").value.trim()) {
-        document.getElementById("perbaikan").value = currentLang === "en"
+      const exitTingkat = "SURAT PERNYATAAN KELUAR";
+      const exitNoSurat = generateNextLetterNumber(exitTingkat);
+      const alasan = document.getElementById("alasanPelanggaran").value || "Mencapai 3 kali pelanggaran dan diproses pernyataan keluar karyawan";
+      const perbaikan = document.getElementById("perbaikan").value.trim() || (
+        currentLang === "en"
           ? "Employee declares exit/resignation after 3 recorded violations; handover of company assets and final settlement completed."
-          : "Karyawan menyatakan keluar setelah 3 kali pelanggaran tercatat; serah terima aset dan penyelesaian administrasi dilaksanakan sesuai ketentuan.";
+          : "Karyawan menyatakan keluar setelah 3 kali pelanggaran tercatat; serah terima aset dan penyelesaian administrasi dilaksanakan sesuai ketentuan."
+      );
+
+      document.getElementById("alasanPelanggaran").value = alasan;
+      document.getElementById("perbaikan").value = perbaikan;
+      tingkatSelect.value = exitTingkat;
+      noSuratInput.value = exitNoSurat;
+
+      const existingId = editRecordIdInput.value.trim() || null;
+      const record = buildRecordFromForm(exitTingkat, exitNoSurat, existingId);
+
+      if (existingId) {
+        const idx = spHistory.findIndex(item => item.id === existingId);
+        if (idx !== -1) spHistory[idx] = record;
+        else spHistory.unshift(record);
+      } else {
+        spHistory.unshift(record);
       }
 
-      const exitNoSurat = generateNextLetterNumber("SURAT PERNYATAAN KELUAR");
-      noSuratInput.value = exitNoSurat;
-      syncPreview();
-
-      const record = buildRecordFromForm("SURAT PERNYATAAN KELUAR", exitNoSurat);
-      spHistory.unshift(record);
       saveHistory();
       currentPage = 1;
       renderHistoryTable();
+      clearFormInputs(true);
 
-      noSuratInput.value = generateNextLetterNumber(tingkatSelect.value);
       statusBanner.style.display = "block";
       statusBanner.textContent = t().resignedMsg(record.noSurat, record.nama);
     });
 
-    resetFormBtn.addEventListener("click", clearFormInputs);
+    resetFormBtn.addEventListener("click", function() {
+      clearFormInputs(false);
+    });
 
     clearStorageBtn.addEventListener("click", function() {
       if (!confirm(t().confirmClear)) return;
       localStorage.removeItem(STORAGE_KEY);
       spHistory = [];
       currentPage = 1;
-      clearFormInputs();
+      clearFormInputs(true);
       renderHistoryTable();
       statusBanner.style.display = "block";
       statusBanner.textContent = t().clearedMsg;
@@ -1607,7 +1709,7 @@
 
     loadHistory();
     applyTranslations();
-    noSuratInput.value = generateNextLetterNumber(tingkatSelect.value);
+    noSuratInput.value = generateNextLetterNumber("");
     syncPreview();
     renderHistoryTable();
   </script>
